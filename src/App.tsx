@@ -1,4 +1,4 @@
-import { FormEvent, useEffect, useState } from "react"
+import { FormEvent, useEffect, useId, useRef, useState } from "react"
 
 type Page = "home" | "shop" | "product" | "about" | "visit" | "contact"
 type Product = {
@@ -66,6 +66,267 @@ const coffees: Product[] = [
     price: 19,
     tone: "forest",
   },
+  {
+    id: 7,
+    name: "La Esperanza",
+    origin: "Cauca, Colombia",
+    process: "Fermentación asistida",
+    notes: ["Frambuesa", "Lavanda", "Ponche"],
+    price: 24,
+    tone: "roast",
+  },
+  {
+    id: 8,
+    name: "Santa Irene",
+    origin: "Huehuetenango, Guatemala",
+    process: "Semilavado",
+    notes: ["Mermelada", "Chocolate", "Sedoso"],
+    price: 20,
+    tone: "sand",
+  },
+  {
+    id: 9,
+    name: "Bensa",
+    origin: "Sidama, Etiopía",
+    process: "Natural",
+    notes: ["Arándano", "Cacao", "Vino tinto"],
+    price: 22,
+    tone: "plum",
+  },
+  {
+    id: 10,
+    name: "Kiln Oficina",
+    origin: "Brasil · Perú",
+    process: "Mezcla",
+    notes: ["Chocolate", "Nuez", "Panela"],
+    price: 14,
+    tone: "clay",
+  },
+  {
+    id: 11,
+    name: "Cápsulas Casa",
+    origin: "Brasil · Colombia",
+    process: "Mezcla",
+    notes: ["Caramelo", "Cacao", "Avellana"],
+    price: 9,
+    tone: "ochre",
+  },
+  {
+    id: 12,
+    name: "Cold Brew 22@",
+    origin: "Colombia · Etiopía",
+    process: "Mezcla",
+    notes: ["Cacao", "Naranja", "Melaza"],
+    price: 12,
+    tone: "forest",
+  },
+  {
+    id: 13,
+    name: "Pack Descubrimiento",
+    origin: "Tres orígenes, Varios",
+    process: "Lavado",
+    notes: ["Fruta", "Floral", "Chocolate"],
+    price: 32,
+    tone: "sand",
+  },
+  {
+    id: 14,
+    name: "Sitio Baixadão",
+    origin: "Sul de Minas, Brasil",
+    process: "Semilavado",
+    notes: ["Cacahuete", "Chocolate", "Caramelo"],
+    price: 16,
+    tone: "olive",
+  },
+  {
+    id: 15,
+    name: "Finca Mileydi",
+    origin: "Cajamarca, Perú",
+    process: "Fermentación asistida",
+    notes: ["Mango", "Maracuyá", "Panela"],
+    price: 23,
+    tone: "rust",
+  },
+  {
+    id: 16,
+    name: "Chelbesa",
+    origin: "Gedeb, Etiopía",
+    process: "Lavado",
+    notes: ["Bergamota", "Limón", "Té blanco"],
+    price: 20,
+    tone: "forest",
+  },
+  {
+    id: 17,
+    name: "Kochere",
+    origin: "Yirgacheffe, Etiopía",
+    process: "Lavado",
+    notes: ["Jazmín", "Limón", "Melocotón"],
+    price: 21,
+    tone: "olive",
+  },
+  {
+    id: 18,
+    name: "Las Flores",
+    origin: "Huila, Colombia",
+    process: "Natural",
+    notes: ["Fresa", "Chocolate con leche", "Ron"],
+    price: 22,
+    tone: "rust",
+  },
+  {
+    id: 19,
+    name: "Kiambu AA",
+    origin: "Kiambu, Kenya",
+    process: "Lavado",
+    notes: ["Pomelo", "Tomate dulce", "Grosella"],
+    price: 23,
+    tone: "forest",
+  },
+  {
+    id: 20,
+    name: "Santa Lucía",
+    origin: "Antigua, Guatemala",
+    process: "Lavado",
+    notes: ["Cacao", "Almendra", "Naranja"],
+    price: 17,
+    tone: "ochre",
+  },
+  {
+    id: 21,
+    name: "Volcán Azul",
+    origin: "Tarrazú, Costa Rica",
+    process: "Semilavado",
+    notes: ["Miel", "Pera", "Caña"],
+    price: 19,
+    tone: "sand",
+  },
+  {
+    id: 22,
+    name: "Kiln Nocturno",
+    origin: "Brasil · Uganda",
+    process: "Mezcla",
+    notes: ["Chocolate negro", "Melaza", "Especias"],
+    price: 15,
+    tone: "roast",
+  },
+  {
+    id: 23,
+    name: "El Mirador",
+    origin: "Nariño, Colombia",
+    process: "Fermentación asistida",
+    notes: ["Cereza", "Canela", "Panela"],
+    price: 25,
+    tone: "plum",
+  },
+  {
+    id: 24,
+    name: "Gakenke",
+    origin: "Gakenke, Ruanda",
+    process: "Natural",
+    notes: ["Mora", "Hibisco", "Cacao"],
+    price: 21,
+    tone: "plum",
+  },
+  {
+    id: 25,
+    name: "Kirinyaga",
+    origin: "Kirinyaga, Kenya",
+    process: "Lavado",
+    notes: ["Casis", "Lima", "Panela"],
+    price: 22,
+    tone: "forest",
+  },
+  {
+    id: 26,
+    name: "Cerro Azul",
+    origin: "Valle del Cauca, Colombia",
+    process: "Fermentación asistida",
+    notes: ["Uva", "Lichi", "Rosa"],
+    price: 28,
+    tone: "roast",
+  },
+  {
+    id: 27,
+    name: "Fazenda Ambiental",
+    origin: "Mogiana, Brasil",
+    process: "Natural",
+    notes: ["Cacahuete", "Cacao", "Caramelo"],
+    price: 15,
+    tone: "clay",
+  },
+  {
+    id: 28,
+    name: "Kiln Descafeinado",
+    origin: "Huila, Colombia",
+    process: "Lavado",
+    notes: ["Caramelo", "Cacao", "Manzana"],
+    price: 17,
+    tone: "sand",
+  },
+  {
+    id: 29,
+    name: "Sumatra Gayo",
+    origin: "Aceh, Indonesia",
+    process: "Semilavado",
+    notes: ["Tabaco dulce", "Cedro", "Chocolate"],
+    price: 18,
+    tone: "olive",
+  },
+  {
+    id: 30,
+    name: "Bombe",
+    origin: "Sidama, Etiopía",
+    process: "Lavado",
+    notes: ["Bergamota", "Miel", "Melocotón"],
+    price: 22,
+    tone: "ochre",
+  },
+  {
+    id: 31,
+    name: "Kiln Brunch",
+    origin: "Colombia · Etiopía",
+    process: "Mezcla",
+    notes: ["Frutos rojos", "Chocolate", "Vainilla"],
+    price: 16,
+    tone: "rust",
+  },
+  {
+    id: 32,
+    name: "Finca Hamilton",
+    origin: "Santa Bárbara, Honduras",
+    process: "Natural",
+    notes: ["Piña", "Ron", "Cacao"],
+    price: 20,
+    tone: "clay",
+  },
+  {
+    id: 33,
+    name: "Mzuzu",
+    origin: "Mzuzu, Malaui",
+    process: "Lavado",
+    notes: ["Albaricoque", "Té verde", "Azúcar"],
+    price: 19,
+    tone: "forest",
+  },
+  {
+    id: 34,
+    name: "Cold Brew Clásico",
+    origin: "Brasil · Colombia",
+    process: "Mezcla",
+    notes: ["Chocolate", "Caramelo", "Avellana"],
+    price: 11,
+    tone: "roast",
+  },
+  {
+    id: 35,
+    name: "Chirinos",
+    origin: "Cajamarca, Perú",
+    process: "Semilavado",
+    notes: ["Ciruela", "Panela", "Cacao"],
+    price: 18,
+    tone: "plum",
+  },
 ]
 
 const images = {
@@ -103,6 +364,17 @@ function BagIcon() {
   )
 }
 
+const bagColors: Record<string, { c: string; st: string; ink: string }> = {
+  rust: { c: "#b8674a", st: "#f3b391", ink: "#fff8ef" },
+  olive: { c: "#6f7a5b", st: "#cfd8a6", ink: "#fff8ef" },
+  ochre: { c: "#b98a42", st: "#f6d68a", ink: "#fff8ef" },
+  plum: { c: "#5f414a", st: "#e9a6b8", ink: "#fff8ef" },
+  clay: { c: "#33281f", st: "#e3a37f", ink: "#f3e6d4" },
+  forest: { c: "#43523f", st: "#b8d39a", ink: "#fff8ef" },
+  roast: { c: "#231b16", st: "#f08aa5", ink: "#f3e6d4" },
+  sand: { c: "#e2d2b9", st: "#f2a273", ink: "#3a2e26" },
+}
+
 function CoffeeBag({
   product,
   large = false,
@@ -110,27 +382,131 @@ function CoffeeBag({
   product: Product
   large?: boolean
 }) {
+  const uid = useId().replace(/:/g, "")
+  const col = bagColors[product.tone] ?? bagColors.rust
+  const lot = String(product.id).padStart(3, "0")
+  const roast = product.process === "Mezcla" ? 4 : product.tone === "roast" || product.tone === "plum" || product.tone === "clay" ? 3 : 2
+  const notesTxt = product.notes.join("  ·  ")
+  const nameSize = product.name.length > 15 ? 11 : product.name.length > 11 ? 13.5 : 16
+  const body = "M31 26 L169 26 C173 70 177 140 179 220 C180 250 179 268 172 276 C166 282 150 283 100 283 C50 283 34 282 28 276 C21 268 20 250 21 220 C23 140 27 70 31 26 Z"
   return (
-    <div className={`coffee-bag ${product.tone} ${large ? "large" : ""}`}>
-      <div className="bag-seal">
-        <i />
-      </div>
-      <div className="bag-head">
-        <span className="bag-brand">KILN</span>
-        <span className="bag-lot">L/{String(product.id).padStart(3, "0")}</span>
-      </div>
-      <div className="bag-label">
-        <span className="bag-type">
-          {product.process === "Mezcla" ? "MEZCLA DE LA CASA" : "CAFÉ DE ORIGEN"}
-        </span>
-        <strong>{product.name}</strong>
-        <span className="bag-origin">{product.origin}</span>
-        <span className="bag-notes">{product.notes.slice(0, 2).join(" / ")}</span>
-      </div>
-      <div className="bag-foot">
-        <span>BCN—22@</span>
-        <span>250 G</span>
-      </div>
+    <div className={`coffee-bag kb kb2 ${product.tone} ${large ? "large" : ""}`}>
+      <svg viewBox="0 0 200 290" role="img" aria-label={`Bolsa de ${product.name}`}>
+        <defs>
+          <clipPath id={`b${uid}`}><path d={body} /></clipPath>
+          <linearGradient id={`h${uid}`} x1="0" x2="1">
+            <stop offset="0" stopColor="#000" stopOpacity=".38" />
+            <stop offset=".1" stopColor="#000" stopOpacity=".08" />
+            <stop offset=".24" stopColor="#fff" stopOpacity=".2" />
+            <stop offset=".34" stopColor="#fff" stopOpacity=".06" />
+            <stop offset=".62" stopColor="#000" stopOpacity="0" />
+            <stop offset=".86" stopColor="#000" stopOpacity=".12" />
+            <stop offset="1" stopColor="#000" stopOpacity=".42" />
+          </linearGradient>
+          <linearGradient id={`v${uid}`} x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0" stopColor="#000" stopOpacity=".3" />
+            <stop offset=".08" stopColor="#000" stopOpacity="0" />
+            <stop offset=".82" stopColor="#000" stopOpacity="0" />
+            <stop offset="1" stopColor="#000" stopOpacity=".35" />
+          </linearGradient>
+          <linearGradient id={`s${uid}`} x1="0" x2="1">
+            <stop offset="0" stopColor={col.st} />
+            <stop offset="1" stopColor="#fbf4e8" />
+          </linearGradient>
+          <pattern id={`c${uid}`} width="3" height="20" patternUnits="userSpaceOnUse">
+            <rect width="1.5" height="20" fill="#000" opacity=".22" />
+            <rect x="1.5" width="1.5" height="20" fill="#fff" opacity=".1" />
+          </pattern>
+          <filter id={`n${uid}`} x="0" y="0" width="100%" height="100%">
+            <feTurbulence type="fractalNoise" baseFrequency=".85" numOctaves="2" seed={product.id} />
+            <feColorMatrix values="0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 .14 0" />
+            <feComposite in2="SourceGraphic" operator="in" />
+          </filter>
+          <linearGradient id={`t${uid}`} x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0" stopColor={col.st} stopOpacity=".55" />
+            <stop offset=".35" stopColor={col.st} stopOpacity=".12" />
+            <stop offset="1" stopColor="#fbf4e8" stopOpacity="0" />
+          </linearGradient>
+          <filter id={`w${uid}`}><feGaussianBlur stdDeviation="2.2" /></filter>
+          <filter id={`l${uid}`} x="-10%" y="-10%" width="120%" height="125%">
+            <feDropShadow dx="0" dy="1.2" stdDeviation="1.2" floodColor="#000" floodOpacity=".28" />
+          </filter>
+        </defs>
+
+        {/* cuerpo */}
+        <path d={body} fill={col.c} />
+        <g clipPath={`url(#b${uid})`}>
+          <rect width="200" height="290" fill="#fff" filter={`url(#n${uid})`} />
+          {/* arrugas y pliegues */}
+          <g filter={`url(#w${uid})`} fill="none" strokeLinecap="round">
+            <path d="M48 40 C52 90 46 150 52 230" stroke="#fff" strokeOpacity=".16" strokeWidth="5" />
+            <path d="M150 44 C146 100 154 170 148 250" stroke="#000" strokeOpacity=".16" strokeWidth="6" />
+            <path d="M30 248 C70 266 130 266 170 248" stroke="#000" strokeOpacity=".3" strokeWidth="7" />
+            <path d="M40 34 C70 44 130 44 162 34" stroke="#000" strokeOpacity=".25" strokeWidth="5" />
+            <path d="M64 236 L84 262 M136 236 L118 262" stroke="#000" strokeOpacity=".14" strokeWidth="4" />
+          </g>
+          <rect width="200" height="290" fill={`url(#h${uid})`} />
+          <rect width="200" height="290" fill={`url(#v${uid})`} />
+        </g>
+
+        {/* cierre termosellado */}
+        <path d="M29 6 L171 6 L170 28 L30 28 Z" fill={col.c} />
+        <path d="M29 6 L171 6 L170 28 L30 28 Z" fill={`url(#c${uid})`} />
+        <path d="M29 6 L171 6 L170 28 L30 28 Z" fill={`url(#h${uid})`} />
+        <line x1="30" y1="28" x2="170" y2="28" stroke="#000" strokeOpacity=".3" />
+        <circle cx="100" cy="15" r="3.2" fill="#000" fillOpacity=".55" />
+        <path d="M30 18 l5 -2 v4 Z M170 18 l-5 -2 v4 Z" fill="#000" fillOpacity=".4" />
+
+        {/* marca impresa */}
+        <g fill={col.ink} fontFamily="Quicksand, sans-serif" textAnchor="middle">
+          <text x="100" y="64" fontSize="28" fontWeight="700" letterSpacing="2">kiln</text>
+          <text x="100" y="77" fontSize="5.4" fontWeight="700" letterSpacing="2.4" opacity=".75">TOSTADORES · POBLENOU</text>
+          <circle cx="100" cy="90" r="4.5" fill="none" stroke={col.ink} strokeOpacity=".6" />
+          <path d="M100 93c-1.8 0-2.7-1.4-2.2-2.7.4-.9 1.3-1.3 1.3-2.7 1.4.9 2.7 2.2 2.7 3.6 0 1-.9 1.8-1.8 1.8Z" fill={col.st} />
+        </g>
+
+        {/* etiqueta troquelada en arco */}
+        <g filter={`url(#l${uid})`}>
+          <path d="M40 244 V138 A60 32 0 0 1 160 138 V244 Z" fill="#fbf4e8" />
+        </g>
+        <path d="M40 244 V138 A60 32 0 0 1 160 138 V244 Z" fill={`url(#t${uid})`} />
+        <path d="M44.5 239.5 V139 A55.5 28.5 0 0 1 155.5 139 V239.5 Z" fill="none" stroke="#3a2e26" strokeOpacity=".35" strokeWidth=".6" />
+        <path d="M47 237 V139.5 A53 26.5 0 0 1 153 139.5 V237 Z" fill="none" stroke="#3a2e26" strokeOpacity=".2" strokeWidth=".4" />
+        <path id={`a${uid}`} d="M56 142 A44 21 0 0 1 144 142" fill="none" />
+        <g fontFamily="Quicksand, sans-serif" fill="#3a2e26" textAnchor="middle">
+          <text fontSize="5.2" fontWeight="700" letterSpacing="1.8" opacity=".75">
+            <textPath href={`#a${uid}`} startOffset="50%">{product.process === "Mezcla" ? "MEZCLA DE LA CASA" : "CAFÉ DE ORIGEN"}</textPath>
+          </text>
+          <circle cx="100" cy="141" r="6.5" fill={col.c} />
+          <text x="100" y="143.6" fontSize="7" fontWeight="700" fill={col.ink}>K</text>
+          <text x="100" y="166" fontSize={nameSize} fontWeight="700" letterSpacing="-.2">{product.name}</text>
+          <text x="100" y="177" fontSize="6.2" fontWeight="600" opacity=".7">{product.origin}</text>
+          <g opacity=".45" stroke="#3a2e26" strokeWidth=".6">
+            <line x1="62" y1="185" x2="94" y2="185" />
+            <line x1="106" y1="185" x2="138" y2="185" />
+          </g>
+          <rect x="97.6" y="182.6" width="4.8" height="4.8" transform="rotate(45 100 185)" fill={col.c} />
+          <text x="100" y="198" fontSize={notesTxt.length > 36 ? 4.8 : 5.6} fontWeight="700" fill="#9a4f35">{notesTxt}</text>
+          <line x1="47" y1="207" x2="153" y2="207" stroke="#3a2e26" strokeOpacity=".2" strokeWidth=".6" />
+          <line x1="82" y1="211" x2="82" y2="233" stroke="#3a2e26" strokeOpacity=".2" strokeWidth=".6" />
+          <line x1="118" y1="211" x2="118" y2="233" stroke="#3a2e26" strokeOpacity=".2" strokeWidth=".6" />
+          <g fontSize="4.2" fontWeight="700" letterSpacing="1" opacity=".55">
+            <text x="64.5" y="217">PROCESO</text>
+            <text x="100" y="217">TUESTE</text>
+            <text x="135.5" y="217">LOTE</text>
+          </g>
+          <text x="64.5" y="228" fontSize={product.process.length > 10 ? 4.4 : 6} fontWeight="700">{product.process}</text>
+          {[0, 1, 2, 3, 4].map((k) => (
+            <circle key={k} cx={92 + k * 4} cy="226" r="1.4" fill={k < roast ? "#3a2e26" : "none"} stroke="#3a2e26" strokeWidth=".5" />
+          ))}
+          <text x="135.5" y="228" fontSize="6" fontWeight="700">Nº {lot}</text>
+        </g>
+        <path d="M40 244 V138 A60 32 0 0 1 160 138 V244 Z" fill={`url(#h${uid})`} opacity=".3" />
+        <text x="100" y="256" fontFamily="Quicksand, sans-serif" fontSize="6.4" fontWeight="700" letterSpacing="1.5" textAnchor="middle" fill={col.ink} opacity=".8">250 g · GRANO ENTERO</text>
+
+
+        <text x="100" y="270" fontFamily="Quicksand, sans-serif" fontSize="5.4" fontWeight="700" letterSpacing="2" textAnchor="middle" fill={col.ink} opacity=".6">BARCELONA · 22@</text>
+      </svg>
     </div>
   )
 }
@@ -167,16 +543,16 @@ function App() {
     navigate("product")
   }
 
-  const addToCart = (product: Product, size = "250g") => {
+  const addToCart = (product: Product, size = "250g", qty = 1) => {
     setCart((current) => {
       const found = current.find(
         (item) => item.product.id === product.id && item.size === size,
       )
       return found
         ? current.map((item) =>
-            item === found ? { ...item, qty: item.qty + 1 } : item,
+            item === found ? { ...item, qty: item.qty + qty } : item,
           )
-        : [...current, { product, qty: 1, size }]
+        : [...current, { product, qty, size }]
     })
     setCartOpen(true)
   }
@@ -225,6 +601,7 @@ function App() {
         menuOpen={menuOpen}
         onMenu={() => setMenuOpen(!menuOpen)}
         onNavigate={navigate}
+        onFilter={(f) => { setFilter(f); navigate("shop") }}
         onCart={() => setCartOpen(true)}
       />
 
@@ -249,6 +626,7 @@ function App() {
             product={activeProduct}
             onAdd={addToCart}
             onNavigate={navigate}
+            onProduct={openProduct}
           />
         )}
         {page === "about" && <About onNavigate={navigate} />}
@@ -287,8 +665,10 @@ function Header({
   menuOpen,
   onMenu,
   onNavigate,
+  onFilter,
   onCart,
 }: {
+  onFilter: (f: string) => void
   dark: boolean
   page: Page
   cartCount: number
@@ -300,6 +680,31 @@ function Header({
   const [scrolled, setScrolled] = useState(false)
   const [hidden, setHidden] = useState(false)
   const [progress, setProgress] = useState(0)
+  const [coffeeOpen, setCoffeeOpen] = useState(false)
+  const coffeeRef = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    if (!coffeeOpen) return
+    const close = (e: MouseEvent) => {
+      if (!coffeeRef.current?.contains(e.target as Node)) setCoffeeOpen(false)
+    }
+    const esc = (e: KeyboardEvent) => e.key === "Escape" && setCoffeeOpen(false)
+    document.addEventListener("mousedown", close)
+    document.addEventListener("keydown", esc)
+    return () => {
+      document.removeEventListener("mousedown", close)
+      document.removeEventListener("keydown", esc)
+    }
+  }, [coffeeOpen])
+
+  useEffect(() => { if (hidden) setCoffeeOpen(false) }, [hidden])
+
+  const coffeeMenu = [
+    { title: "Todo el café", items: ["Todos", "Cápsulas", "Para la oficina", "Packs de descubrimiento", "Suscripción en casa"] },
+    { title: "Por método", items: ["Filtro", "Espresso", "Prensa francesa", "Cafetera de goteo", "Cold brew y concentrado"] },
+    { title: "Por proceso", items: ["Lavado", "Semilavado", "Fermentación asistida", "Natural"] },
+    { title: "Por colección", items: ["Cafés de la casa", "Selección de temporada", "Microlotes", "Edición Poblenou"] },
+  ]
 
   useEffect(() => {
     let lastY = window.scrollY
@@ -330,12 +735,33 @@ function Header({
         className={`site-header ${dark && !scrolled ? "on-dark" : ""} ${scrolled ? "is-scrolled" : ""} ${hidden ? "is-hidden" : ""}`}
       >
         <nav className="desktop-nav" aria-label="Navegación principal">
-          <button
-            className={page === "shop" ? "active" : ""}
-            onClick={() => onNavigate("shop")}
-          >
-            Café
-          </button>
+          <div className="coffee-menu-wrap" ref={coffeeRef}>
+            <button
+              className={page === "shop" || coffeeOpen ? "active" : ""}
+              onClick={() => setCoffeeOpen(!coffeeOpen)}
+              aria-expanded={coffeeOpen}
+              aria-haspopup="true"
+            >
+              Café
+            </button>
+            <div className={`coffee-menu ${coffeeOpen ? "open" : ""}`} role="menu">
+              {coffeeMenu.map((col) => (
+                <div key={col.title} className="coffee-menu-col">
+                  <p>{col.title}</p>
+                  {col.items.map((item) => (
+                    <a
+                      key={item}
+                      href="#"
+                      role="menuitem"
+                      onClick={(e) => { e.preventDefault(); setCoffeeOpen(false); onFilter(item) }}
+                    >
+                      {item}
+                    </a>
+                  ))}
+                </div>
+              ))}
+            </div>
+          </div>
           <button
             className={page === "shop" ? "active" : ""}
             onClick={() => onNavigate("shop")}
@@ -449,13 +875,12 @@ function Home({
             { c: coffees[5], badge: "Nuevo", tone: "d0", line: "Cítrico y sedoso" },
             { c: coffees[1], badge: "Edición limitada", tone: "d1", line: "Jugoso y vibrante" },
             { c: coffees[3], badge: "Vuelve", tone: "d2", line: "Dulce y profundo" },
-          ].map(({ c, badge, tone, line }, i) => (
+          ].map(({ c, badge, tone, line }) => (
             <article key={c.id} className={`k-drop-card ${tone}`} onClick={() => onProduct(c)} role="button" tabIndex={0} onKeyDown={(e) => e.key === "Enter" && onProduct(c)}>
-              <div className="k-drop-top">
-                <span className="k-pill">{badge}</span>
-                <span className="k-drop-idx">0{i + 1}</span>
+              <div className="ks-tags">
+                <span className="ks-tag new">{badge}</span>
+                <span className={`ks-tag ${tagTone[coffeeMeta[c.id].collection]}`}>{coffeeMeta[c.id].collection}</span>
               </div>
-              <span className="k-drop-back" aria-hidden="true">{c.origin.split(",")[1]?.trim() ?? c.origin}</span>
               <div className="k-drop-bag"><CoffeeBag product={c} /></div>
               <ul className="k-drop-notes">{c.notes.map((n) => <li key={n}>{n}</li>)}</ul>
               <div className="k-drop-info">
@@ -483,7 +908,7 @@ function Home({
         <div className="k-cards">
           {[coffees[0], coffees[4], coffees[3], coffees[1]].map((c) => (
             <article key={c.id} className="k-card" onClick={() => onProduct(c)} role="button" tabIndex={0} onKeyDown={(e) => e.key === "Enter" && onProduct(c)}>
-              <div className="k-card-visual"><CoffeeBag product={c} /></div>
+              <div className="k-card-visual"><Tags product={c} /><CoffeeBag product={c} /></div>
               <div className="k-card-body">
                 <div className="k-card-top">
                   <span>{c.origin}</span>
@@ -675,7 +1100,13 @@ function HomeHero({ onNavigate, onProduct }: { onNavigate: (p: Page) => void; on
           <div className="hm-hero-haze" />
           <div className="hm-hero-center">
             <p className="hm-slide-tag">{sl.tag}</p>
-            <h2 className="hm-slide-title">{sl.title}</h2>
+            <h2 className="hm-slide-title" aria-label={sl.title}>
+              {sl.title.split(" ").map((w, wi) => (
+                <span key={wi} className="hm-word" aria-hidden="true">
+                  {w.split("").map((ch, ci) => <span key={ci} className="hm-char">{ch}</span>)}
+                </span>
+              ))}
+            </h2>
             <button className="hm-slide-cta" onClick={sl.go} tabIndex={i === index ? 0 : -1}>
               {sl.cta} <Arrow />
             </button>
@@ -715,6 +1146,84 @@ function HomeNewsletter() {
   )
 }
 
+type Meta = {
+  methods: string[]
+  collection: string
+  formats: string[]
+  isNew?: boolean
+  best?: boolean
+  added: number
+}
+
+const coffeeMeta: Record<number, Meta> = {
+  1: { methods: ["Filtro", "Espresso", "Prensa francesa", "Cafetera de goteo"], collection: "Cafés de la casa", formats: ["Grano", "Para la oficina", "Suscripción en casa"], best: true, added: 1 },
+  2: { methods: ["Filtro", "Cafetera de goteo"], collection: "Selección de temporada", formats: ["Grano", "Packs de descubrimiento"], isNew: true, added: 7 },
+  3: { methods: ["Filtro", "Cold brew y concentrado"], collection: "Microlotes", formats: ["Grano", "Packs de descubrimiento"], isNew: true, added: 8 },
+  4: { methods: ["Espresso", "Prensa francesa"], collection: "Selección de temporada", formats: ["Grano", "Cápsulas"], added: 4 },
+  5: { methods: ["Espresso", "Prensa francesa", "Cafetera de goteo"], collection: "Cafés de la casa", formats: ["Grano", "Cápsulas", "Para la oficina", "Suscripción en casa"], best: true, added: 2 },
+  6: { methods: ["Filtro", "Espresso"], collection: "Edición Poblenou", formats: ["Grano", "Suscripción en casa"], added: 3 },
+  7: { methods: ["Filtro", "Espresso", "Cold brew y concentrado"], collection: "Microlotes", formats: ["Grano"], isNew: true, added: 9 },
+  8: { methods: ["Filtro", "Cafetera de goteo"], collection: "Edición Poblenou", formats: ["Grano", "Packs de descubrimiento"], isNew: true, added: 6 },
+  9: { methods: ["Filtro", "Prensa francesa"], collection: "Microlotes", formats: ["Grano", "Packs de descubrimiento"], isNew: true, added: 10 },
+  10: { methods: ["Espresso", "Cafetera de goteo"], collection: "Cafés de la casa", formats: ["Grano", "Para la oficina", "Cápsulas", "Suscripción en casa"], best: true, added: 2 },
+  11: { methods: ["Espresso"], collection: "Cafés de la casa", formats: ["Cápsulas", "Para la oficina", "Suscripción en casa"], added: 3 },
+  12: { methods: ["Cold brew y concentrado"], collection: "Edición Poblenou", formats: ["Para la oficina"], isNew: true, added: 11 },
+  13: { methods: ["Filtro", "Espresso", "Prensa francesa"], collection: "Selección de temporada", formats: ["Packs de descubrimiento", "Suscripción en casa"], isNew: true, added: 12 },
+  14: { methods: ["Espresso", "Prensa francesa", "Cafetera de goteo"], collection: "Cafés de la casa", formats: ["Grano", "Cápsulas", "Para la oficina"], added: 1 },
+  15: { methods: ["Filtro", "Cold brew y concentrado"], collection: "Microlotes", formats: ["Grano"], isNew: true, added: 13 },
+  16: { methods: ["Filtro", "Cafetera de goteo"], collection: "Selección de temporada", formats: ["Grano", "Packs de descubrimiento", "Suscripción en casa"], added: 5 },
+  17: { methods: ["Filtro", "Cafetera de goteo"], collection: "Selección de temporada", formats: ["Grano", "Packs de descubrimiento"], added: 0 },
+  18: { methods: ["Filtro", "Espresso"], collection: "Microlotes", formats: ["Grano"], added: 1 },
+  19: { methods: ["Filtro", "Cold brew y concentrado"], collection: "Selección de temporada", formats: ["Grano", "Suscripción en casa"], added: 2 },
+  20: { methods: ["Espresso", "Prensa francesa", "Cafetera de goteo"], collection: "Cafés de la casa", formats: ["Grano", "Para la oficina", "Suscripción en casa"], added: 3 },
+  21: { methods: ["Filtro", "Espresso"], collection: "Selección de temporada", formats: ["Grano", "Packs de descubrimiento"], added: 4 },
+  22: { methods: ["Espresso", "Prensa francesa"], collection: "Cafés de la casa", formats: ["Grano", "Cápsulas", "Para la oficina"], best: true, added: 5 },
+  23: { methods: ["Filtro", "Espresso"], collection: "Microlotes", formats: ["Grano"], added: 6 },
+  24: { methods: ["Filtro", "Prensa francesa"], collection: "Edición Poblenou", formats: ["Grano", "Packs de descubrimiento"], added: 7 },
+  25: { methods: ["Filtro", "Cafetera de goteo"], collection: "Microlotes", formats: ["Grano"], added: 8 },
+  26: { methods: ["Filtro"], collection: "Microlotes", formats: ["Grano", "Packs de descubrimiento"], added: 9 },
+  27: { methods: ["Espresso", "Prensa francesa", "Cafetera de goteo", "Cold brew y concentrado"], collection: "Cafés de la casa", formats: ["Grano", "Cápsulas", "Para la oficina", "Suscripción en casa"], best: true, added: 10 },
+  28: { methods: ["Espresso", "Filtro", "Cafetera de goteo"], collection: "Cafés de la casa", formats: ["Grano", "Cápsulas", "Suscripción en casa"], added: 11 },
+  29: { methods: ["Prensa francesa", "Espresso"], collection: "Selección de temporada", formats: ["Grano", "Para la oficina"], added: 12 },
+  30: { methods: ["Filtro", "Cold brew y concentrado"], collection: "Edición Poblenou", formats: ["Grano", "Packs de descubrimiento"], added: 20 },
+  31: { methods: ["Espresso", "Filtro", "Cafetera de goteo"], collection: "Edición Poblenou", formats: ["Grano", "Cápsulas", "Suscripción en casa"], best: true, added: 21 },
+  32: { methods: ["Filtro", "Prensa francesa"], collection: "Selección de temporada", formats: ["Grano", "Suscripción en casa"], added: 22 },
+  33: { methods: ["Filtro", "Cafetera de goteo"], collection: "Selección de temporada", formats: ["Grano", "Packs de descubrimiento"], added: 23 },
+  34: { methods: ["Cold brew y concentrado"], collection: "Cafés de la casa", formats: ["Para la oficina", "Suscripción en casa"], added: 24 },
+  35: { methods: ["Espresso", "Prensa francesa", "Cafetera de goteo"], collection: "Edición Poblenou", formats: ["Grano", "Cápsulas", "Para la oficina"], added: 25 },
+}
+
+const filterGroups: { key: string; label: string; options: string[]; get: (p: Product) => string[] }[] = [
+  { key: "method", label: "Método", options: ["Filtro", "Espresso", "Prensa francesa", "Cafetera de goteo", "Cold brew y concentrado"], get: (p) => coffeeMeta[p.id].methods },
+  { key: "process", label: "Proceso", options: ["Lavado", "Semilavado", "Fermentación asistida", "Natural", "Mezcla"], get: (p) => [p.process] },
+  { key: "collection", label: "Colección", options: ["Cafés de la casa", "Selección de temporada", "Microlotes", "Edición Poblenou"], get: (p) => [coffeeMeta[p.id].collection] },
+  { key: "format", label: "Formato", options: ["Cápsulas", "Para la oficina", "Packs de descubrimiento", "Suscripción en casa"], get: (p) => coffeeMeta[p.id].formats },
+]
+
+const tagTone: Record<string, string> = {
+  Novedad: "new",
+  "Más vendido": "best",
+  "Cafés de la casa": "house",
+  "Selección de temporada": "season",
+  Microlotes: "micro",
+  "Edición Poblenou": "poble",
+}
+
+function tagsFor(p: Product) {
+  const m = coffeeMeta[p.id]
+  return [m.isNew ? "Novedad" : m.best ? "Más vendido" : null, m.collection].filter(Boolean) as string[]
+}
+
+function Tags({ product }: { product: Product }) {
+  return (
+    <div className="ks-tags">
+      {tagsFor(product).map((t) => (
+        <span key={t} className={`ks-tag ${tagTone[t] ?? ""}`}>{t}</span>
+      ))}
+    </div>
+  )
+}
+
 function ProductCard({
   product,
   onOpen,
@@ -724,53 +1233,118 @@ function ProductCard({
   onOpen: (p: Product) => void
   onAdd: (p: Product) => void
 }) {
-  const tilt = (event: React.PointerEvent<HTMLButtonElement>) => {
-    const rect = event.currentTarget.getBoundingClientRect()
-    const x = (event.clientX - rect.left) / rect.width - 0.5
-    const y = (event.clientY - rect.top) / rect.height - 0.5
-    event.currentTarget.style.setProperty("--tilt-x", `${x * 7}deg`)
-    event.currentTarget.style.setProperty("--tilt-y", `${y * -7}deg`)
-    event.currentTarget.style.setProperty("--move-x", `${x * 10}px`)
-    event.currentTarget.style.setProperty("--move-y", `${y * 10}px`)
-  }
-  const resetTilt = (event: React.PointerEvent<HTMLButtonElement>) => {
-    event.currentTarget.style.removeProperty("--tilt-x")
-    event.currentTarget.style.removeProperty("--tilt-y")
-    event.currentTarget.style.removeProperty("--move-x")
-    event.currentTarget.style.removeProperty("--move-y")
-  }
-
   return (
-    <article className="product-card">
-      <button
-        className={`product-image ${product.tone}`}
-        onClick={() => onOpen(product)}
-        onPointerMove={tilt}
-        onPointerLeave={resetTilt}
-        aria-label={`Ver ${product.name}`}
-      >
-        <span className="product-code">K/{String(product.id).padStart(2, "0")}</span>
+    <article className="ks-card">
+      <button className={`ks-visual ${product.tone}`} onClick={() => onOpen(product)} aria-label={`Ver ${product.name}`}>
+        <Tags product={product} />
         <CoffeeBag product={product} />
-        <span className="product-profile">{product.process} · 250 G</span>
-        <span className="quick-view">
-          Ver café <Arrow />
-        </span>
       </button>
-      <div className="product-card-info">
-        <button className="product-name" onClick={() => onOpen(product)}>
-          {product.name}
-        </button>
-        <span>Desde {product.price} €</span>
-        <p>{product.origin}</p>
-        <button
-          className="round-add"
-          onClick={() => onAdd(product)}
-          aria-label={`Añadir ${product.name} a la cesta`}
-        >
-          Añadir
-        </button>
+      <div className="ks-info">
+        <div>
+          <button className="ks-name" onClick={() => onOpen(product)}>{product.name}</button>
+          <p className="ks-origin">{product.origin} · {product.process}</p>
+          <p className="ks-notes">{product.notes.join(" + ")}</p>
+        </div>
+        <div className="ks-buy">
+          <span>{product.price} €</span>
+          <button onClick={() => onAdd(product)} aria-label={`Añadir ${product.name} a la cesta`}>Añadir</button>
+        </div>
       </div>
     </article>
+  )
+}
+
+function ShopFeatured({ onProduct }: { onProduct: (p: Product) => void }) {
+  const items = [...coffees].filter((c) => coffeeMeta[c.id].isNew).sort((a, b) => coffeeMeta[b.id].added - coffeeMeta[a.id].added)
+  const [i, setI] = useState(0)
+  const [paused, setPaused] = useState(false)
+  const go = (d: number) => setI((v) => (v + d + items.length) % items.length)
+  const cur = items[i]
+
+  return (
+    <section className="ks-featured">
+      <p className="ks-kicker">Novedades en la colección</p>
+      <div className="ks-stage">
+        {items.map((c, n) => {
+          const half = Math.floor(items.length / 2)
+          const off = ((n - i + items.length + half) % items.length) - half
+          return (
+            <button
+              key={c.id}
+              className={`ks-slide ${c.tone} ${off === 0 ? "active" : ""} ${Math.abs(off) > 3 ? "far" : ""}`}
+              style={{ "--off": off } as React.CSSProperties}
+              onMouseEnter={off === 0 ? () => setPaused(true) : undefined}
+              onMouseLeave={() => setPaused(false)}
+              onClick={() => (off === 0 ? onProduct(c) : (setPaused(false), setI(n)))}
+              aria-label={off === 0 ? `Ver ${c.name}` : `Mostrar ${c.name}`}
+              tabIndex={Math.abs(off) > 2 ? -1 : 0}
+            >
+              <Tags product={c} />
+              <CoffeeBag product={c} />
+            </button>
+          )
+        })}
+        <button className="hm-arrow prev ks-arrow" onClick={() => go(-1)} aria-label="Anterior">
+          <svg viewBox="0 0 24 48"><path d="M20 4L4 24l16 20" /></svg>
+        </button>
+        <button className="hm-arrow next ks-arrow" onClick={() => go(1)} aria-label="Siguiente">
+          <svg viewBox="0 0 24 48"><path d="M4 4l16 20L4 44" /></svg>
+        </button>
+      </div>
+      <div className={`ks-dots ${paused ? "paused" : ""}`}>
+        {items.map((c, n) => (
+          <button key={c.id} className={n === i ? "on" : ""} onClick={() => { setPaused(false); setI(n) }} aria-label={`Ir a ${c.name}`}>
+            <i key={n === i ? `on-${i}` : "off"} onAnimationEnd={n === i ? () => go(1) : undefined} />
+          </button>
+        ))}
+      </div>
+      <div className="ks-feat-meta">
+        <p>{cur.notes.join(" + ")}</p>
+      </div>
+      <h2 key={cur.id} className="ks-feat-title">{cur.origin.split(",").pop()?.trim()} — {cur.name}</h2>
+      <button className="k-btn light ks-feat-cta" onClick={() => onProduct(cur)}>Descubrir este café <Arrow /></button>
+    </section>
+  )
+}
+
+const sortOptions = [
+  { value: "featured", label: "Destacados" },
+  { value: "new", label: "Novedades" },
+  { value: "price-asc", label: "Precio: menor a mayor" },
+  { value: "price-desc", label: "Precio: mayor a menor" },
+  { value: "name", label: "Nombre A–Z" },
+]
+
+function SortMenu({ value, onChange }: { value: string; onChange: (v: string) => void }) {
+  const [open, setOpen] = useState(false)
+  const ref = useRef<HTMLDivElement>(null)
+  useEffect(() => {
+    if (!open) return
+    const close = (e: MouseEvent) => { if (!ref.current?.contains(e.target as Node)) setOpen(false) }
+    const esc = (e: KeyboardEvent) => e.key === "Escape" && setOpen(false)
+    document.addEventListener("mousedown", close)
+    document.addEventListener("keydown", esc)
+    return () => { document.removeEventListener("mousedown", close); document.removeEventListener("keydown", esc) }
+  }, [open])
+  const current = sortOptions.find((o) => o.value === value) ?? sortOptions[0]
+  return (
+    <div className="ks-sort" ref={ref}>
+      <span className="ks-sort-label">Ordenar por</span>
+      <button className={`ks-sort-btn ${open ? "open" : ""}`} onClick={() => setOpen(!open)} aria-haspopup="listbox" aria-expanded={open}>
+        {current.label}
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m6 9 6 6 6-6" /></svg>
+      </button>
+      <ul className={`ks-sort-menu ${open ? "open" : ""}`} role="listbox">
+        {sortOptions.map((o) => (
+          <li key={o.value}>
+            <button role="option" aria-selected={o.value === value} className={o.value === value ? "on" : ""} onClick={() => { onChange(o.value); setOpen(false) }}>
+              {o.label}
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m5 12 5 5 9-10" /></svg>
+            </button>
+          </li>
+        ))}
+      </ul>
+    </div>
   )
 }
 
@@ -785,51 +1359,137 @@ function Shop({
   onProduct: (p: Product) => void
   onAdd: (p: Product) => void
 }) {
+  const [selected, setSelected] = useState<Record<string, string[]>>({})
+  const [sort, setSort] = useState("featured")
+  const [panel, setPanel] = useState(false)
+  const gridRef = useRef<HTMLDivElement>(null)
+
+  // Sincroniza la selección que llega desde el menú de la navbar
+  useEffect(() => {
+    const group = filterGroups.find((g) => g.options.includes(filter))
+    setSelected(group ? { [group.key]: [filter] } : {})
+    if (group) window.setTimeout(() => gridRef.current?.scrollIntoView({ behavior: "smooth", block: "start" }), 450)
+  }, [filter])
+
+  const toggle = (key: string, opt: string) =>
+    setSelected((s) => {
+      const cur = s[key] ?? []
+      const next = cur.includes(opt) ? cur.filter((o) => o !== opt) : [...cur, opt]
+      return { ...s, [key]: next }
+    })
+  const clear = () => { setSelected({}); setFilter("Todos") }
+
+  const active = filterGroups.flatMap((g) => (selected[g.key] ?? []).map((o) => ({ key: g.key, o })))
+  const list = coffees
+    .filter((p) => filterGroups.every((g) => {
+      const sel = selected[g.key] ?? []
+      return sel.length === 0 || g.get(p).some((v) => sel.includes(v))
+    }))
+    .sort((a, b) => {
+      if (sort === "price-asc") return a.price - b.price
+      if (sort === "price-desc") return b.price - a.price
+      if (sort === "new") return coffeeMeta[b.id].added - coffeeMeta[a.id].added
+      if (sort === "name") return a.name.localeCompare(b.name)
+      return Number(!!coffeeMeta[b.id].best) - Number(!!coffeeMeta[a.id].best)
+    })
+
   return (
-    <div className="page-shell shop-page">
-      <section className="page-intro">
-        <p className="eyebrow">Tostado cada semana · Poblenou / BCN</p>
-        <h1>
-          Café para
-          <br />
-          <em>tu momento.</em>
-        </h1>
-        <p>
-          Lotes de temporada y un café de la casa que siempre está. Todos
-          tostados para encontrar dulzor, claridad y equilibrio.
-        </p>
-      </section>
-      <div className="shop-toolbar">
-        <span>{coffees.length} cafés</span>
-        <div className="filters">
-          {["Todos", "Filtro", "Espresso"].map((item) => (
-            <button
-              key={item}
-              className={filter === item ? "active" : ""}
-              onClick={() => setFilter(item)}
-            >
-              {item}
+    <div className="ks-page">
+      <ShopFeatured onProduct={onProduct} />
+
+      <section className="ks-all" ref={gridRef}>
+        <div className="ks-head">
+          <div>
+            <span className="k-tag">Tostado cada semana · Poblenou</span>
+            <h1>Todo el café</h1>
+            <p>Café de especialidad recién tostado para espresso o filtro.</p>
+          </div>
+          <div className="ks-controls">
+            <SortMenu value={sort} onChange={setSort} />
+            <button className={`ks-filter-btn ${panel ? "open" : ""}`} onClick={() => setPanel(!panel)} aria-expanded={panel}>
+              Filtros{active.length > 0 && <b>{active.length}</b>}
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m6 9 6 6 6-6" /></svg>
             </button>
-          ))}
+          </div>
         </div>
-      </div>
-      <section className="shop-grid">
-        {coffees.map((coffee) => (
-          <ProductCard
-            key={coffee.id}
-            product={coffee}
-            onOpen={onProduct}
-            onAdd={onAdd}
-          />
-        ))}
+
+        <div className={`ks-panel ${panel ? "open" : ""}`}>
+          <div className="ks-panel-inner">
+            {filterGroups.map((g) => (
+              <div key={g.key} className="ks-group">
+                <p>{g.label}</p>
+                {g.options.map((o) => {
+                  const on = (selected[g.key] ?? []).includes(o)
+                  const count = coffees.filter((p) => g.get(p).includes(o)).length
+                  return (
+                    <button key={o} className={on ? "on" : ""} onClick={() => toggle(g.key, o)} disabled={count === 0}>
+                      <i aria-hidden="true" />{o}<small>{count}</small>
+                    </button>
+                  )
+                })}
+              </div>
+            ))}
+          </div>
+        </div>
+
+        <div className="ks-active">
+          <span>{list.length} {list.length === 1 ? "café" : "cafés"}</span>
+          {active.map(({ key, o }) => (
+            <button key={key + o} onClick={() => toggle(key, o)}>{o} <span aria-hidden="true">×</span></button>
+          ))}
+          {active.length > 0 && <button className="ks-clear" onClick={clear}>Limpiar filtros</button>}
+        </div>
+
+        {list.length > 0 ? (
+          <div className="ks-grid">
+            {list.map((c) => (
+              <ProductCard key={c.id} product={c} onOpen={onProduct} onAdd={onAdd} />
+            ))}
+          </div>
+        ) : (
+          <div className="ks-empty">
+            <p>Ningún café coincide con estos filtros.</p>
+            <button className="k-btn" onClick={clear}>Ver todo el café <Arrow /></button>
+          </div>
+        )}
       </section>
-      <section className="shipping-note">
-        <span>TOSTADO BAJO PEDIDO</span>
-        <p>
-          Los pedidos realizados hasta el lunes se tuestan y salen el martes. El
-          resto viaja con el tueste del viernes.
-        </p>
+
+      <section className="ks-note">
+        <span className="k-tag">Tostado bajo pedido</span>
+        <p>Los pedidos hasta el lunes se tuestan y salen el martes. El resto viaja con el tueste del viernes.</p>
       </section>
+    </div>
+  )
+}
+
+function productDetails(p: Product) {
+  const n = p.id
+  const farms = ["Familia Rodríguez", "Cooperativa local", "Finca de altura", "Colectivo de pequeños productores", "Familia Mutua", "Estación de lavado comunitaria"]
+  const varieties = ["Caturra y Castillo", "SL28 y SL34", "Heirloom etíope", "Bourbon rojo", "Catuaí y Mundo Novo", "Geisha", "Pacamara", "Typica"]
+  const alt = 1400 + ((n * 137) % 700)
+  const isBlend = p.process === "Mezcla"
+  return {
+    producer: isBlend ? "Varios productores" : farms[n % farms.length],
+    variety: isBlend ? "Mezcla de varietales" : varieties[n % varieties.length],
+    altitude: `${alt}–${alt + 200} m`,
+    harvest: ["Octubre – Enero", "Noviembre – Febrero", "Mayo – Agosto"][n % 3],
+    story: isBlend
+      ? `${p.name} es nuestra respuesta al café de cada día: orígenes que se complementan para dar una taza redonda, dulce y fácil de querer, tanto sola como con leche.`
+      : `Este lote de ${p.origin} llega de pequeñas fincas que trabajan a mano. Las cerezas maduras se seleccionan una a una y el proceso ${p.process.toLowerCase()} subraya notas de ${p.notes[0].toLowerCase()} y ${p.notes[1].toLowerCase()}.`,
+    filter: { dose: `${14 + (n % 3)} g`, water: `${(14 + (n % 3)) * 16} g`, ratio: "1:16", time: `${["2:45", "3:00", "3:15"][n % 3]} min`, temp: `${93 + (n % 3)} °C` },
+    espresso: { dose: `${18 + (n % 2)} g`, yield: `${38 + (n % 3) * 2} g`, time: `${27 + (n % 4)}–${29 + (n % 4)} segundos`, temp: `${(92.5 + (n % 3) * 0.5).toFixed(1)} °C`, pressure: "9 bar" },
+  }
+}
+
+function Accordion({ title, children, defaultOpen = false }: { title: string; children: React.ReactNode; defaultOpen?: boolean }) {
+  const [open, setOpen] = useState(defaultOpen)
+  return (
+    <div className={`kp-acc ${open ? "open" : ""}`}>
+      <button onClick={() => setOpen(!open)} aria-expanded={open}>
+        {title}
+        <span aria-hidden="true" />
+      </button>
+      <div className="kp-acc-body"><div>{children}</div></div>
     </div>
   )
 }
@@ -838,104 +1498,166 @@ function ProductPage({
   product,
   onAdd,
   onNavigate,
+  onProduct,
 }: {
   product: Product
-  onAdd: (p: Product, size: string) => void
+  onAdd: (p: Product, size: string, qty: number) => void
   onNavigate: (p: Page) => void
+  onProduct: (p: Product) => void
 }) {
-  const [size, setTamaño] = useState("250g")
-  const [grind, setMolienda] = useState("En grano")
-  const price = size === "1kg" ? Math.round(product.price * 3.2) : product.price
+  const [size, setSize] = useState("250g")
+  const [grind, setGrind] = useState("En grano")
+  const [qty, setQty] = useState(1)
+  const [slide, setSlide] = useState(0)
+  const d = productDetails(product)
+  const unit = size === "1kg" ? Math.round(product.price * 3.2) : product.price
+  const total = unit * qty
+  const points = total * 10
+  const slides = ["bag", images.cup, images.farm, images.method]
+
+  useEffect(() => {
+    setQty(1); setSize("250g"); setSlide(0)
+  }, [product.id])
+  useEffect(() => {
+    const t = window.setInterval(() => setSlide((s) => (s + 1) % slides.length), 4500)
+    return () => window.clearInterval(t)
+  }, [product.id, slides.length])
+
+  const related = coffees.filter((c) => c.id !== product.id && (c.process === product.process || coffeeMeta[c.id].collection === coffeeMeta[product.id].collection)).slice(0, 3)
+
   return (
-    <div className="product-page page-shell">
-      <div className="product-gallery">
-        <div className={`gallery-main ${product.tone}`}>
-          <CoffeeBag product={product} large />
-          <span className="gallery-index">01 / 03</span>
-        </div>
-        <img src={images.cup} alt="Café servido en una taza de cerámica" />
-      </div>
-      <section className="product-buy">
-        <button className="back-link" onClick={() => onNavigate("shop")}>
-          ← Ver todos
-        </button>
-        <p className="origin">
-          {product.origin} · {product.process}
-        </p>
-        <h1 className="serif-title">{product.name}</h1>
-        <p className="tasting">{product.notes.join(" · ")}</p>
-        <div className="choice">
-          <div>
-            <span>Tamaño</span>
-            <span>
-              {size === "250g" ? "aprox. 15 tazas" : "aprox. 60 tazas"}
-            </span>
+    <div className="kp-page">
+      <div className="kp-top">
+        <div className="kp-gallery">
+          <div className={`kp-stage ks-visual ${product.tone}`}>
+            {slides.map((s, n) => (
+              <div key={n} className={`kp-slide ${n === slide ? "on" : ""}`}>
+                {s === "bag" ? <CoffeeBag product={product} large /> : <img src={s} alt="" />}
+              </div>
+            ))}
+            <Tags product={product} />
+            <div className="kp-dots">
+              {slides.map((_, n) => (
+                <button key={n} className={n === slide ? "on" : ""} onClick={() => setSlide(n)} aria-label={`Imagen ${n + 1}`}><i /></button>
+              ))}
+            </div>
           </div>
-          <div className="choice-row">
-            {["250g", "1kg"].map((v) => (
-              <button
-                className={size === v ? "selected" : ""}
-                onClick={() => setTamaño(v)}
-                key={v}
-              >
-                {v}
+          <div className="kp-thumbs">
+            {slides.map((s, n) => (
+              <button key={n} className={`ks-visual ${product.tone} ${n === slide ? "on" : ""}`} onClick={() => setSlide(n)} aria-label={`Ver imagen ${n + 1}`}>
+                {s === "bag" ? <CoffeeBag product={product} /> : <img src={s} alt="" />}
               </button>
             ))}
           </div>
         </div>
-        <div className="choice">
-          <div>
-            <span>Molienda</span>
-            <span>Elige según tu cafetera</span>
+
+        <section className="kp-buy">
+          <button className="kp-back" onClick={() => onNavigate("shop")}>← Todo el café</button>
+          <span className="k-tag">{product.origin} · {product.process}</span>
+          <h1>{product.name}</h1>
+          <p className="kp-notes">{product.notes.join(" + ")}</p>
+          <p className="kp-story">{d.story}</p>
+
+          <div className="kp-opt">
+            <div className="kp-opt-head"><span>Tamaño</span><small>{size === "250g" ? "aprox. 15 tazas" : "aprox. 60 tazas"}</small></div>
+            <div className="kp-chips">
+              {["250g", "1kg"].map((v) => (
+                <button key={v} className={size === v ? "on" : ""} onClick={() => setSize(v)}>
+                  {v === "250g" ? "250 g" : "1 kg"}
+                  <small>{v === "1kg" ? Math.round(product.price * 3.2) : product.price} €</small>
+                </button>
+              ))}
+            </div>
           </div>
-          <select
-            value={grind}
-            onChange={(event) => setMolienda(event.target.value)}
-          >
-            <option>En grano</option>
-            <option>Filtro</option>
-            <option>Espresso</option>
-            <option>Prensa francesa</option>
-          </select>
-        </div>
-        <button className="add-main" onClick={() => onAdd(product, size)}>
-          <span>Añadir a la cesta</span>
-          <span>{price} €</span>
-        </button>
-        <div className="dispatch">
-          <span>Recién tostado</span>
-          <span>Sale en 1–2 días</span>
-        </div>
-      </section>
-      <section className="lot-story">
-        <div className="section-number">EL LOTE / 01</div>
-        <h2>
-          Una taza con
-          <br />
-          <em>un lugar propio.</em>
-        </h2>
-        <div>
-          <p>
-            Este lote procede de pequeñas fincas familiares de altura. Las
-            cerezas maduras se recogen a mano, se seleccionan con cuidado y
-            reposan antes de un secado lento y limpio.
-          </p>
-          <dl>
-            <div>
-              <dt>Productor</dt>
-              <dd>Colectivo de pequeños productores</dd>
+
+          <div className="kp-opt">
+            <div className="kp-opt-head"><span>Molienda</span><small>Según tu cafetera</small></div>
+            <div className="kp-chips wrap">
+              {["En grano", "Espresso", "Filtro", "Prensa francesa"].map((g) => (
+                <button key={g} className={grind === g ? "on" : ""} onClick={() => setGrind(g)}>{g}</button>
+              ))}
             </div>
-            <div>
-              <dt>Altitud</dt>
-              <dd>1,850–2,050 masl</dd>
+          </div>
+
+          <div className="kp-opt">
+            <div className="kp-opt-head"><span>Cantidad</span><small>{qty} {qty === 1 ? "paquete" : "paquetes"}</small></div>
+            <div className="kp-qty-row">
+              <div className="kp-qty">
+                <button onClick={() => setQty((q) => Math.max(1, q - 1))} disabled={qty === 1} aria-label="Quitar un paquete">−</button>
+                <span key={qty}>{qty}</span>
+                <button onClick={() => setQty((q) => Math.min(10, q + 1))} disabled={qty === 10} aria-label="Añadir un paquete">+</button>
+              </div>
+              <button className="kp-add" onClick={() => onAdd(product, size, qty)}>
+                Añadir a la cesta <b>{total} €</b>
+              </button>
             </div>
-            <div>
-              <dt>Variedad</dt>
-              <dd>Caturra, Colombia</dd>
-            </div>
-          </dl>
-        </div>
-      </section>
+          </div>
+
+          <div className="kp-points">
+            <span className="kp-points-badge">★</span>
+            <p>Con este pedido ganarás <strong key={points}>{points} puntos</strong> para el Club Kiln.</p>
+            <small>10 puntos por cada euro</small>
+          </div>
+
+          <div className="kp-perks">
+            <span>Tostado el martes</span>
+            <span>Envío gratis desde 35 €</span>
+            <span>Sale en 1–2 días</span>
+          </div>
+
+          <div className="kp-accs">
+            <Accordion title="Origen" defaultOpen>
+              <p>{d.story}</p>
+              <dl>
+                <div><dt>Productor</dt><dd>{d.producer}</dd></div>
+                <div><dt>Región</dt><dd>{product.origin}</dd></div>
+                <div><dt>Variedad</dt><dd>{d.variety}</dd></div>
+                <div><dt>Altitud</dt><dd>{d.altitude}</dd></div>
+                <div><dt>Proceso</dt><dd>{product.process}</dd></div>
+                <div><dt>Cosecha</dt><dd>{d.harvest}</dd></div>
+              </dl>
+            </Accordion>
+            <Accordion title="Receta de preparación">
+              <h4>Espresso</h4>
+              <ul className="kp-recipe">
+                <li><b>Dosis:</b> {d.espresso.dose}</li>
+                <li><b>Rendimiento:</b> {d.espresso.yield}</li>
+                <li><b>Tiempo de extracción:</b> {d.espresso.time}</li>
+                <li><b>Temperatura:</b> {d.espresso.temp}</li>
+                <li><b>Presión:</b> {d.espresso.pressure}</li>
+              </ul>
+              <h4>Filtro (V60)</h4>
+              <ul className="kp-recipe">
+                <li><b>Dosis:</b> {d.filter.dose}</li>
+                <li><b>Agua:</b> {d.filter.water}</li>
+                <li><b>Ratio:</b> {d.filter.ratio}</li>
+                <li><b>Tiempo total:</b> {d.filter.time}</li>
+                <li><b>Temperatura:</b> {d.filter.temp}</li>
+              </ul>
+            </Accordion>
+            <Accordion title="Notas de cata">
+              <p>Una taza de {product.notes[0].toLowerCase()} al principio, con {product.notes[1].toLowerCase()} en el centro y un final largo de {product.notes[2].toLowerCase()}.</p>
+            </Accordion>
+            <Accordion title="Envío y frescura">
+              <p>Tostamos los martes y viernes en Poblenou. Recomendamos dejar reposar el café 5–7 días tras el tueste y consumirlo antes de 6 semanas. Envío gratis en pedidos desde 35 €.</p>
+            </Accordion>
+          </div>
+        </section>
+      </div>
+
+      {related.length > 0 && (
+        <section className="kp-related">
+          <div className="kp-related-head">
+            <h2>También te puede gustar</h2>
+            <button className="k-btn" onClick={() => onNavigate("shop")}>Ver todo el café <Arrow /></button>
+          </div>
+          <div className="ks-grid">
+            {related.map((c) => (
+              <ProductCard key={c.id} product={c} onOpen={onProduct} onAdd={(p) => onAdd(p, "250g", 1)} />
+            ))}
+          </div>
+        </section>
+      )}
     </div>
   )
 }
