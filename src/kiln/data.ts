@@ -73,6 +73,11 @@ export const BAG_SIZES: { id: BagSizeOption; label: string; multiplier: number; 
 ]
 
 export const PHOTOS = {
+  homeSeason: "https://images.unsplash.com/photo-1595236629937-aadaf7c1d99d?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=85&w=2400",
+  homeShop: "https://images.unsplash.com/photo-1638126687923-31912a6ee0ff?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=85&w=1600",
+  homeSubscriptions: "https://images.unsplash.com/photo-1541870730196-cd1efcbf5649?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=85&w=1600",
+  homeAbout: "https://images.unsplash.com/photo-1565626424178-c699f6601afd?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=85&w=1600",
+  homeGifts: "https://images.unsplash.com/photo-1759267447583-831d99650e60?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=85&w=1600",
   homeHero: "https://images.unsplash.com/photo-1788311170929-5a461a7d9718?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=85&w=2200",
   heroRoastery: "https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?auto=format&fit=crop&w=2000&q=85",
   pourOverBar: "https://images.unsplash.com/photo-1514432324607-a09d9b4aefdd?auto=format&fit=crop&w=1600&q=85",
@@ -84,7 +89,7 @@ export const PHOTOS = {
   greenCoffee: "https://images.unsplash.com/photo-1559056199-641a0ac8b55e?auto=format&fit=crop&w=1400&q=85",
 }
 
-export const COFFEE_LOTS: CoffeeLot[] = [
+const CORE_LOTS: CoffeeLot[] = [
   {
     id: "halo-hartume",
     no: "01",
@@ -576,6 +581,119 @@ export const COFFEE_LOTS: CoffeeLot[] = [
     },
   },
 ]
+
+type LotSeed = [
+  id: string,
+  name: string,
+  subtitle: string,
+  country: CoffeeLot["country"],
+  region: string,
+  producer: string,
+  altitude: string,
+  variety: string,
+  process: CoffeeLot["process"],
+  roast: CoffeeLot["roast"],
+  category: CoffeeLot["category"],
+  score: string,
+  price250: number,
+  tone: CoffeeLot["tone"],
+  notes: [string, string, string],
+  sensory: CoffeeLot["sensory"],
+]
+
+const EXTRA_LOT_SEEDS: LotSeed[] = [
+  ["guji-uraga", "Uraga Natural", "Natural intenso y limpio de altura", "Etiopía", "Uraga, Guji", "Cooperativa Uraga", "2.100 – 2.250 m", "Heirloom etíope", "Natural", "Filtro", "Microlote", "88.75", 20.5, "terracotta", ["Arándano", "Cacao claro", "Rosa"], { acidity: 8, sweetness: 9, body: 6, floral: 8, clarity: 8 }],
+  ["sidama-bensa", "Bensa Lavado", "Floral, cítrico y muy limpio", "Etiopía", "Bensa, Sidama", "Productores de Bombe", "2.000 – 2.300 m", "74158", "Lavado", "Filtro", "Cosecha Estacional", "88.50", 18.9, "ivory", ["Limón", "Té negro", "Azahar"], { acidity: 9, sweetness: 7, body: 4, floral: 9, clarity: 10 }],
+  ["limu-gera", "Gera Honey", "Dulce, sedoso y equilibrado", "Etiopía", "Gera, Limu", "Familia Abba Jifar", "1.900 – 2.100 m", "Heirloom etíope", "Honey / Semilavado", "Omnitueste", "Cosecha Estacional", "87.50", 17.8, "sand", ["Albaricoque", "Miel", "Bergamota"], { acidity: 7, sweetness: 8, body: 6, floral: 7, clarity: 8 }],
+  ["nyeri-gatomboya", "Gatomboya AA", "Jugoso, profundo y vibrante", "Kenia", "Nyeri", "Barichu Farmers", "1.750 – 1.900 m", "SL28 & SL34", "Lavado", "Filtro", "Microlote", "89.75", 22.5, "oxblood", ["Grosella", "Tomate dulce", "Panela"], { acidity: 10, sweetness: 8, body: 7, floral: 5, clarity: 9 }],
+  ["kirinyaga-kii", "Kii Peaberry", "Cítrico, brillante y estructurado", "Kenia", "Kirinyaga", "Rungeto Farmers", "1.700 – 1.850 m", "SL28, Ruiru 11", "Lavado", "Omnitueste", "Cosecha Estacional", "88.25", 20.0, "stone", ["Pomelo", "Mora", "Hibisco"], { acidity: 9, sweetness: 7, body: 6, floral: 6, clarity: 9 }],
+  ["huila-pitalito", "Pitalito Rosado", "Afrutado, cremoso y expresivo", "Colombia", "Pitalito, Huila", "Familia Ortiz", "1.650 – 1.800 m", "Bourbon Rosado", "Lavado", "Filtro", "Microlote", "89.00", 21.5, "smoke", ["Frambuesa", "Caramelo", "Lima"], { acidity: 8, sweetness: 9, body: 6, floral: 7, clarity: 9 }],
+  ["narino-buesaco", "Buesaco Alto", "Delicado, ácido y luminoso", "Colombia", "Buesaco, Nariño", "Asociación El Tablón", "2.000 – 2.150 m", "Caturra & Castillo", "Lavado", "Filtro", "Cosecha Estacional", "87.75", 18.4, "ivory", ["Manzana verde", "Panela", "Jazmín"], { acidity: 9, sweetness: 7, body: 5, floral: 7, clarity: 9 }],
+  ["tolima-planadas", "Planadas Noir", "Cacao, cereza y cuerpo redondo", "Colombia", "Planadas, Tolima", "Productores Nasa", "1.700 – 1.900 m", "Caturra", "Natural", "Espresso", "Casa & Espresso", "86.75", 16.9, "noir", ["Cereza negra", "Cacao", "Melaza"], { acidity: 6, sweetness: 8, body: 8, floral: 4, clarity: 7 }],
+  ["cauca-inza", "Inzá Honey", "Dulce y versátil para cualquier método", "Colombia", "Inzá, Cauca", "Asorcafé", "1.750 – 1.950 m", "Castillo & Colombia", "Honey / Semilavado", "Omnitueste", "Casa & Espresso", "86.50", 15.9, "sand", ["Naranja", "Caramelo", "Avellana"], { acidity: 6, sweetness: 8, body: 7, floral: 4, clarity: 8 }],
+  ["boquete-volcan", "Volcán Catuai", "Equilibrado, dulce y de final largo", "Panamá", "Volcán, Chiriquí", "Finca Hartmann", "1.500 – 1.700 m", "Catuai", "Honey / Semilavado", "Omnitueste", "Cosecha Estacional", "87.00", 19.8, "olive", ["Ciruela", "Miel", "Nuez"], { acidity: 7, sweetness: 8, body: 6, floral: 5, clarity: 8 }],
+  ["boquete-geisha-natural", "Geisha Natural", "Floral, tropical y excepcional", "Panamá", "Boquete, Chiriquí", "Finca Elida", "1.800 – 2.000 m", "Geisha", "Natural", "Filtro", "Reserva Competición", "92.00", 38.0, "ivory", ["Mango", "Jazmín", "Mandarina"], { acidity: 9, sweetness: 10, body: 6, floral: 10, clarity: 9 }],
+  ["nyamasheke-kigeyo", "Kigeyo Lavado", "Brillante, limpio y especiado", "Ruanda", "Nyamasheke", "Estación Kigeyo", "1.750 – 1.950 m", "Red Bourbon", "Lavado", "Filtro", "Cosecha Estacional", "87.50", 18.2, "stone", ["Granada", "Té rojo", "Clavo"], { acidity: 8, sweetness: 7, body: 5, floral: 6, clarity: 9 }],
+  ["huye-mountain", "Huye Natural", "Rojo, maduro y profundo", "Ruanda", "Huye", "Huye Mountain Coffee", "1.800 – 2.100 m", "Red Bourbon", "Natural", "Omnitueste", "Microlote", "88.00", 19.6, "oxblood", ["Fresa", "Vino tinto", "Chocolate"], { acidity: 7, sweetness: 9, body: 7, floral: 5, clarity: 8 }],
+  ["huehue-injerto", "Injerto Lavado", "Clásico, dulce y estructurado", "Guatemala", "Huehuetenango", "Familia Aguirre", "1.700 – 1.900 m", "Bourbon & Caturra", "Lavado", "Omnitueste", "Casa & Espresso", "86.75", 16.5, "smoke", ["Toffee", "Manzana roja", "Cacao"], { acidity: 6, sweetness: 8, body: 7, floral: 3, clarity: 8 }],
+  ["acatenango-sierra", "Sierra Negra", "Denso, achocolatado y persistente", "Guatemala", "Acatenango", "Finca La Sierra", "1.550 – 1.750 m", "Caturra", "Lavado", "Espresso", "Casa & Espresso", "86.25", 15.5, "noir", ["Chocolate negro", "Almendra", "Naranja"], { acidity: 5, sweetness: 7, body: 9, floral: 2, clarity: 7 }],
+  ["atitlan-anaerobic", "Atitlán Carbónico", "Experimental, licoroso y tropical", "Guatemala", "Lago de Atitlán", "Finca San Pedro", "1.650 – 1.850 m", "Pacamara", "Maceración carbónica", "Filtro", "Reserva Competición", "89.50", 26.0, "terracotta", ["Piña", "Ron", "Cereza"], { acidity: 8, sweetness: 9, body: 7, floral: 5, clarity: 7 }],
+  ["cajamarca-jaen", "Jaén Andino", "Suave, dulce y fácil de beber", "Perú", "Jaén, Cajamarca", "Cooperativa Sol & Café", "1.700 – 1.900 m", "Typica & Bourbon", "Lavado", "Omnitueste", "Casa & Espresso", "85.75", 14.9, "sand", ["Panela", "Nuez", "Mandarina"], { acidity: 6, sweetness: 7, body: 6, floral: 3, clarity: 8 }],
+  ["puno-sandia", "Sandia Gesha", "Floral, fino y de altura", "Perú", "Sandia, Puno", "Familia Quispe", "1.900 – 2.150 m", "Gesha", "Lavado", "Filtro", "Reserva Competición", "90.50", 29.0, "ivory", ["Lavanda", "Melocotón", "Lima"], { acidity: 9, sweetness: 8, body: 5, floral: 10, clarity: 10 }],
+  ["amazonas-rodriguez", "Rodríguez Natural", "Frutal, goloso y redondo", "Perú", "Rodríguez de Mendoza", "Productores Huambo", "1.650 – 1.850 m", "Caturra & Catimor", "Natural", "Espresso", "Microlote", "87.25", 17.4, "terracotta", ["Frutos rojos", "Cacao", "Vainilla"], { acidity: 6, sweetness: 9, body: 8, floral: 4, clarity: 7 }],
+  ["cerrado-patrocinio", "Cerrado Base", "Cacao, cuerpo y baja acidez", "Brasil", "Patrocínio, Cerrado Mineiro", "Fazenda Santa Lúcia", "1.050 – 1.200 m", "Mundo Novo", "Natural", "Espresso", "Casa & Espresso", "85.25", 13.9, "noir", ["Cacao", "Avellana", "Caramelo"], { acidity: 4, sweetness: 7, body: 9, floral: 2, clarity: 7 }],
+  ["mantiqueira-honey", "Mantiqueira Honey", "Dulce, sedoso y muy equilibrado", "Brasil", "Sul de Minas", "Fazenda Serra Alta", "1.200 – 1.450 m", "Yellow Bourbon", "Honey / Semilavado", "Omnitueste", "Cosecha Estacional", "86.75", 16.4, "olive", ["Miel", "Pera", "Chocolate con leche"], { acidity: 5, sweetness: 9, body: 7, floral: 3, clarity: 8 }],
+  ["chapada-diamantina", "Diamantina Carbónico", "Intenso, frutal y diferente", "Brasil", "Chapada Diamantina", "Fazenda Progresso", "1.100 – 1.300 m", "Catuai Amarillo", "Maceración carbónica", "Omnitueste", "Microlote", "88.25", 20.8, "oxblood", ["Uva", "Cereza", "Cacao"], { acidity: 7, sweetness: 9, body: 8, floral: 4, clarity: 7 }],
+  ["kiln-noir-blend", "Kiln Noir", "Ensamblaje oscuro para espresso", "Brasil", "Brasil & Guatemala", "Selección Kiln", "1.100 – 1.800 m", "Mundo Novo & Caturra", "Ensamblaje", "Espresso", "Casa & Espresso", "85.50", 14.5, "noir", ["Chocolate", "Melaza", "Tostado"], { acidity: 4, sweetness: 7, body: 9, floral: 1, clarity: 7 }],
+  ["kiln-blanc-blend", "Kiln Blanc", "Ensamblaje luminoso para filtro", "Etiopía", "Etiopía & Kenia", "Selección Kiln", "1.800 – 2.200 m", "Heirloom & SL28", "Ensamblaje", "Filtro", "Casa & Espresso", "86.50", 16.0, "ivory", ["Cítricos", "Té", "Flor blanca"], { acidity: 8, sweetness: 7, body: 4, floral: 8, clarity: 9 }],
+  ["pack-origenes", "Pack Orígenes", "Tres cafés para recorrer la colección", "Colombia", "Colombia, Etiopía & Kenia", "Selección Kiln", "1.700 – 2.200 m", "Variedades mixtas", "Ensamblaje", "Omnitueste", "Formatos", "87.00", 42.0, "smoke", ["Fruta", "Flor", "Cacao"], { acidity: 7, sweetness: 8, body: 6, floral: 6, clarity: 8 }],
+]
+
+const toTitle = (value: string) => value.charAt(0).toUpperCase() + value.slice(1).toLowerCase()
+
+const EXTRA_LOTS: CoffeeLot[] = EXTRA_LOT_SEEDS.map(
+  ([id, name, subtitle, country, region, producer, altitude, variety, process, roast, category, score, price250, tone, notes, sensory], index) => {
+    const isEspresso = roast === "Espresso"
+    return {
+      id,
+      no: String(index + CORE_LOTS.length + 1).padStart(2, "0"),
+      name,
+      subtitle,
+      origin: `${region}, ${country}`,
+      country,
+      region,
+      producer,
+      altitude,
+      variety,
+      process,
+      roast,
+      category,
+      score,
+      price250,
+      tone,
+      harvestMonth: index % 2 === 0 ? "Febrero 2026" : "Marzo 2026",
+      lotAllocationKg: 140 + index * 12,
+      fobPriceUsd: `${(7.8 + index * 0.18).toFixed(2).replace(".", ",")} $/kg`,
+      farmGatePremium: `+${120 + index * 4}% sobre mercado C`,
+      moistureContent: `${(10.2 + (index % 5) * 0.1).toFixed(1)}%`,
+      waterActivity: `0.${52 + (index % 6)} aw`,
+      densityGml: `0.${730 + index * 2} g/ml`,
+      roasterMachine: "Loring S15 Falcon (Convección)",
+      developmentTimeRatio: isEspresso ? "15.5% (1:30 min)" : "12.0% (1:06 min)",
+      endTempCelsius: isEspresso ? "209.0 °C" : "204.0 °C",
+      notes,
+      tastingParagraph: `${toTitle(notes[0])}, ${notes[1].toLowerCase()} y ${notes[2].toLowerCase()} en una taza ${subtitle.toLowerCase()}.`,
+      story: `Seleccionado por Kiln en ${region}. Un café de ${producer.toLowerCase()} elegido por su precisión y su carácter en taza.`,
+      agronomy: `Cultivado entre ${altitude} con variedades ${variety}.`,
+      sensory,
+      recipe: isEspresso
+        ? {
+            method: "Espresso",
+            doseG: 18,
+            waterMl: 40,
+            tempC: 93,
+            grindClicks: "Molienda fina",
+            totalTime: "00:28",
+            steps: [{ time: "0:00 – 0:28", water: "40 g", note: "Extracción continua a 9 bares." }],
+          }
+        : {
+            method: "Hario V60 02",
+            doseG: 15,
+            waterMl: 250,
+            tempC: 94,
+            grindClicks: "Molienda media-fina",
+            totalTime: "02:45",
+            steps: [
+              { time: "0:00 – 0:40", water: "45 ml", note: "Preinfusión uniforme." },
+              { time: "0:40 – 1:30", water: "150 ml", note: "Vertido central continuo." },
+              { time: "1:30 – 2:45", water: "250 ml", note: "Vertido final y drenaje plano." },
+            ],
+          },
+    }
+  },
+)
+
+export const COFFEE_LOTS: CoffeeLot[] = [...CORE_LOTS, ...EXTRA_LOTS]
 
 export const SUBSCRIPTION_PLANS = [
   {
