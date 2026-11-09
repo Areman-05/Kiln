@@ -241,9 +241,6 @@ export function RoastCurveChart({ lot }: { lot: CoffeeLot }) {
 export function LotCard({
   lot,
   onSelectLot,
-  onQuickAdd,
-  isCompared,
-  onToggleCompare,
 }: {
   lot: CoffeeLot
   onSelectLot: (lot: CoffeeLot) => void
@@ -254,26 +251,18 @@ export function LotCard({
     return (
     <article className="k-lot-card">
       <button type="button" className="k-lot-stage" onClick={() => onSelectLot(lot)} aria-label={`Ver ${lot.name}`}>
-        <span className="k-lot-tags">
-          <span className={`k-lot-tag is-${lot.roast.toLowerCase()}`}>{lot.roast}</span>
-          <span className="k-lot-tag is-process">{lot.process}</span>
-        </span>
         <Bag lot={{ name: lot.name, no: lot.no, origin: lot.origin, process: lot.process, roast: lot.roast, notes: lot.notes, tone: lot.tone }} size="md" />
+        <span className="k-lot-view" aria-hidden="true">Ver producto</span>
       </button>
 
       <div className="k-lot-body">
-        <span className="k-lot-meta-line">{lot.origin}</span>
-        <button type="button" className="k-lot-title" onClick={() => onSelectLot(lot)}>
-          {lot.name}
-        </button>
-        <p className="k-lot-sub">{lot.subtitle}. {lot.notes.join(" · ")}.</p>
-
-        <div className="k-lot-actions">
-          <span className="k-lot-price">{formatEur(lot.price250)}</span>
-          <button type="button" className="k-add-mini" onClick={() => onQuickAdd(lot, "250g", "En grano")}>
-            Añadir
+        <div className="k-lot-headline">
+          <button type="button" className="k-lot-title" onClick={() => onSelectLot(lot)}>
+            {lot.name}
           </button>
+          <span className="k-lot-price">{formatEur(lot.price250)}</span>
         </div>
+        <span className="k-lot-meta-line">{lot.origin}</span>
       </div>
     </article>
   )
