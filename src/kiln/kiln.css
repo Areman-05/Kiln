@@ -51,26 +51,39 @@
 html {
   font-size: 16px;
   scroll-behavior: smooth;
-  background-color: var(--bg-primary);
+  background-color: #050505;
   color: var(--ink-primary);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
+html,
+body {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  min-height: 100%;
+}
+
 body {
   font-family: var(--font-sans);
-  background-color: var(--bg-primary);
+  background-color: #050505;
   color: var(--ink-primary);
   line-height: 1.55;
   letter-spacing: 0;
   overflow-x: hidden;
 }
 
+#root {
+  min-height: 100vh;
+}
+
 .kiln-shell {
   min-height: 100vh;
+  min-height: 100dvh;
   display: flex;
   flex-direction: column;
-  background-color: var(--bg-primary);
+  background-color: #fff;
   color: var(--ink-primary);
 }
 
@@ -2023,3 +2036,282 @@ body {
 
 /* Etiquetas de café más visibles */
 .k-shop-view .k-lot-tag{background:#cfe6c2;color:#15300d}.k-shop-view .k-lot-tag.is-espresso{background:#efc9a8;color:#4a2208}.k-shop-view .k-lot-tag.is-omnitueste{background:#d4d0f4;color:#25205b}.k-shop-view .k-lot-tag.is-process{background:#e5e5e1;color:#222}.k-shop-view .k-lot-sub{min-height:3.75rem}
+
+/* Hero Home: composición industrial compacta */
+.k-home-hero {
+  height: calc(100svh - 5.25rem);
+  min-height: 560px;
+  max-height: 900px;
+  align-items: center;
+}
+
+.k-home-hero-content {
+  height: 100%;
+  padding: clamp(2rem, 4vh, 3.5rem) clamp(1.5rem, 4vw, 4.5rem) 5.75rem;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: center;
+}
+
+.k-home-hero h1 {
+  max-width: none;
+  margin: 0 0 1.7rem;
+  font-size: clamp(3.2rem, 6.5vw, 7rem);
+  line-height: 0.79;
+  letter-spacing: -0.09em;
+  transform: skewX(-7deg);
+  transform-origin: left bottom;
+}
+
+.k-home-hero h1 span {
+  display: block;
+  white-space: nowrap;
+}
+
+.k-home-hero .k-home-hero-action {
+  flex: 0 0 auto;
+}
+
+.k-scroll-cue {
+  position: absolute;
+  left: 50%;
+  bottom: 1.35rem;
+  width: 3.5rem;
+  height: 3.5rem;
+  margin: 0;
+  border: 0;
+  border-radius: 0;
+  background: #050505;
+  color: #fff;
+  transform: translateX(-50%);
+  animation: none;
+}
+
+.k-scroll-cue::before {
+  position: absolute;
+  top: 0.8rem;
+  left: 50%;
+  width: 2px;
+  height: 1.45rem;
+  background: #fff;
+  content: "";
+  transform: translateX(-50%);
+}
+
+.k-scroll-cue i {
+  position: absolute;
+  left: 50%;
+  bottom: 0.72rem;
+  width: 0.72rem;
+  height: 0.72rem;
+  border-right: 2px solid #fff;
+  border-bottom: 2px solid #fff;
+  transform: translateX(-50%) rotate(45deg);
+}
+
+@media (max-width: 720px) {
+  .k-home-hero {
+    height: calc(100svh - 4.5rem);
+    min-height: 560px;
+  }
+
+  .k-home-hero-content {
+    padding: 2rem 1.25rem 5.5rem;
+  }
+
+  .k-home-hero h1 {
+    font-size: clamp(2.7rem, 12.5vw, 4.2rem);
+    letter-spacing: -0.085em;
+  }
+
+  .k-scroll-cue {
+    width: 3.1rem;
+    height: 3.1rem;
+  }
+}
+
+/* Hero final: sans extendida, arquitectónica y exclusiva */
+.k-home-hero h1{margin:0;font-family:"Syncopate",var(--font-sans),sans-serif!important;font-size:clamp(2.35rem,4.35vw,5rem)!important;font-weight:700!important;line-height:.98!important;letter-spacing:-.055em!important;text-transform:uppercase;transform:skewX(10deg)!important;transform-origin:left bottom}
+.k-home-hero h1 span{display:block;white-space:nowrap}
+.k-home-hero .k-home-hero-action{min-height:3.5rem;margin-top:2.2rem;padding:0 1.25rem;gap:2rem;border:2px solid #050505!important;border-radius:0!important;background:#050505!important;color:#fff!important;font:700 .62rem/1 "Syncopate",var(--font-sans),sans-serif;letter-spacing:.24em;text-transform:uppercase;box-shadow:none!important;transform:none!important}
+.k-home-hero .k-home-hero-action::after{width:1.35rem;height:.55rem;border-right:2px solid currentColor;border-bottom:2px solid currentColor;content:"";transform:skewX(45deg)}
+.k-home-hero .k-home-hero-action:hover{background:#fff!important;color:#050505!important}
+@media(max-width:720px){.k-home-hero h1{font-size:clamp(1.65rem,7.4vw,2.6rem)!important;line-height:1!important}}
+
+/* Café: cabecera y controles mínimos */
+.k-shop-view .k-shop-head{display:flex;align-items:flex-end;justify-content:space-between;gap:2rem;margin:0 0 1.4rem}
+.k-shop-view .k-shop-head h1{margin:0!important;font:700 clamp(2.4rem,5vw,5.4rem)/.95 "Syncopate",var(--font-sans),sans-serif!important;letter-spacing:-.06em!important;text-transform:uppercase}
+.k-shop-count{flex:none;color:#777;font:600 .72rem/1 var(--font-sans);letter-spacing:.14em;text-transform:uppercase}
+.k-shop-controls{display:flex;justify-content:flex-end;gap:2.25rem;margin-bottom:3.5rem;padding-top:1.1rem;border-top:1px solid #050505}
+.kiln-shell .k-shop-control{display:inline-flex;align-items:baseline;gap:.6rem;padding:0 0 .3rem;border:0;border-bottom:1px solid transparent;border-radius:0;background:none;color:#050505;cursor:pointer;transition:border-color .2s}
+.kiln-shell .k-shop-control span{font:700 .74rem/1 var(--font-sans);letter-spacing:.14em;text-transform:uppercase}
+.kiln-shell .k-shop-control small{color:#888;font:600 .66rem/1 var(--font-sans);letter-spacing:.08em;text-transform:uppercase}
+.kiln-shell .k-shop-control:hover,.kiln-shell .k-shop-control[aria-expanded="true"]{border-bottom-color:#050505}
+.kiln-shell .k-shop-control:focus-visible{outline:2px solid #050505;outline-offset:4px}
+.k-shop-filters{display:grid;gap:1.4rem;margin:-2.25rem 0 3.5rem;padding:0 0 1.8rem;border-bottom:1px solid #e3e3e3}
+.k-shop-filter-row{display:flex;align-items:baseline;gap:1.5rem;margin:0;padding:0;border:0}
+.k-shop-filter-row legend{float:left;width:6rem;flex:none;padding:0;color:#888;font:600 .64rem/1.6 var(--font-sans);letter-spacing:.14em;text-transform:uppercase}
+.k-shop-filter-row>div{display:flex;flex-wrap:wrap;gap:.4rem 1.4rem}
+.kiln-shell .k-shop-filter-row button{padding:0 0 .2rem;border:0;border-bottom:1px solid transparent;border-radius:0;background:none;color:#888;font:600 .78rem/1.3 var(--font-sans);cursor:pointer;transition:color .2s,border-color .2s}
+.kiln-shell .k-shop-filter-row button:hover{color:#050505}
+.kiln-shell .k-shop-filter-row button[aria-pressed="true"]{color:#050505;border-bottom-color:#050505}
+.k-shop-filter-tools{display:flex;flex-wrap:wrap;align-items:flex-end;gap:1.25rem 2rem;padding-left:7.5rem}
+.k-shop-filter-tools label{display:flex;align-items:baseline;gap:.75rem}
+.k-shop-filter-tools label>span{color:#888;font:600 .64rem/1 var(--font-sans);letter-spacing:.14em;text-transform:uppercase}
+.k-shop-view .k-shop-filter-tools input,.k-shop-view .k-shop-filter-tools select{height:2rem;min-width:0;padding:0!important;border:0!important;border-bottom:1px solid #cfcfcf!important;border-radius:0!important;background:transparent!important;color:#050505;font:600 .8rem var(--font-sans)!important;outline:none}
+.k-shop-view .k-shop-filter-tools input{width:14rem}
+.k-shop-view .k-shop-filter-tools input:focus,.k-shop-view .k-shop-filter-tools select:focus{border-bottom-color:#050505!important}
+.kiln-shell .k-shop-reset{margin-left:auto;padding:0 0 .2rem;border:0;border-bottom:1px solid #050505;border-radius:0;background:none;color:#050505;font:700 .66rem/1 var(--font-sans);letter-spacing:.14em;text-transform:uppercase;cursor:pointer}
+.kiln-shell .k-shop-reset:disabled{border-color:transparent;color:#bbb;cursor:default}
+@media(max-width:720px){.k-shop-view .k-shop-head{align-items:flex-start;flex-direction:column;gap:.8rem}.k-shop-controls{justify-content:space-between;gap:1rem}.kiln-shell .k-shop-control small{display:none}.k-shop-filters{margin-top:-2.25rem}.k-shop-filter-row{flex-direction:column;gap:.7rem}.k-shop-filter-row legend{float:none;width:auto}.k-shop-filter-tools{padding-left:0}.k-shop-filter-tools label{width:100%}.k-shop-view .k-shop-filter-tools input,.k-shop-view .k-shop-filter-tools select{flex:1}.kiln-shell .k-shop-reset{margin-left:0}}
+
+/* Café: tarjeta compacta con delimitación al pasar el cursor */
+.k-shop-view .k-catalog-grid{gap:2.5rem 1.5rem}
+.k-shop-view .k-lot-card{position:relative;display:flex;flex-direction:column;padding:1.25rem;outline:1px solid transparent;outline-offset:0;transition:outline-color .2s}
+.k-shop-view .k-lot-card:hover,.k-shop-view .k-lot-card:focus-within{outline-color:#050505}
+.k-shop-view .k-lot-card .kiln-bag-wrap,.k-shop-view .k-lot-card:hover .kiln-bag-wrap,.k-shop-view .k-lot-card .kiln-bag-wrap:hover{transform:none!important;transition:none!important}
+.k-shop-view .k-lot-stage{aspect-ratio:1/.92!important;padding:.5rem 0!important;overflow:hidden}
+.k-shop-view .k-lot-stage .kiln-bag-wrap{max-height:100%}
+.k-shop-view .k-lot-stage .kiln-bag-svg{max-height:100%;width:auto}
+.k-shop-view .k-lot-body{display:flex;flex-direction:column;gap:.55rem;padding:1rem 0 0!important}
+.k-shop-view .k-lot-meta-line,.k-shop-view .k-lot-sub{margin:0!important;min-height:0!important;color:#888!important;font:600 .66rem/1.45 var(--font-sans)!important;letter-spacing:.12em!important;text-transform:uppercase}
+.k-shop-view .k-lot-title{padding:0;font-size:clamp(1.6rem,2.2vw,2.3rem)!important}
+.k-shop-view .k-lot-price{margin-top:.35rem;padding-top:.75rem;border-top:1px solid #e5e5e5;color:#050505;font:800 1rem/1 var(--font-sans);letter-spacing:-.02em}
+
+/* Café: tarjeta mínima premium */
+.k-shop-view .k-lot-body{gap:.45rem;padding:1.1rem 0 0!important}
+.k-shop-view .k-lot-headline{display:flex;align-items:baseline;justify-content:space-between;gap:1rem}
+.k-shop-view .k-lot-title{font:700 clamp(.95rem,1.25vw,1.2rem)/1.1 "Syncopate",var(--font-sans),sans-serif!important;letter-spacing:-.03em!important}
+.k-shop-view .k-lot-price{flex:none;margin:0!important;padding:0!important;border:0!important;color:#050505;font:600 .9rem/1 var(--font-sans)!important;letter-spacing:0!important}
+
+/* Café: acceso al producto al pasar el cursor (blanco sobre #0033ff ≈ 8.6:1) */
+.k-shop-view .k-lot-view{position:absolute;left:50%;bottom:1rem;z-index:3;padding:.7rem 1.15rem;border-radius:999px;background:#0033ff;color:#fff;font:700 .68rem/1 var(--font-sans);letter-spacing:.12em;text-transform:uppercase;white-space:nowrap;opacity:0;transform:translate(-50%,.35rem);transition:opacity .2s,transform .2s;pointer-events:none}
+.k-shop-view .k-lot-card:hover .k-lot-view,.k-shop-view .k-lot-card:focus-within .k-lot-view{opacity:1;transform:translate(-50%,0)}
+@media(hover:none){.k-shop-view .k-lot-view{display:none}}
+
+/* Café: “Ver producto” centrado vertical y horizontalmente en la card */
+.k-shop-view .k-lot-card>.k-lot-stage{position:static!important}
+.k-shop-view .k-lot-view{top:50%;bottom:auto;transform:translate(-50%,calc(-50% + .35rem))}
+.k-shop-view .k-lot-card:hover .k-lot-view,.k-shop-view .k-lot-card:focus-within .k-lot-view{transform:translate(-50%,-50%)}
+
+/* Home v2: hero de temporada + cuadrícula 2x2 con medios en movimiento */
+.k-home-v2{background:#fff}
+.kiln-shell .k-media-link{position:relative;display:block;width:100%;padding:0;overflow:hidden;border:0;border-radius:0;background:#050505;cursor:pointer}
+.k-media-link img{position:absolute;inset:-4%;width:108%;height:108%;object-fit:cover;filter:grayscale(1) contrast(1.15);animation:kMediaDrift 18s ease-in-out infinite alternate;transition:filter .5s ease}
+.k-media-link:hover img,.k-media-link:focus-visible img{filter:grayscale(1) contrast(1.15) blur(10px) brightness(.75)}
+.k-media-label{position:absolute;inset:0;z-index:2;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:.8rem;color:#fff;font:700 clamp(1rem,2vw,1.6rem)/1 "Syncopate",var(--font-sans),sans-serif;letter-spacing:.06em;text-transform:uppercase;opacity:0;transition:opacity .4s ease}
+.k-media-label small{font:600 .68rem/1 var(--font-sans);letter-spacing:.24em}
+.k-media-link:hover .k-media-label,.k-media-link:focus-visible .k-media-label{opacity:1}
+.kiln-shell .k-media-link:focus-visible{outline:3px solid #0033ff;outline-offset:-3px}
+.kiln-shell .k-home-v2-hero{height:calc(100svh - 5.25rem);min-height:520px}
+.k-home-v2-hero .k-media-label{font-size:clamp(1.6rem,4vw,3.6rem)}
+.k-home-v2-hero img{animation-duration:24s}
+.k-home-v2-grid{display:grid;grid-template-columns:1fr 1fr;gap:2px;margin:clamp(3rem,6vw,6rem) auto;width:min(1100px,calc(100% - 2rem));aspect-ratio:1/1;background:#fff}
+.k-home-v2-grid .k-media-link{height:100%}
+.k-home-v2-grid .k-media-link:nth-child(2) img{animation-delay:-6s}
+.k-home-v2-grid .k-media-link:nth-child(3) img{animation-delay:-11s}
+.k-home-v2-grid .k-media-link:nth-child(4) img{animation-delay:-3s}
+@keyframes kMediaDrift{0%{transform:scale(1) translate(0,0)}50%{transform:scale(1.06) translate(-1.5%,1%)}100%{transform:scale(1.03) translate(1.5%,-1%)}}
+@media(hover:none){.k-media-label{opacity:1;background:rgba(0,0,0,.28)}}
+@media(prefers-reduced-motion:reduce){.k-media-link img{animation:none}}
+@media(max-width:720px){.kiln-shell .k-home-v2-hero{height:calc(100svh - 4.5rem)}.k-home-v2-grid{width:calc(100% - 1rem);margin:1rem auto 3rem}.k-media-label{font-size:.78rem}}
+
+/* Home v2: movimiento lento sin deformar bordes y cuadrícula a sangre */
+.k-media-link img{inset:0;width:100%;height:100%;filter:grayscale(1) contrast(1.15);transform-origin:center;will-change:transform;animation:kMediaSlow 26s ease-in-out infinite alternate}
+.k-media-link:hover img,.k-media-link:focus-visible img{filter:grayscale(1) contrast(1.15) blur(10px) brightness(.72)}
+@keyframes kMediaSlow{0%{transform:scale(1.12) translate(0,0)}100%{transform:scale(1.2) translate(-2.5%,1.5%)}}
+.k-home-v2{background:#050505}
+.k-home-v2-grid{width:100%;margin:0;gap:0;aspect-ratio:auto;height:100svh;min-height:560px;grid-template-rows:1fr 1fr;background:#050505}
+@media(prefers-reduced-motion:reduce){.k-media-link img{animation:none;transform:scale(1.12)}}
+@media(max-width:720px){.k-home-v2-grid{min-height:420px}}
+
+/* Navbar: sin franja, Menú · Marca · Cuenta + panel lateral */
+.k-topnav{position:sticky;top:0;z-index:60;display:grid;grid-template-columns:1fr auto 1fr;align-items:center;height:4.5rem;padding:0 clamp(1.25rem,3vw,2.75rem);background:transparent;color:#050505;pointer-events:none}
+.k-topnav.is-overlay{position:fixed;left:0;right:0;color:#fff;mix-blend-mode:difference}
+.k-topnav>*{pointer-events:auto}
+.kiln-shell .k-topnav-link{justify-self:start;padding:.3rem 0;border:0;border-bottom:1px solid transparent;border-radius:0;background:none;color:inherit;font:700 .72rem/1 var(--font-sans);letter-spacing:.16em;text-transform:uppercase;cursor:pointer;transition:border-color .2s}
+.kiln-shell .k-topnav-link:hover,.kiln-shell .k-topnav-link:focus-visible{border-bottom-color:currentColor;outline:none}
+.k-topnav-right{display:flex;justify-self:end;gap:1.75rem}
+.k-topnav-count{font-variant-numeric:tabular-nums}
+.kiln-shell .k-topnav-brand{display:flex;align-items:center;gap:.7rem;padding:0;border:0;background:none;color:inherit;font:700 1rem/1 "Syncopate",var(--font-sans),sans-serif;letter-spacing:.24em;cursor:pointer}
+.k-topnav-brand .k-logo-mark{transform:none!important}
+.k-topnav-brand .k-logo-mark i,.k-topnav-brand .k-logo-mark b{background:currentColor!important}
+.k-side-backdrop{position:fixed;inset:0;z-index:90;background:rgba(5,5,5,.35);opacity:0;visibility:hidden;transition:opacity .4s,visibility .4s}
+.k-side-backdrop.open{opacity:1;visibility:visible}
+.k-side-menu{position:fixed;inset:0 auto 0 0;z-index:95;display:flex;flex-direction:column;width:min(420px,88vw);padding:1.5rem clamp(1.5rem,3vw,2.75rem) 2.25rem;background:#fff;color:#050505;transform:translateX(-100%);visibility:hidden;transition:transform .55s cubic-bezier(.77,0,.18,1),visibility .55s}
+.k-side-menu.open{transform:none;visibility:visible}
+.k-side-menu-head{display:flex;align-items:center;height:1.5rem;margin-bottom:clamp(3rem,10vh,6rem)}
+.kiln-shell .k-side-close{padding:.3rem 0;border:0;border-bottom:1px solid #050505;background:none;color:#050505;font:700 .72rem/1 var(--font-sans);letter-spacing:.16em;text-transform:uppercase;cursor:pointer}
+.k-side-nav{display:flex;flex-direction:column;gap:1.1rem}
+.kiln-shell .k-side-nav button{align-self:flex-start;padding:0;border:0;background:none;color:#050505;font:700 clamp(1.25rem,2.4vw,1.75rem)/1 "Syncopate",var(--font-sans),sans-serif;letter-spacing:-.03em;text-transform:uppercase;text-align:left;cursor:pointer;opacity:0;transform:translateX(-1.25rem);transition:opacity .4s,transform .5s cubic-bezier(.16,1,.3,1),color .2s}
+.k-side-menu.open .k-side-nav button{opacity:1;transform:none}
+.kiln-shell .k-side-nav button:hover,.kiln-shell .k-side-nav button.active{color:#8a8a8a}
+.k-side-extra{display:flex;flex-direction:column;gap:.9rem;margin-top:auto;padding-top:2rem;border-top:1px solid #e3e3e3}
+.kiln-shell .k-side-extra button{align-self:flex-start;padding:0;border:0;background:none;color:#555;font:700 .7rem/1 var(--font-sans);letter-spacing:.16em;text-transform:uppercase;cursor:pointer}
+.kiln-shell .k-side-extra button:hover{color:#050505}
+.kiln-shell .k-home-v2-hero{height:100svh}
+@media(max-width:720px){.k-topnav{height:4rem}.k-topnav-right{gap:1rem}.kiln-shell .k-topnav-brand>span:last-child{display:none}.kiln-shell .k-topnav-link{font-size:.66rem}}
+@media(prefers-reduced-motion:reduce){.k-side-menu,.kiln-shell .k-side-nav button{transition:none}}
+.k-topnav{color:#fff;mix-blend-mode:difference}
+
+/* Navbar: gris fijo y trazo fino */
+.k-topnav,.k-topnav.is-overlay{color:#6b6b6b;mix-blend-mode:normal}
+.kiln-shell .k-topnav-link{font-weight:400;font-size:.74rem;letter-spacing:.2em}
+.kiln-shell .k-topnav-brand{font-weight:400;letter-spacing:.3em}
+.k-topnav,.k-topnav.is-overlay{color:#b8b8b8}
+
+/* Footer v2: negro, trazo fino, firma KILN */
+.k-footer.k-footer-v2{margin:0;padding:clamp(3rem,6vw,5rem) clamp(1.25rem,3vw,2.75rem) 1.5rem;border:0;background:#050505;color:#b8b8b8;overflow:hidden}
+.k-footer-v2-top{display:grid;grid-template-columns:1.4fr repeat(3,1fr);gap:2rem}
+.kiln-shell .k-footer-v2-mark{align-self:start;justify-self:start;padding:0;border:0;background:none;color:#b8b8b8;cursor:pointer}
+.k-footer-v2-mark .k-logo-mark{transform:none!important}
+.k-footer-v2-mark .k-logo-mark i,.k-footer-v2-mark .k-logo-mark b{background:currentColor!important}
+.k-footer-v2-col{display:flex;flex-direction:column;align-items:flex-start;gap:.85rem}
+.k-footer-v2-col>span{margin-bottom:.4rem;color:#5f5f5f;font:400 .66rem/1 var(--font-sans);letter-spacing:.22em;text-transform:uppercase}
+.kiln-shell .k-footer-v2-col button{padding:0;border:0;background:none;color:#b8b8b8;font:400 .78rem/1.2 var(--font-sans);letter-spacing:.12em;text-transform:uppercase;text-align:left;cursor:pointer;transition:color .2s}
+.kiln-shell .k-footer-v2-col button:hover,.kiln-shell .k-footer-v2-col button:focus-visible{color:#fff;outline:none}
+.k-footer-v2-word{margin:clamp(3rem,8vw,7rem) 0 1.25rem;color:#b8b8b8;font:400 19.5vw/.8 "Syncopate",var(--font-sans),sans-serif;letter-spacing:-.02em;text-align:center;white-space:nowrap;user-select:none}
+.k-footer-v2-bottom{display:flex;justify-content:space-between;gap:1rem;padding-top:1.25rem;border-top:1px solid #1f1f1f;color:#5f5f5f;font:400 .64rem/1 var(--font-sans);letter-spacing:.2em;text-transform:uppercase}
+@media(max-width:720px){.k-footer-v2-top{grid-template-columns:1fr 1fr;gap:2.25rem 1.5rem}.k-footer-v2-mark{grid-column:1/-1}.kiln-shell .k-footer-v2-col button{font-size:.7rem;letter-spacing:.08em}}
+
+/* Menú lateral negro, fondo difuminado, opciones editoriales */
+.k-side-backdrop{background:rgba(5,5,5,.25);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px)}
+.k-side-menu{width:min(480px,90vw);background:#050505;color:#fff}
+.k-side-menu-head{justify-content:space-between;gap:1rem}
+.k-side-actions{display:flex;gap:1.5rem}
+.kiln-shell .k-side-close{border-bottom-color:#fff;color:#fff;font-weight:400;letter-spacing:.2em}
+.kiln-shell .k-side-close:hover,.kiln-shell .k-side-close:focus-visible{color:#b8b8b8;border-bottom-color:#b8b8b8;outline:none}
+.k-side-nav{gap:clamp(1.4rem,3.2vh,2.2rem)}
+.kiln-shell .k-side-nav button{color:#fff;font:400 clamp(2.2rem,4vw,3.25rem)/1 "Bodoni Moda",Georgia,serif;letter-spacing:-.01em;text-transform:none}
+.kiln-shell .k-side-nav button:hover,.kiln-shell .k-side-nav button.active{color:#6b6b6b}
+.kiln-shell .k-side-nav button:focus-visible{outline:1px solid #fff;outline-offset:6px}
+@media(max-height:700px){.k-side-nav{gap:1.1rem}.kiln-shell .k-side-nav button{font-size:2rem}}
+.kiln-shell .k-side-nav button{font:400 clamp(1.3rem,2.1vw,1.85rem)/1.05 "Syncopate",var(--font-sans),sans-serif;letter-spacing:-.02em;text-transform:uppercase}
+@media(max-height:700px){.kiln-shell .k-side-nav button{font-size:1.25rem}}
+
+/* Menú lateral: más estrecho, opciones mayores y página difuminada */
+.k-side-menu{width:min(400px,88vw);padding-left:2rem;padding-right:2rem}
+.kiln-shell .k-side-nav button{font-size:clamp(1.45rem,7vw,1.85rem);letter-spacing:-.035em}
+.kiln-shell>main,.kiln-shell>footer,.kiln-shell>.k-topnav{transition:filter .45s ease}
+.kiln-shell.is-menu-open>main,.kiln-shell.is-menu-open>footer,.kiln-shell.is-menu-open>.k-topnav{filter:blur(14px)}
+.k-side-backdrop{background:rgba(5,5,5,.3)}
+@media(max-height:700px){.kiln-shell .k-side-nav button{font-size:1.4rem}}
+/* Home: títulos de medios en Syncopate fina con recuadro trazado en bucle */
+.k-media-title{position:relative;display:inline-block;padding:.85rem 1.2rem;font:400 clamp(1rem,2vw,1.6rem)/1 "Syncopate",var(--font-sans),sans-serif;letter-spacing:.04em;text-transform:uppercase}
+.k-home-v2-hero .k-media-title{font-size:clamp(1.6rem,4vw,3.4rem);padding:1.1rem 1.6rem}
+.k-media-label small{font-weight:400}
+.k-media-title::after{position:absolute;inset:0;content:"";pointer-events:none;background-image:linear-gradient(#fff,#fff),linear-gradient(#fff,#fff),linear-gradient(#fff,#fff),linear-gradient(#fff,#fff);background-repeat:no-repeat;background-size:0 1px,1px 0,0 1px,1px 0;background-position:left bottom,left bottom,left top,right bottom}
+.k-media-link:hover .k-media-title::after,.k-media-link:focus-visible .k-media-title::after{animation:kBoxTrace 2.6s cubic-bezier(.65,0,.35,1) infinite}
+@keyframes kBoxTrace{
+  0%{background-size:0 1px,1px 0,0 1px,1px 0;background-position:left bottom,left bottom,left top,right bottom}
+  22%{background-size:100% 1px,1px 100%,0 1px,1px 0;background-position:left bottom,left bottom,left top,right bottom}
+  44%{background-size:100% 1px,1px 100%,100% 1px,1px 100%;background-position:left bottom,left bottom,left top,right bottom}
+  50%{background-size:100% 1px,1px 100%,100% 1px,1px 100%;background-position:left bottom,left bottom,left top,right bottom}
+  50.1%{background-size:100% 1px,1px 100%,100% 1px,1px 100%;background-position:right bottom,left top,right top,right top}
+  72%{background-size:0 1px,1px 0,100% 1px,1px 100%;background-position:right bottom,left top,right top,right top}
+  94%,100%{background-size:0 1px,1px 0,0 1px,1px 0;background-position:right bottom,left top,right top,right top}
+}
+@media(prefers-reduced-motion:reduce){.k-media-link:hover .k-media-title::after{animation:none;background-size:100% 1px,1px 100%,100% 1px,1px 100%}}
+@media(hover:none){.k-media-title::after{background-size:100% 1px,1px 100%,100% 1px,1px 100%}}
+@media(max-width:720px){.k-media-title{font-size:.8rem;padding:.65rem .8rem}}
