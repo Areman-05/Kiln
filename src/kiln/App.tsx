@@ -24,6 +24,7 @@ import { StudioView, SubscriptionsView, VisitView, WholesaleView } from "./Extra
 
 export default function KilnApp() {
   const [view, setView] = useState<ViewName>("home")
+  const [shopCategory, setShopCategory] = useState<string>("Todos")
   const [selectedLot, setSelectedLot] = useState<CoffeeLot>(COFFEE_LOTS[0])
   const [subTab, setSubTab] = useState<SubTab>("personal")
 
@@ -88,6 +89,7 @@ export default function KilnApp() {
         setMatcherOpen(false)
         setCompareModalOpen(false)
         setCartOpen(false)
+        setMobileMenuOpen(false)
       }
     }
     window.addEventListener("keydown", onKeyDown)
@@ -101,17 +103,18 @@ export default function KilnApp() {
     }, 4500)
   }
 
-  const navigateTo = (target: ViewName) => {
+  const navigateTo = (target: ViewName, category = "Todos") => {
+    setShopCategory(category)
     setView(target)
     setMobileMenuOpen(false)
     window.scrollTo({ top: 0, behavior: "smooth" })
   }
 
-  const navigateWithTransition = (target: ViewName) => {
+  const navigateWithTransition = (target: ViewName, category = "Todos") => {
     if (target === view) return
     setMobileMenuOpen(false)
     setRouteTransition(true)
-    window.setTimeout(() => navigateTo(target), 260)
+    window.setTimeout(() => navigateTo(target, category), 260)
     window.setTimeout(() => setRouteTransition(false), 760)
   }
 
@@ -224,7 +227,7 @@ export default function KilnApp() {
   }
 
   return (
-    <div className="kiln-shell">
+    <div className={`kiln-shell ${mobileMenuOpen ? "is-menu-open" : ""}`}>
       {/* 1. BARRA SUPERIOR DE ESTADO DE TUESTE EN VIVO (Heurística #1) */}
       <div className="k-roast-bar">
         <div className="k-roast-bar-left">
@@ -247,119 +250,102 @@ export default function KilnApp() {
         </div>
       )}
 
-      {/* 2. NAVBAR REFINADA EDITORIAL */}
-      <header className={`k-header ${scrolled ? "scrolled" : ""}`}>
-        <div className="k-header-inner">
+      {/* 2. NAVBAR: Menú · Marca · Cuenta */}
+      <header className={`k-topnav ${view === "home" ? "is-overlay" : ""}`}>
+        <button
+          type="button"
+          className="k-topnav-link"
+          onClick={() => setMobileMenuOpen(true)}
+          aria-expanded={mobileMenuOpen}
+          aria-controls="k-side-menu"
+        >
+          Menú
+        </button>
+
+        <button
+          type="button"
+          className="k-topnav-brand"
+          onClick={() => navigateWithTransition("home")}
+          aria-label="Ir a inicio de Kiln"
+        >
+          <span className="k-logo-mark" aria-hidden="true"><i /><b /><b /><b /><b /></span>
+          <span>KILN</span>
+        </button>
+
+        <div className="k-topnav-right">
           <button
             type="button"
-            className="k-brand-btn"
-            onClick={() => navigateWithTransition("home")}
-            aria-label="Ir a inicio de Kiln Coffee Roasters"
+            className="k-topnav-link"
+            onClick={() => {
+              setSubTab("personal")
+              navigateWithTransition("subscriptions")
+            }}
           >
-            <span className="k-logo-mark" aria-hidden="true"><i /><b /><b /><b /><b /></span><span className="k-brand-word">KILN</span>
+            Cuenta
           </button>
+        </div>
+      </header>
 
-          <nav className="k-nav" aria-label="Navegación principal">
-            {(
-              [
-                ["shop", "Café"],
-                ["subscriptions", "Suscripciones"],
-                ["studio", "El estudio"],
-                ["visit", "Visítanos"],
-              ] as [ViewName, string][]
-            ).map(([id, label]) => (
-              <button
-                key={id}
-                type="button"
-                className={`k-nav-item ${view === id || (id === "shop" && view === "product") ? "active" : ""}`}
-                onClick={() => navigateWithTransition(id)}
-              >
-                {label}
-              </button>
-            ))}
-          </nav>
-
-          <div className="k-header-tools">
+      <div className={`k-side-backdrop ${mobileMenuOpen ? "open" : ""}`} onClick={() => setMobileMenuOpen(false)} />
+      <aside id="k-side-menu" className={`k-side-menu ${mobileMenuOpen ? "open" : ""}`} aria-label="Menú principal" aria-hidden={!mobileMenuOpen}>
+        <div className="k-side-menu-head">
+          <button type="button" className="k-side-close" onClick={() => setMobileMenuOpen(false)} tabIndex={mobileMenuOpen ? 0 : -1}>
+            Cerrar
+          </button>
+          <div className="k-side-actions">
             <button
               type="button"
-              className="k-icon-tool"
-              onClick={() => setSearchModalOpen(true)}
-              title="Buscar lote o nota de cata (⌘K)"
-              aria-label="Buscar lote o nota de cata"
-            >
-              <svg viewBox="0 0 24 24" aria-hidden="true">
-                <circle cx="10.8" cy="10.8" r="5.8" />
-                <path d="m15.2 15.2 4 4" />
-              </svg>
-            </button>
-
-            <button
-              type="button"
-              className="k-cart-trigger"
+              className="k-side-close"
+              tabIndex={mobileMenuOpen ? 0 : -1}
               onClick={() => {
+                setMobileMenuOpen(false)
+                setSearchModalOpen(true)
+              }}
+            >
+              Buscar
+            </button>
+            <button
+              type="button"
+              className="k-side-close"
+              tabIndex={mobileMenuOpen ? 0 : -1}
+              onClick={() => {
+                setMobileMenuOpen(false)
                 setCheckoutStep("cart")
                 setCartOpen(true)
               }}
             >
-              <span className="k-cart-label">Cesta</span>
-              <span className="k-cart-count">{cartCount}</span>
-            </button>
-
-            <button
-              type="button"
-              className="k-mobile-toggle"
-              onClick={() => setMobileMenuOpen((m) => !m)}
-            >
-              {mobileMenuOpen ? "Cerrar" : "Menú"}
+              Cesta ({cartCount})
             </button>
           </div>
         </div>
-
-        {/* Menú desplegable móvil */}
-        {mobileMenuOpen && (
-          <div
-            style={{
-              background: "var(--bg-card)",
-              borderBottom: "1px solid var(--line-medium)",
-              padding: "1.25rem 1.5rem",
-              display: "flex",
-              flexDirection: "column",
-              gap: "0.85rem",
-            }}
-          >
-            {(
-              [
-                ["home", "Inicio"],
-                ["shop", "Café"],
-                ["subscriptions", "Suscripciones"],
-                ["studio", "El estudio"],
-                ["visit", "Visítanos"],
-                ["brew", "Guías de extracción"],
-                ["wholesale", "Profesionales"],
-              ] as [ViewName, string][]
-            ).map(([id, label]) => (
-              <button
-                key={id}
-                type="button"
-                className="k-mobile-nav-item"
-                onClick={() => navigateTo(id)}
-              >
-                {label}
-              </button>
-            ))}
+        <nav className="k-side-nav">
+          {(
+            [
+              ["home", "Inicio"],
+              ["shop", "Café"],
+              ["subscriptions", "Suscripciones"],
+              ["studio", "El estudio"],
+              ["visit", "Visítanos"],
+              ["brew", "Guías"],
+              ["wholesale", "Profesionales"],
+            ] as [ViewName, string][]
+          ).map(([id, label], index) => (
             <button
+              key={id}
               type="button"
-              className="k-mobile-nav-item k-mobile-nav-assistant"
+              className={view === id || (id === "shop" && view === "product") ? "active" : ""}
+              style={{ transitionDelay: mobileMenuOpen ? `${120 + index * 45}ms` : "0ms" }}
+              tabIndex={mobileMenuOpen ? 0 : -1}
               onClick={() => {
                 setMobileMenuOpen(false)
-                setMatcherOpen(true)
+                navigateWithTransition(id)
               }}
             >
-              Encuentra tu café
+              {label}
             </button>
-          </div>
-        )}
-      </header>
+          ))}
+        </nav>
+      </aside>
 
       {/* 3. BARRA DE RASTRO (BREADCRUMBS) EN VISTAS INTERNAS */}
       {view !== "home" && view !== "shop" && view !== "product" && (
@@ -380,18 +366,16 @@ export default function KilnApp() {
       <main style={{ flex: 1 }}>
         {view === "home" && (
           <HomeView
-            onNavigate={navigateTo}
-            onSelectLot={openLotDetail}
-            onQuickAdd={(l, s, g) => handleAddToCart(l, s, g, 1, " puntual")}
-            comparedIds={comparedIds}
-            onToggleCompare={handleToggleCompare}
-            onOpenMatcher={() => setMatcherOpen(true)}
+            onNavigate={(target) => navigateWithTransition(target)}
+            onOpenSeason={() => navigateWithTransition("shop", "Cosecha Estacional")}
             onOpenSubTab={(t) => setSubTab(t)}
           />
         )}
 
         {view === "shop" && (
           <ShopView
+            key={shopCategory}
+            initialCategory={shopCategory}
             onSelectLot={openLotDetail}
             onQuickAdd={(l, s, g) => handleAddToCart(l, s, g, 1, " puntual")}
             comparedIds={comparedIds}
@@ -1100,25 +1084,32 @@ export default function KilnApp() {
       </aside>
 
       {/* 10. FOOTER */}
-      <footer className="k-footer">
-        <div className="k-container">
-          <div className="k-footer-simple">
-            <div>
-              <span className="k-footer-wordmark"><span className="k-logo-mark" aria-hidden="true"><i /><b /><b /><b /><b /></span>KILN</span>
-              <p>Café de especialidad seleccionado y tostado con precisión.</p>
-            </div>
-            <nav className="k-footer-nav" aria-label="Navegación del pie">
-              <button type="button" onClick={() => navigateTo("shop")}>Café</button>
-              <button type="button" onClick={() => navigateTo("subscriptions")}>Suscripciones</button>
-              <button type="button" onClick={() => navigateTo("studio")}>Estudio</button>
-              <button type="button" onClick={() => navigateTo("visit")}>Visítanos</button>
+      <footer className="k-footer k-footer-v2">
+        <div className="k-footer-v2-top">
+          <button type="button" className="k-footer-v2-mark" onClick={() => navigateWithTransition("home")} aria-label="Ir a inicio de Kiln">
+            <span className="k-logo-mark" aria-hidden="true"><i /><b /><b /><b /><b /></span>
+          </button>
+          {(
+            [
+              ["Tienda", [["Café", () => navigateWithTransition("shop")], ["Suscripciones", () => { setSubTab("personal"); navigateWithTransition("subscriptions") }], ["Regalos", () => { setSubTab("gift"); navigateWithTransition("subscriptions") }]]],
+              ["Kiln", [["El estudio", () => navigateWithTransition("studio")], ["Visítanos", () => navigateWithTransition("visit")], ["Profesionales", () => navigateWithTransition("wholesale")]]],
+              ["Ayuda", [["Guías", () => navigateWithTransition("brew")], ["Encontrar mi café", () => setMatcherOpen(true)], ["hola@kilncoffee.es", () => { window.location.href = "mailto:hola@kilncoffee.es" }]]],
+            ] as [string, [string, () => void][]][]
+          ).map(([title, links]) => (
+            <nav key={title} className="k-footer-v2-col" aria-label={title}>
+              <span>{title}</span>
+              {links.map(([label, onClick]) => (
+                <button key={label} type="button" onClick={onClick}>
+                  {label}
+                </button>
+              ))}
             </nav>
-            <p className="k-footer-address">Origen preciso<br />Tueste exacto</p>
-          </div>
-          <div className="k-footer-bottom">
-            <span>© 2026 Kiln Coffee Roasters</span>
-            <span>hola@kilncoffee.es</span>
-          </div>
+          ))}
+        </div>
+        <div className="k-footer-v2-word" aria-hidden="true">KILN</div>
+        <div className="k-footer-v2-bottom">
+          <span>© 2026 Kiln</span>
+          <span>EUR (€) · ES</span>
         </div>
       </footer>
 

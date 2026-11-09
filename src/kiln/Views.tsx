@@ -29,136 +29,60 @@ import {
    ========================================================================== */
 export function HomeView({
   onNavigate,
-  onSelectLot,
-  onQuickAdd,
-  comparedIds,
-  onToggleCompare,
+  onOpenSeason,
   onOpenSubTab,
 }: {
   onNavigate: (v: ViewName) => void
-  onSelectLot: (lot: CoffeeLot) => void
-  onQuickAdd: (lot: CoffeeLot, size: BagSizeOption, grind: GrindOption) => void
-  comparedIds: string[]
-  onToggleCompare: (id: string) => void
-  onOpenMatcher: () => void
+  onOpenSeason: () => void
   onOpenSubTab: (tab: SubTab) => void
 }) {
-  const seasonalLots = COFFEE_LOTS.slice(0, 2)
-  const featuredLot = seasonalLots[0]
-
-  useEffect(() => {
-    const sections = document.querySelectorAll<HTMLElement>(".k-home-reveal > .k-container")
-    const observer = new IntersectionObserver(
-      (entries) => entries.forEach((entry) => entry.isIntersecting && entry.target.classList.add("is-visible")),
-      { threshold: 0.08, rootMargin: "0px 0px -8% 0px" }
-    )
-    sections.forEach((section) => observer.observe(section))
-    return () => observer.disconnect()
-  }, [])
+  const tiles: { label: string; image: string; alt: string; onClick: () => void }[] = [
+    { label: "Comprar café", image: PHOTOS.homeShop, alt: "Granos de café tostado", onClick: () => onNavigate("shop") },
+    {
+      label: "Suscripciones",
+      image: PHOTOS.homeSubscriptions,
+      alt: "Superficie de un café vista desde arriba",
+      onClick: () => {
+        onOpenSubTab("personal")
+        onNavigate("subscriptions")
+      },
+    },
+    { label: "Sobre nosotros", image: PHOTOS.homeAbout, alt: "Superficie de bloques de hormigón", onClick: () => onNavigate("studio") },
+    {
+      label: "Regalos",
+      image: PHOTOS.homeGifts,
+      alt: "Formas abstractas en blanco y negro",
+      onClick: () => {
+        onOpenSubTab("gift")
+        onNavigate("subscriptions")
+      },
+    },
+  ]
 
   return (
-    <div>
-      <section className="k-home-hero">
-        <img src={PHOTOS.homeHero} alt="Retícula de bloques de hormigón con sombras marcadas" className="k-home-hero-image" />
-        <div className="k-home-hero-shade" />
-        <div className="k-home-hero-content">
-          <h1>
-            Origen preciso<br />
-            Tueste exacto<br />
-            Sin ruido
-          </h1>
-          <button type="button" className="k-home-hero-action" onClick={() => onNavigate("shop")}>
-            Comprar cafés
+    <div className="k-home-v2">
+      <button type="button" className="k-media-link k-home-v2-hero" onClick={onOpenSeason}>
+        <img src={PHOTOS.homeSeason} alt="Sombras de hojas de palmera sobre un muro" />
+        <span className="k-media-label">
+          <small>Temporada</small>
+          <span className="k-media-title">Nueva colección</span>
+        </span>
+      </button>
+
+      <div className="k-home-v2-grid">
+        {tiles.map((tile) => (
+          <button key={tile.label} type="button" className="k-media-link" onClick={tile.onClick}>
+            <img src={tile.image} alt={tile.alt} loading="lazy" />
+            <span className="k-media-label"><span className="k-media-title">{tile.label}</span></span>
           </button>
-          <span className="k-scroll-cue" aria-hidden="true">↓</span>
-        </div>
-      </section>
-
-      <section className="k-home-intro k-home-reveal">
-        <div className="k-home-intro-logo" aria-hidden="true"><i /><b /><b /><b /><b /></div>
-        <div className="k-container">
-          <span className="k-eyebrow">NUESTRO OFICIO</span>
-          <p>Café sin artificio.</p>
-          <p className="k-home-intro-detail">Compramos pocos lotes, los seguimos de cerca y los tostamos con precisión para que cada taza muestre su origen con claridad.</p>
-          <div className="k-home-intro-actions">
-            <button type="button" className="k-home-intro-button k-home-intro-button-primary" onClick={() => onNavigate("studio")}>
-              Sobre nosotros
-            </button>
-            <button type="button" className="k-home-intro-button" onClick={() => onNavigate("shop")}>
-              Nuestro café
-            </button>
-          </div>
-        </div>
-      </section>
-
-      <section className="k-home-season k-home-reveal">
-        <div className="k-container">
-          <div className="k-home-section-heading">
-            <div>
-              <span className="k-eyebrow">NUEVA COLECCIÓN</span>
-              <h2 className="k-title-lg">Trópico Nocturno</h2>
-            </div>
-            <button type="button" className="k-link-arrow" onClick={() => onNavigate("shop")}>
-              Ver colección →
-            </button>
-          </div>
-          <div className="k-home-collection">
-            {seasonalLots.map((lot, index) => (
-              <article key={lot.id} className={`k-home-collection-item ${index === 1 ? "is-left" : ""}`}>
-                <div className="k-home-collection-copy">
-                  <span className="k-home-collection-number">0{index + 1}</span>
-                  <h3>{lot.name}</h3>
-                  <p>{lot.tastingParagraph} {lot.story}</p>
-                  <span className="k-home-collection-meta">{lot.notes[0]} · {formatEur(lot.price250)}</span>
-                  <button type="button" className="k-home-collection-button" onClick={() => onSelectLot(lot)}>
-                    Ver producto
-                  </button>
-                </div>
-                <button type="button" className="k-home-collection-bag" onClick={() => onSelectLot(lot)} aria-label={`Ver ${lot.name}`}>
-                  <Bag lot={{ name: lot.name, no: lot.no, origin: lot.origin, process: lot.process, roast: lot.roast, notes: lot.notes, tone: index === 0 ? "noir" : "ivory" }} size="lg" />
-                </button>
-              </article>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      <section className="k-home-subscriptions k-home-reveal">
-        <div className="k-container">
-          <div className="k-home-subscription-panel">
-            <div>
-              <span className="k-eyebrow">SUSCRIPCIÓN KILN</span>
-              <h2>Café nuevo. Cada ciclo.</h2>
-              <p>Recibe una selección precisa de nuestros lotes más recientes. Ajusta cantidad, frecuencia y molienda cuando quieras, sin permanencia.</p>
-            </div>
-            <div className="k-home-subscription-actions">
-              <button
-                type="button"
-                className="k-btn-outline-light"
-                onClick={() => {
-                  onOpenSubTab("personal")
-                  onNavigate("subscriptions")
-                }}
-              >
-                Empezar suscripción
-              </button>
-              <button
-                type="button"
-                className="k-home-subscription-link"
-                onClick={() => {
-                  onOpenSubTab("gift")
-                  onNavigate("subscriptions")
-                }}
-              >
-                Regalar suscripción
-              </button>
-            </div>
-          </div>
-        </div>
-      </section>
+        ))}
+      </div>
     </div>
   )
 }
+
+const ROAST_OPTIONS = ["Todos", "Cosecha Estacional", "Filtro", "Omnitueste", "Espresso", "Reserva Competición", "Formatos"]
+const PROCESS_OPTIONS = ["Todos", "Lavado", "Natural", "Maceración carbónica", "Honey / Semilavado", "Ensamblaje"]
 
 export function ShopView({
   initialCategory = "Todos",
@@ -203,96 +127,88 @@ export function ShopView({
     })
   }, [roastFilter, processFilter, searchQuery, sortBy])
 
+  const activeFilterCount = [roastFilter !== "Todos", processFilter !== "Todos", searchQuery.trim() !== ""].filter(Boolean).length
+  const resetFilters = () => {
+    setRoastFilter("Todos")
+    setProcessFilter("Todos")
+    setSearchQuery("")
+    setSortBy("no")
+  }
+
   return (
     <section className="k-section-sm k-shop-view">
       <div className="k-container">
-        <div className="k-section-head">
-          <div>
-            <span className="k-eyebrow">CAFÉ KILN</span>
-            <h1 className="k-title-lg">Todos los cafés</h1>
-          </div>
-          <button type="button" className="k-btn-secondary" onClick={onOpenMatcher}>
-            Encontrar mi café
+        <header className="k-shop-head">
+          <h1>Todos los cafés</h1>
+          <span className="k-shop-count">{String(filteredLots.length).padStart(2, "0")} cafés</span>
+        </header>
+
+        <div className="k-shop-controls">
+          <button type="button" className="k-shop-control is-primary" onClick={onOpenMatcher}>
+            <span>Encontrar mi café</span>
+            <small>2 preguntas rápidas</small>
+          </button>
+          <button
+            type="button"
+            className="k-shop-control"
+            onClick={() => setFiltersOpen((open) => !open)}
+            aria-expanded={filtersOpen}
+            aria-controls="k-shop-filters"
+          >
+            <span>{filtersOpen ? "Cerrar filtros" : "Filtrar"}</span>
+            <small>{activeFilterCount > 0 ? `${activeFilterCount} activo${activeFilterCount > 1 ? "s" : ""}` : "Perfil, proceso, precio"}</small>
           </button>
         </div>
 
-        <div className="k-shop-filter-toggle-row">
-          <button type="button" className="k-shop-filter-toggle" onClick={() => setFiltersOpen((open) => !open)} aria-expanded={filtersOpen}>
-            {filtersOpen ? "Cerrar filtros" : "Filtrar"}
-          </button>
-        </div>
+        {filtersOpen && (
+          <div id="k-shop-filters" className="k-shop-filters">
+            <fieldset className="k-shop-filter-row">
+              <legend>Uso</legend>
+              <div>
+                {ROAST_OPTIONS.map((r) => (
+                  <button key={r} type="button" aria-pressed={roastFilter === r} onClick={() => setRoastFilter(r)}>
+                    {r}
+                  </button>
+                ))}
+              </div>
+            </fieldset>
 
-        {/* Barra de Filtros Combinables */}
-        {filtersOpen && <div className="k-shop-toolbar">
-          <div style={{ display: "flex", flexDirection: "column", gap: "0.75rem" }}>
-            <div className="k-filter-pills">
-              <span className="k-eyebrow" style={{ alignSelf: "center", marginRight: "0.4rem" }}>
-                Perfil
-              </span>
-              {["Todos", "Filtro", "Omnitueste", "Espresso", "Reserva Competición", "Formatos"].map((r) => (
-                <button
-                  key={r}
-                  type="button"
-                  className={`k-filter-pill ${roastFilter === r ? "active" : ""}`}
-                  onClick={() => setRoastFilter(r)}
-                >
-                  {r}
-                </button>
-              ))}
-            </div>
+            <fieldset className="k-shop-filter-row">
+              <legend>Proceso</legend>
+              <div>
+                {PROCESS_OPTIONS.map((p) => (
+                  <button key={p} type="button" aria-pressed={processFilter === p} onClick={() => setProcessFilter(p)}>
+                    {p}
+                  </button>
+                ))}
+              </div>
+            </fieldset>
 
-            <div className="k-filter-pills">
-              <span className="k-eyebrow" style={{ alignSelf: "center", marginRight: "0.4rem" }}>
-                Proceso
-              </span>
-              {["Todos", "Lavado", "Natural", "Maceración carbónica", "Honey / Semilavado", "Ensamblaje"].map((p) => (
-                <button
-                  key={p}
-                  type="button"
-                  className={`k-filter-pill ${processFilter === p ? "active" : ""}`}
-                  onClick={() => setProcessFilter(p)}
-                >
-                  {p}
-                </button>
-              ))}
+            <div className="k-shop-filter-tools">
+              <label>
+                <span>Buscar</span>
+                <input
+                  type="search"
+                  placeholder="Origen, nota o nombre"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                />
+              </label>
+              <label>
+                <span>Ordenar</span>
+                <select aria-label="Ordenar cafés" value={sortBy} onChange={(e) => setSortBy(e.target.value as typeof sortBy)}>
+                  <option value="no">Colección</option>
+                  <option value="score">Puntuación</option>
+                  <option value="price-asc">Precio: menor a mayor</option>
+                  <option value="price-desc">Precio: mayor a menor</option>
+                </select>
+              </label>
+              <button type="button" className="k-shop-reset" onClick={resetFilters} disabled={activeFilterCount === 0 && sortBy === "no"}>
+                Limpiar
+              </button>
             </div>
           </div>
-
-          <div style={{ display: "flex", gap: "0.75rem", flexWrap: "wrap", alignItems: "center" }}>
-            <input
-              type="search"
-              placeholder="Buscar café, origen o nota"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              style={{
-                padding: "0.52rem 0.9rem",
-                border: "1px solid var(--line-medium)",
-                borderRadius: "var(--radius-xs)",
-                background: "var(--bg-primary)",
-                fontSize: "0.82rem",
-                minWidth: "240px",
-              }}
-            />
-
-            <select
-              aria-label="Ordenar lotes"
-              value={sortBy}
-              onChange={(e) => setSortBy(e.target.value as typeof sortBy)}
-              style={{
-                padding: "0.52rem 0.85rem",
-                border: "1px solid var(--line-medium)",
-                borderRadius: "var(--radius-xs)",
-                background: "var(--bg-primary)",
-                fontSize: "0.82rem",
-              }}
-            >
-              <option value="no">Orden de colección</option>
-              <option value="score">Mayor Puntuación SCA</option>
-              <option value="price-asc">Precio: menor a mayor</option>
-              <option value="price-desc">Precio: mayor a menor</option>
-            </select>
-          </div>
-        </div>}
+        )}
 
         {/* Estado vacío con recuperación (Heurística de Nielsen #9) */}
         {filteredLots.length === 0 ? (
@@ -311,11 +227,7 @@ export function ShopView({
             <button
               type="button"
               className="k-btn-primary"
-              onClick={() => {
-                setRoastFilter("Todos")
-                setProcessFilter("Todos")
-                setSearchQuery("")
-              }}
+              onClick={resetFilters}
             >
               Restablecer todos los filtros
             </button>
