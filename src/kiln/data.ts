@@ -775,3 +775,16 @@ export const CAFE_MENU = [
     ],
   },
 ]
+
+/* Fotografía de origen para el catálogo: dos imágenes por país, alternadas por lote */
+export const ORIGIN_PHOTOS: Record<CoffeeLot["country"], [string, string]> = {
+  "Etiopía": ["https://images.unsplash.com/photo-1662186567737-b2ddea11e547?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=1200", "https://images.unsplash.com/photo-1658823235938-c424fa0875d6?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=1200"],
+  "Kenia": ["https://images.unsplash.com/photo-1597816792530-f6d57bd2bf9e?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=1200", "https://images.unsplash.com/photo-1676921820173-33e5e4d20aee?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=1200"],
+  "Colombia": ["https://images.unsplash.com/photo-1789009413779-99c4a0ddaedf?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=1200", "https://images.unsplash.com/photo-1778188985186-25a9d5f7d2b8?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=1200"],
+  "Panamá": ["https://images.unsplash.com/photo-1768875857393-6a7972b532f6?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=1200", "https://images.unsplash.com/photo-1764620967387-7412a794202d?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=1200"],
+  "Ruanda": ["https://images.unsplash.com/photo-1647891684895-15c5b831fde1?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=1200", "https://images.unsplash.com/photo-1779900275257-aaadab6d9285?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=1200"],
+  "Guatemala": ["https://images.unsplash.com/photo-1528543010705-e7e75169b717?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=1200", "https://images.unsplash.com/photo-1606503809729-40646b716a36?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=1200"],
+  "Perú": ["https://images.unsplash.com/photo-1717813864181-6d879c978f2d?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=1200", "https://images.unsplash.com/photo-1568507790497-847e2dbaccc8?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=1200"],
+  "Brasil": ["https://images.unsplash.com/photo-1762686852371-763b689910b2?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=1200", "https://images.unsplash.com/photo-1646753555452-cf31c0f86159?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=1200"],
+}
+
