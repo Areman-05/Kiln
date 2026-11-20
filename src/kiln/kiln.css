@@ -2409,3 +2409,55 @@ body {
 .kiln-shell .k-sort-list li[aria-selected="true"] button::before{content:"— "}
 @keyframes kSortIn{from{opacity:0;transform:translateY(-.3rem)}to{opacity:1;transform:none}}
 @media(max-width:720px){.k-sort{width:100%}.k-sort-menu,.kiln-shell .k-sort-trigger{flex:1;min-width:0;width:100%}}
+
+/* Ficha de café v2: oscura, bolsa fija, compra limpia */
+.k-pdp2{background:#050505;color:#b8b8b8}
+.k-pdp2-grid{display:grid;grid-template-columns:1fr 1fr;border-bottom:1px solid #1c1c1c}
+.k-pdp2-stage{position:sticky;top:0;display:flex;align-items:center;justify-content:center;height:100svh;min-height:560px;border-right:1px solid #1c1c1c}
+.k-pdp2-stage .k-lot-chip{position:absolute;top:5.5rem;right:1.5rem}
+.k-pdp2-stage .kiln-bag-wrap{transform:none!important}
+.k-pdp2-stage .kiln-bag-svg>ellipse{display:none}
+.k-pdp2-info{padding:6.5rem clamp(1.5rem,4vw,4rem) 4rem}
+.kiln-shell .k-pdp2-back{padding:0 0 .3rem;border:0;border-bottom:1px solid transparent;background:none;color:#6b6b6b;font:400 .66rem/1 var(--font-sans);letter-spacing:.18em;text-transform:uppercase;cursor:pointer}
+.kiln-shell .k-pdp2-back:hover{color:#fff;border-bottom-color:#fff}
+.k-pdp2-info h1{margin:2.5rem 0 1rem;color:#fff;font:400 clamp(1.8rem,3.4vw,3.2rem)/1.02 "Syncopate",var(--font-sans),sans-serif;letter-spacing:-.04em;text-transform:uppercase}
+.k-pdp2-origin{margin:0;color:#6b6b6b;font:400 .7rem/1.4 var(--font-sans);letter-spacing:.16em;text-transform:uppercase}
+.k-pdp2-notes{margin:1.6rem 0 0;color:#fff;font:400 .8rem/1.5 var(--font-sans);letter-spacing:.14em;text-transform:uppercase}
+.k-pdp2-text{max-width:34rem;margin:1rem 0 0;color:#8a8a8a;font:400 .92rem/1.7 var(--font-sans)}
+.k-pdp2-specs{display:grid;grid-template-columns:1fr 1fr;margin:2.5rem 0 0;border-top:1px solid #1c1c1c}
+.k-pdp2-specs>div{padding:1rem 0;border-bottom:1px solid #1c1c1c}
+.k-pdp2-specs>div:nth-child(odd){padding-right:1rem}
+.k-pdp2-specs dt{color:#5f5f5f;font:400 .6rem/1 var(--font-sans);letter-spacing:.18em;text-transform:uppercase}
+.k-pdp2-specs dd{margin:.55rem 0 0;color:#e8e8e8;font:400 .85rem/1.35 var(--font-sans)}
+.k-pdp2-buy{display:grid;gap:1.6rem;margin-top:2.75rem}
+.k-pdp2-field>span{display:block;margin-bottom:.7rem;color:#5f5f5f;font:400 .6rem/1 var(--font-sans);letter-spacing:.18em;text-transform:uppercase}
+.k-pdp2-options{display:grid;gap:0;border-top:1px solid #2a2a2a;border-left:1px solid #2a2a2a}
+.k-pdp2-options.is-3{grid-template-columns:repeat(3,1fr)}
+.k-pdp2-options.is-2{grid-template-columns:repeat(2,1fr)}
+.kiln-shell .k-pdp2-options button{display:flex;flex-direction:column;align-items:flex-start;gap:.45rem;min-height:3.1rem;padding:.85rem 1rem;border:0;border-right:1px solid #2a2a2a;border-bottom:1px solid #2a2a2a;border-radius:0;background:none;color:#8a8a8a;font:400 .7rem/1.2 var(--font-sans);letter-spacing:.12em;text-transform:uppercase;text-align:left;cursor:pointer;transition:color .2s,background .2s}
+.kiln-shell .k-pdp2-options button small{color:inherit;opacity:.7;font-size:.68rem;letter-spacing:.06em}
+.kiln-shell .k-pdp2-options button:hover{color:#fff;background:#111}
+.kiln-shell .k-pdp2-options button[aria-pressed="true"]{background:#fff;color:#050505}
+.k-pdp2-cadence{margin-top:.75rem}
+.k-pdp2-action{display:flex;gap:.75rem;margin-top:.4rem}
+.k-pdp2-qty{display:flex;align-items:center;border:1px solid #2a2a2a}
+.kiln-shell .k-pdp2-qty button{width:2.75rem;height:100%;border:0;background:none;color:#b8b8b8;font:300 1.1rem/1 var(--font-sans);cursor:pointer}
+.kiln-shell .k-pdp2-qty button:hover{color:#fff}
+.k-pdp2-qty span{min-width:1.6rem;color:#fff;font:400 .85rem/1 var(--font-sans);text-align:center}
+.kiln-shell .k-pdp2-add{display:flex;flex:1;align-items:center;justify-content:space-between;gap:1rem;height:3.6rem;padding:0 1.4rem;border:1px solid #fff;border-radius:0;background:#fff;color:#050505;font:400 .74rem/1 var(--font-sans);letter-spacing:.18em;text-transform:uppercase;cursor:pointer;transition:background .25s,color .25s}
+.kiln-shell .k-pdp2-add:hover,.kiln-shell .k-pdp2-add:focus-visible{background:#050505;color:#fff;outline:none}
+.k-pdp2-more{margin-top:3rem;border-top:1px solid #1c1c1c}
+.k-pdp2-more details{border-bottom:1px solid #1c1c1c}
+.k-pdp2-more summary{display:flex;justify-content:space-between;align-items:center;padding:1.15rem 0;color:#e8e8e8;font:400 .7rem/1 var(--font-sans);letter-spacing:.18em;text-transform:uppercase;list-style:none;cursor:pointer}
+.k-pdp2-more summary::-webkit-details-marker{display:none}
+.k-pdp2-more summary::after{content:"+";color:#6b6b6b;font-size:1rem;letter-spacing:0}
+.k-pdp2-more details[open] summary::after{content:"−"}
+.k-pdp2-more p{margin:0 0 1rem;color:#8a8a8a;font:400 .88rem/1.7 var(--font-sans)}
+.k-pdp2-more ol{display:grid;gap:.7rem;margin:0 0 1.4rem;padding:0;list-style:none}
+.k-pdp2-more li{display:grid;grid-template-columns:7.5rem 4.5rem 1fr;gap:.75rem;color:#8a8a8a;font:400 .82rem/1.5 var(--font-sans)}
+.k-pdp2-more li b{color:#e8e8e8;font-weight:400}
+.k-pdp2-more li span{color:#b8b8b8}
+.kiln-shell.is-dark .k-pdp2-related.k-shop-view{padding:4rem 0 0}
+.k-pdp2-related h2{margin:0 clamp(1.25rem,3vw,2.75rem) 2rem;color:#fff;font:400 clamp(1rem,1.8vw,1.4rem)/1.1 "Syncopate",var(--font-sans),sans-serif;letter-spacing:-.02em;text-transform:uppercase}
+@media(max-width:900px){.k-pdp2-grid{grid-template-columns:1fr}.k-pdp2-stage{position:relative;height:auto;min-height:0;padding:6rem 1rem 3rem;border-right:0;border-bottom:1px solid #1c1c1c}.k-pdp2-info{padding-top:3rem}.k-pdp2-stage .kiln-bag-wrap{width:240px!important;height:350px!important}}
+@media(max-width:560px){.k-pdp2-options.is-3{grid-template-columns:repeat(2,1fr)}.k-pdp2-more li{grid-template-columns:1fr;gap:.2rem}}
