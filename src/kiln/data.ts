@@ -788,3 +788,19 @@ export const ORIGIN_PHOTOS: Record<CoffeeLot["country"], [string, string]> = {
   "Brasil": ["https://images.unsplash.com/photo-1762686852371-763b689910b2?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=1200", "https://images.unsplash.com/photo-1646753555452-cf31c0f86159?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=1200"],
 }
 
+/* Portada única por café; ORIGIN_PHOTOS queda como reserva para lotes nuevos */
+const LOT_PHOTOS: Record<string, string> = {
+  "halo-hartume": "https://images.unsplash.com/photo-1662186567737-b2ddea11e547?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=1200",
+  "guji-uraga": "https://images.unsplash.com/photo-1658823235938-c424fa0875d6?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=1200",
+  "sidama-bensa": "https://images.unsplash.com/photo-1572888195250-3037a59d3578?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=1200",
+  "limu-gera": "https://images.unsplash.com/photo-1573403092240-26095e118918?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=1200",
+  "kiln-blanc-blend": "https://images.unsplash.com/photo-1573402828455-643c2789fb46?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=1200",
+  "karinga-ab": "https://images.unsplash.com/photo-1597816792530-f6d57bd2bf9e?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=1200",
+  "nyeri-gatomboya": "https://images.unsplash.com/photo-1765307095557-703fe7b10118?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=1200",
+  "kirinyaga-kii": "https://images.unsplash.com/photo-1676921820173-33e5e4d20aee?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=1200",
+  "la-esmeralda-geisha": "https://images.unsplash.com/photo-1768875857393-6a7972b532f6?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=1200",
+  "finca-deborah-symbiosis": "https://images.unsplash.com/photo-1764620967387-7412a794202d?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=1200",
+  "boquete-volcan": "https://images.unsplash.com/photo-1504252060324-1c76e2e09939?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=1200",
+  "boquete-geisha-natural": "https://images.unsplash.com/photo-1632307941173-5d541ea1d940?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=1200",
+}
+
