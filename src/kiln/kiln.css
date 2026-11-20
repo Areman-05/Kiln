@@ -2315,3 +2315,25 @@ body {
 @media(prefers-reduced-motion:reduce){.k-media-link:hover .k-media-title::after{animation:none;background-size:100% 1px,1px 100%,100% 1px,1px 100%}}
 @media(hover:none){.k-media-title::after{background-size:100% 1px,1px 100%,100% 1px,1px 100%}}
 @media(max-width:720px){.k-media-title{font-size:.8rem;padding:.65rem .8rem}}
+
+/* Café oscuro: misma identidad que Home */
+.kiln-shell.is-dark{background:#050505}
+.kiln-shell.is-dark .k-shop-view{padding:2.5rem 0 0;background:#050505;color:#b8b8b8}
+.kiln-shell.is-dark .k-shop-view>.k-container{max-width:none;padding:0}
+.kiln-shell.is-dark .k-shop-head,.kiln-shell.is-dark .k-shop-controls,.kiln-shell.is-dark .k-shop-filters{margin-left:clamp(1.25rem,3vw,2.75rem);margin-right:clamp(1.25rem,3vw,2.75rem)}
+.kiln-shell.is-dark .k-shop-view .k-shop-head h1{color:#fff;font-weight:400!important;letter-spacing:-.03em!important}
+.kiln-shell.is-dark .k-shop-count{color:#6b6b6b;font-weight:400}
+.kiln-shell.is-dark .k-shop-controls{margin-bottom:2.5rem;border-top-color:#2a2a2a}
+.kiln-shell.is-dark .k-shop-control{color:#b8b8b8}
+.kiln-shell.is-dark .k-shop-control span{font-weight:400;letter-spacing:.18em}
+.kiln-shell.is-dark .k-shop-control small{color:#5f5f5f}
+.kiln-shell.is-dark .k-shop-control:hover,.kiln-shell.is-dark .k-shop-control[aria-expanded="true"]{color:#fff;border-bottom-color:#fff}
+.kiln-shell.is-dark .k-shop-filters{margin-top:-1.25rem;border-bottom-color:#1f1f1f}
+.kiln-shell.is-dark .k-shop-filter-row legend,.kiln-shell.is-dark .k-shop-filter-tools label>span{color:#5f5f5f}
+.kiln-shell.is-dark .k-shop-filter-row button{color:#6b6b6b;font-weight:400}
+.kiln-shell.is-dark .k-shop-filter-row button:hover{color:#fff}
+.kiln-shell.is-dark .k-shop-filter-row button[aria-pressed="true"]{color:#fff;border-bottom-color:#fff}
+.kiln-shell.is-dark .k-shop-view .k-shop-filter-tools input,.kiln-shell.is-dark .k-shop-view .k-shop-filter-tools select{color:#fff;border-bottom-color:#333!important;font-weight:400!important}
+.kiln-shell.is-dark .k-shop-view .k-shop-filter-tools select option{background:#050505;color:#fff}
+.kiln-shell.is-dark .k-shop-reset{border-bottom-color:#fff;color:#fff;font-weight:400}
+.kiln-shell.is-dark .k-shop-reset:disabled{color:#3a3a3a;border-color:transparent}
