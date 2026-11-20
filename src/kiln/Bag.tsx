@@ -14,6 +14,8 @@ export type BagLot = {
   tone?: string
   score?: string
   format?: "bag" | "box" | "capsules" | "bottle"
+  weight?: string
+  view?: "front" | "side" | "back"
 }
 
 /* Paletas táctiles: papel algodón de 320g y laminado mate cerámico compostable
@@ -142,6 +144,7 @@ const palettes: Record<
 }
 
 const widths = {
+  xs: 54,
   sm: 108,
   md: 215,
   lg: 310,
@@ -155,7 +158,7 @@ export function Bag({
   style,
 }: {
   lot: BagLot
-  size?: "sm" | "md" | "lg" | "xl"
+  size?: "xs" | "sm" | "md" | "lg" | "xl"
   className?: string
   style?: CSSProperties
 }) {
@@ -172,7 +175,25 @@ export function Bag({
   const id = `bag-${cleanId}-${size}`
 
   const displayName = lot.name.toUpperCase()
-  const titleFontSize = displayName.length > 21 ? "10.2" : displayName.length > 16 ? "11.6" : "13.2"
+  // Nombre en Syncopate (muy ancha): partir en dos líneas si es largo y ajustar el cuerpo al ancho útil
+  const words = displayName.split(" ")
+  let nameLines = [displayName]
+  if (displayName.length > 14 && words.length > 1) {
+    let best = 1
+    let bestDiff = Infinity
+    for (let i = 1; i < words.length; i++) {
+      const diff = Math.abs(words.slice(0, i).join(" ").length - words.slice(i).join(" ").length)
+      if (diff < bestDiff) {
+        bestDiff = diff
+        best = i
+      }
+    }
+    nameLines = [words.slice(0, best).join(" "), words.slice(best).join(" ")]
+  }
+  const longest = Math.max(...nameLines.map((l) => l.length))
+  const nameSize = Math.max(6.5, Math.min(13, 136 / (longest * 1.06)))
+  const weight = (lot.weight ?? "250 G").toUpperCase()
+  const view = lot.view ?? "front"
 
   return (
     <div
@@ -185,6 +206,42 @@ export function Bag({
       role="img"
       aria-label={`Envase de café ${lot.name}, origen ${lot.origin}`}
     >
+      {view === "side" ? (
+        <svg viewBox="0 0 240 350" width="100%" height="100%" className="kiln-bag-svg" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <linearGradient id={`${id}-side`} x1="0%" y1="0%" x2="100%" y2="0%">
+              <stop offset="0%" stopColor="#e4e4e1" />
+              <stop offset="35%" stopColor="#ffffff" />
+              <stop offset="75%" stopColor="#f3f3f1" />
+              <stop offset="100%" stopColor="#d9d9d5" />
+            </linearGradient>
+          </defs>
+          <path d="M 84 18 L 156 18 L 160 336 L 80 336 Z" fill={`url(#${id}-side)`} />
+          <path d="M 120 30 L 120 316" stroke="rgba(0,0,0,0.12)" strokeWidth="0.8" />
+          <path d="M 80 336 L 120 316 L 160 336 Z" fill="#000" opacity="0.05" />
+          <rect x="82" y="12" width="76" height="11" rx="1.5" fill="#f6f6f4" />
+          <rect x="84" y="72" width="7" height="96" fill={accent} />
+          <g transform="translate(108 52)" fill={p.ink}>
+            <rect x="0" y="0" width="3" height="24" />
+            <circle cx="10" cy="6" r="4.6" />
+            <circle cx="20" cy="6" r="4.6" />
+            <circle cx="10" cy="18" r="4.6" />
+            <circle cx="20" cy="18" r="4.6" />
+          </g>
+          <text
+            transform="translate(128 300) rotate(-90)"
+            fill={p.ink}
+            fontFamily="'Syncopate', 'DM Sans', sans-serif"
+            fontSize="17"
+            letterSpacing="6"
+          >
+            KILN
+          </text>
+          <text transform="translate(96 300) rotate(-90)" fill={p.subInk} fontFamily="'DM Sans', sans-serif" fontSize="6" letterSpacing="2">
+            {(lot.roast ?? "").toUpperCase()}
+          </text>
+        </svg>
+      ) : (
       <svg
         viewBox="0 0 240 350"
         width="100%"
@@ -291,6 +348,7 @@ export function Bag({
         </g>
 
         {/* Logo protagonista */}
+        {view === "front" && (
         <g>
           <g transform="translate(57 72)" fill={p.ink}>
             <rect x="0" y="0" width="13" height="178" />
@@ -299,14 +357,64 @@ export function Bag({
             <circle cx="55" cy="136" r="35" />
             <circle cx="128" cy="136" r="35" />
           </g>
-          <text x="52" y="296" fill={p.ink} fontFamily="'DM Sans', -apple-system, sans-serif" fontSize={displayName.length > 18 ? "12" : "16"} fontWeight="900" letterSpacing="-1.1">
-            {displayName}
-          </text>
-          <text x="188" y="296" textAnchor="end" fill={p.ink} fontFamily="'DM Mono', monospace" fontSize="7" fontWeight="500">
-            250 G
+          {nameLines.map((line, i) => (
+            <text
+              key={line}
+              x="52"
+              y={nameLines.length === 1 ? 290 : 280 + i * (nameSize + 3)}
+              fill={p.ink}
+              fontFamily="'Syncopate', 'DM Sans', sans-serif"
+              fontSize={nameSize.toFixed(1)}
+              fontWeight="400"
+              letterSpacing="-0.2"
+            >
+              {line}
+            </text>
+          ))}
+          <text x="188" y="308" textAnchor="end" fill={p.ink} fontFamily="'DM Sans', sans-serif" fontSize="7" fontWeight="500" letterSpacing="1.2">
+            {weight}
           </text>
         </g>
+        )}
+        {view === "back" && (
+          <g fontFamily="'DM Sans', sans-serif" fill={p.ink}>
+            <rect x="52" y="64" width="136" height="214" fill="#ffffff" stroke={p.ink} strokeWidth="0.8" />
+            <g transform="translate(62 76)">
+              <rect x="0" y="0" width="2.4" height="18" />
+              <circle cx="8" cy="4.4" r="3.6" />
+              <circle cx="15.6" cy="4.4" r="3.6" />
+              <circle cx="8" cy="13.6" r="3.6" />
+              <circle cx="15.6" cy="13.6" r="3.6" />
+            </g>
+            <text x="62" y="114" fontFamily="'Syncopate', 'DM Sans', sans-serif" fontSize={Math.min(9, 112 / (displayName.length * 1.06)).toFixed(1)}>
+              {displayName}
+            </text>
+            <line x1="62" y1="122" x2="178" y2="122" stroke={p.ink} strokeWidth="0.5" />
+            {[
+              ["ORIGEN", lot.origin],
+              ["PROCESO", lot.process ?? ""],
+              ["VARIEDAD", lot.variety ?? ""],
+              ["TUESTE", lot.roast ?? ""],
+              ["NOTAS", (lot.notes ?? []).join(", ")],
+            ].map(([label, value], i) => (
+              <g key={label} transform={`translate(62 ${136 + i * 19})`}>
+                <text fontSize="4.4" letterSpacing="1.1" fill={p.subInk}>{label}</text>
+                <text y="8" fontSize={value.length > 34 ? "4.6" : "5.4"}>{value.length > 44 ? `${value.slice(0, 43)}…` : value}</text>
+              </g>
+            ))}
+            <line x1="62" y1="234" x2="178" y2="234" stroke={p.ink} strokeWidth="0.5" />
+            <text x="62" y="244" fontSize="4.4" fill={p.subInk}>Café de especialidad · 100% arábica</text>
+            <text x="62" y="252" fontSize="4.4" fill={p.subInk}>Mejor en los 3 meses tras el tueste.</text>
+            <text x="62" y="260" fontSize="4.4" fill={p.subInk}>Conservar en lugar fresco y seco.</text>
+            <g transform="translate(140 240)">
+              {[0, 2, 3, 5, 8, 9, 11, 14, 15, 17, 20, 22, 23, 26, 28, 30, 31, 34].map((x) => (
+                <rect key={x} x={x} y="0" width={x % 3 === 0 ? 1.4 : 0.8} height="22" />
+              ))}
+            </g>
+          </g>
+        )}
       </svg>
+      )}
     </div>
   )
 }
