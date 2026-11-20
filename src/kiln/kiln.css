@@ -2557,3 +2557,39 @@ body {
 @media(prefers-reduced-motion:reduce){.k-pdp2-bag{animation:kFadeOnly .3s ease both}}
 @keyframes kFadeOnly{from{opacity:0}to{opacity:1}}
 @media(max-width:600px){.k-pdp2-gallery{gap:.25rem}}
+
+/* Cesta y checkout: misma familia oscura que la ficha */
+.k-backdrop{background:rgba(5,5,5,.6);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px)}
+.k-drawer{--bg-primary:#0d0d0d;--bg-secondary:#0d0d0d;--bg-card:#050505;--ink-primary:#fff;--ink-secondary:#9a9a9a;--ink-muted:#6b6b6b;--ink-light-sub:#3a3a3a;--line-subtle:rgba(255,255,255,.08);--line-medium:rgba(255,255,255,.18);--line-strong:rgba(255,255,255,.4);--accent-rust:#fff;max-width:480px;border-left:1px solid rgba(255,255,255,.12);background:#050505;color:#d8d8d8;box-shadow:none;font-family:var(--font-sans)}
+.k-drawer h3,.k-drawer h4,.k-drawer .font-serif{color:#fff;font-family:"Syncopate",var(--font-sans),sans-serif!important;font-weight:400!important;letter-spacing:-.02em;text-transform:uppercase}
+.k-drawer h3{font-size:1.15rem!important}
+.k-drawer .font-serif{font-size:.82rem!important;line-height:1.3}
+.k-drawer .k-eyebrow{color:#6b6b6b;font-family:var(--font-sans);font-size:.6rem;letter-spacing:.2em}
+.k-drawer .font-mono{font-family:var(--font-sans);letter-spacing:.04em}
+.k-drawer button{color:inherit}
+.k-drawer-ship{color:#9a9a9a;border-bottom:1px solid rgba(255,255,255,.08)}
+.k-drawer-ship strong{color:#fff;font-weight:500}
+.k-drawer-ship>div{height:2px!important;border-radius:0!important;background:rgba(255,255,255,.12)!important}
+.k-drawer-ship>div>div{transition:width .6s cubic-bezier(.22,1,.36,1)}
+.k-drawer input{color:#fff;border-radius:0;font:400 .9rem var(--font-sans);transition:border-color .2s}
+.k-drawer input:focus{outline:none;border-color:#fff!important}
+.k-drawer .k-selector-option{border-radius:0;background:none;color:#9a9a9a}
+.k-drawer .k-selector-option>div:first-child{font-weight:500!important}
+.k-drawer .k-selector-option.active{border-color:#fff;background:none;color:#fff}
+.k-drawer .k-selector-option.active .sub{color:#9a9a9a!important}
+.kiln-shell .k-drawer .k-btn-primary,.k-drawer .k-btn-primary{height:3.4rem;padding:0 1.4rem;border:1px solid #fff!important;border-radius:0!important;background:#fff!important;color:#050505!important;box-shadow:none;transform:none;font:400 .66rem/1 "Syncopate",var(--font-sans),sans-serif;letter-spacing:.06em;text-transform:uppercase}
+.kiln-shell .k-drawer .k-btn-primary:hover:not(:disabled),.k-drawer .k-btn-primary:hover:not(:disabled){background:none!important;color:#fff!important;box-shadow:none;transform:none}
+.kiln-shell .k-drawer .k-btn-secondary,.k-drawer .k-btn-secondary{height:3.4rem;padding:0 1.1rem;border:1px solid rgba(255,255,255,.3)!important;border-radius:0!important;background:none;color:#9a9a9a;font:400 .62rem/1 var(--font-sans);letter-spacing:.18em}
+.kiln-shell .k-drawer .k-btn-secondary:hover,.k-drawer .k-btn-secondary:hover{border-color:#fff!important;background:none;color:#fff}
+.k-drawer [role="alert"]{color:#ff8a70!important}
+.k-drawer input[aria-invalid="true"]{border-color:#ff8a70!important}
+
+/* Cesta sin divisores: el ritmo lo marca el espacio */
+.k-drawer{--line-subtle:transparent;--bg-secondary:#050505;border-left-color:rgba(255,255,255,.08)}
+.k-drawer-ship{border-bottom:0;padding-bottom:1.5rem!important}
+.k-drawer-qty{gap:.25rem;border:0!important;margin-left:-.55rem}
+.k-drawer-qty button{color:#6b6b6b!important;transition:color .2s}
+.k-drawer-qty button:hover{color:#fff!important}
+.k-drawer-qty span{min-width:1.5rem;text-align:center;color:#fff}
+.k-drawer-total{align-items:baseline;margin-top:1rem;padding-top:0!important;margin-bottom:1.5rem!important;color:#fff;font:400 .95rem/1 "Syncopate",var(--font-sans),sans-serif!important;text-transform:uppercase}
+.k-drawer-total span:last-child{font-size:1.25rem}
