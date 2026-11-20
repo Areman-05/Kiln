@@ -2378,3 +2378,34 @@ body {
 .k-lot-chip i{width:6px;height:6px;border-radius:50%;background:#8fc27a}
 .k-lot-chip.is-espresso i{background:#e0925f}
 .k-lot-chip.is-omnitueste i{background:#a397ec}
+
+/* Café: hueco final negro, cabecera limpia y filtros con recuento */
+.kiln-shell.is-dark .k-shop-view .k-catalog-grid{gap:0;background:#050505;border-top:1px solid #1c1c1c}
+.kiln-shell.is-dark .k-shop-view .k-lot-card{box-shadow:inset -1px -1px 0 #1c1c1c}
+.kiln-shell.is-dark .k-shop-head{margin-bottom:1rem}
+.kiln-shell.is-dark .k-shop-controls{justify-content:flex-start;padding-top:0;border-top:0;margin-bottom:2rem}
+.kiln-shell.is-dark .k-shop-filters{margin-top:-.5rem}
+.kiln-shell .k-shop-filter-row button sup{margin-left:.3rem;color:#5f5f5f;font-size:.6em;vertical-align:super}
+.kiln-shell .k-shop-filter-row button[aria-pressed="true"] sup{color:#b8b8b8}
+.kiln-shell .k-shop-filter-row button:disabled{color:#333!important;cursor:default}
+.kiln-shell .k-shop-filter-row button:disabled sup{color:#2a2a2a}
+.k-shop-results{align-self:center;color:#6b6b6b;font:400 .66rem/1 var(--font-sans);letter-spacing:.16em;text-transform:uppercase}
+.kiln-shell.is-dark .k-shop-filter-tools .k-shop-reset{margin-left:0}
+
+/* Café: portadas estáticas */
+.k-lot-photo{animation:none!important;transform:none!important}
+/* Ordenar: desplegable propio */
+.k-sort{display:flex;align-items:baseline;gap:.75rem}
+.k-sort>span{color:#5f5f5f;font:400 .64rem/1 var(--font-sans);letter-spacing:.14em;text-transform:uppercase}
+.k-sort-menu{position:relative}
+.kiln-shell .k-sort-trigger{display:inline-flex;align-items:center;gap:.9rem;min-width:13rem;height:2rem;padding:0;border:0;border-bottom:1px solid #333;border-radius:0;background:none;color:#fff;font:400 .74rem/1 var(--font-sans);letter-spacing:.12em;text-transform:uppercase;text-align:left;cursor:pointer;justify-content:space-between}
+.kiln-shell .k-sort-trigger:hover,.kiln-shell .k-sort-trigger[aria-expanded="true"]{border-bottom-color:#fff}
+.k-sort-trigger i{width:.45rem;height:.45rem;border-right:1px solid currentColor;border-bottom:1px solid currentColor;transform:translateY(-25%) rotate(45deg);transition:transform .25s}
+.k-sort-trigger[aria-expanded="true"] i{transform:translateY(25%) rotate(-135deg)}
+.k-sort-list{position:absolute;top:calc(100% + .5rem);left:0;z-index:20;min-width:100%;margin:0;padding:.4rem 0;list-style:none;border:1px solid #fff;background:#050505;animation:kSortIn .2s ease}
+.kiln-shell .k-sort-list button{display:block;width:100%;padding:.8rem 1rem;border:0;background:none;color:#8a8a8a;font:400 .7rem/1 var(--font-sans);letter-spacing:.12em;text-transform:uppercase;text-align:left;white-space:nowrap;cursor:pointer}
+.kiln-shell .k-sort-list button:hover,.kiln-shell .k-sort-list button:focus-visible{color:#fff;background:#141414;outline:none}
+.kiln-shell .k-sort-list li[aria-selected="true"] button{color:#fff}
+.kiln-shell .k-sort-list li[aria-selected="true"] button::before{content:"— "}
+@keyframes kSortIn{from{opacity:0;transform:translateY(-.3rem)}to{opacity:1;transform:none}}
+@media(max-width:720px){.k-sort{width:100%}.k-sort-menu,.kiln-shell .k-sort-trigger{flex:1;min-width:0;width:100%}}
