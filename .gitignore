@@ -6,3 +6,4 @@ dist
 .env.*
 .next
 .payload
+.figma-make-sync
