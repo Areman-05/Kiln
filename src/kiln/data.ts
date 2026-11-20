@@ -802,5 +802,16 @@ const LOT_PHOTOS: Record<string, string> = {
   "finca-deborah-symbiosis": "https://images.unsplash.com/photo-1764620967387-7412a794202d?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=1200",
   "boquete-volcan": "https://images.unsplash.com/photo-1504252060324-1c76e2e09939?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=1200",
   "boquete-geisha-natural": "https://images.unsplash.com/photo-1632307941173-5d541ea1d940?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=1200",
+  "los-nogales-bourbon": "https://images.unsplash.com/photo-1789009413779-99c4a0ddaedf?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=1200",
+  "huila-pitalito": "https://images.unsplash.com/photo-1778188985186-25a9d5f7d2b8?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=1200",
+  "narino-buesaco": "https://images.unsplash.com/photo-1662559102063-a665b04771fd?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=1200",
+  "tolima-planadas": "https://images.unsplash.com/photo-1493925410384-84f842e616fb?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=1200",
+  "cauca-inza": "https://images.unsplash.com/photo-1642613630414-1d9938f4fe02?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=1200",
+  "pack-origenes": "https://images.unsplash.com/photo-1561986810-4f3ba2f46ceb?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=1200",
+  "gitesi-bourbon": "https://images.unsplash.com/photo-1647891684895-15c5b831fde1?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=1200",
+  "nyamasheke-kigeyo": "https://images.unsplash.com/photo-1779900275257-aaadab6d9285?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=1200",
+  "huye-mountain": "https://images.unsplash.com/photo-1790858887420-c56af07cd75a?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=1200",
+  "santa-irene-maragogipe": "https://images.unsplash.com/photo-1528543010705-e7e75169b717?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=1200",
+  "huehue-injerto": "https://images.unsplash.com/photo-1606503809729-40646b716a36?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=1200",
+  "acatenango-sierra": "https://images.unsplash.com/photo-1718668691088-ad203aff1f3e?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=1200",
 }
-
