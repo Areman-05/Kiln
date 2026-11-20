@@ -814,4 +814,19 @@ const LOT_PHOTOS: Record<string, string> = {
   "santa-irene-maragogipe": "https://images.unsplash.com/photo-1528543010705-e7e75169b717?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=1200",
   "huehue-injerto": "https://images.unsplash.com/photo-1606503809729-40646b716a36?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=1200",
   "acatenango-sierra": "https://images.unsplash.com/photo-1718668691088-ad203aff1f3e?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=1200",
+  "atitlan-anaerobic": "https://images.unsplash.com/photo-1637141144577-933907eb8c92?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=1200",
+  "finca-mileydi-peru": "https://images.unsplash.com/photo-1717813864181-6d879c978f2d?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=1200",
+  "cajamarca-jaen": "https://images.unsplash.com/photo-1568507790497-847e2dbaccc8?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=1200",
+  "puno-sandia": "https://images.unsplash.com/photo-1633437805600-2c58bf56663c?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=1200",
+  "amazonas-rodriguez": "https://images.unsplash.com/photo-1786558675611-d7defbc94aff?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=1200",
+  "kiln-house": "https://images.unsplash.com/photo-1762686852371-763b689910b2?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=1200",
+  "cerrado-patrocinio": "https://images.unsplash.com/photo-1646753555452-cf31c0f86159?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=1200",
+  "mantiqueira-honey": "https://images.unsplash.com/photo-1654815439629-5e93cb7f74a1?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=1200",
+  "chapada-diamantina": "https://images.unsplash.com/photo-1777835898136-13f2b930de5e?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=1200",
+  "kiln-noir-blend": "https://images.unsplash.com/photo-1701006643345-e8971bbccd98?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=1200",
+  "pack-cata-estacional": "https://images.unsplash.com/photo-1677125671399-65852c6dfb05?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=1200",
 }
+
+export const lotPhoto = (lot: CoffeeLot) =>
+  LOT_PHOTOS[lot.id] ?? ORIGIN_PHOTOS[lot.country][Number.parseInt(lot.no, 10) % 2]
+
