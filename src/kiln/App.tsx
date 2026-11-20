@@ -1,6 +1,6 @@
 "use client"
 
-import React, { useEffect, useMemo, useState } from "react"
+import React, { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react"
 import { Bag } from "./Bag"
 import {
   BAG_SIZES,
@@ -54,6 +54,10 @@ export default function KilnApp() {
 
   // Suscripción activa para el panel de usuario
   const [activeSub, setActiveSub] = useState<ActiveSubscription | null>(null)
+  const [subOfferSeen, setSubOfferSeen] = useState<boolean>(false)
+  const [checkoutTried, setCheckoutTried] = useState<boolean>(false)
+  // Solo una suscripción activa da derecho al 12% en compras puntuales
+  const isMember = activeSub?.status === "Activa"
 
   // Comparador de Lotes (máx 3)
   const [comparedIds, setComparedIds] = useState<string[]>([])
@@ -62,6 +66,8 @@ export default function KilnApp() {
   // Buscador rápido (Cmd+K) y Asistente Sensorial
   const [searchModalOpen, setSearchModalOpen] = useState<boolean>(false)
   const [quickQuery, setQuickQuery] = useState<string>("")
+  const [searchIndex, setSearchIndex] = useState<number>(0)
+  const searchInputRef = useRef<HTMLInputElement>(null)
   const [matcherOpen, setMatcherOpen] = useState<boolean>(false)
   const [matcherBrew, setMatcherBrew] = useState<"filtro" | "espresso" | "ambos">("filtro")
   const [matcherFlavor, setMatcherFlavor] = useState<"floral" | "frutal" | "cacao">("floral")
@@ -71,6 +77,7 @@ export default function KilnApp() {
   const [scrolled, setScrolled] = useState<boolean>(false)
   const [mobileMenuOpen, setMobileMenuOpen] = useState<boolean>(false)
   const [routeTransition, setRouteTransition] = useState<boolean>(false)
+  const overlayOpen = cartOpen || searchModalOpen || matcherOpen || compareModalOpen || mobileMenuOpen
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 18)
@@ -78,12 +85,34 @@ export default function KilnApp() {
     return () => window.removeEventListener("scroll", onScroll)
   }, [])
 
+  useEffect(() => {
+    if (!overlayOpen) return
+    const previous = document.body.style.overflow
+    document.body.style.overflow = "hidden"
+    return () => {
+      document.body.style.overflow = previous
+    }
+  }, [cartOpen, searchModalOpen, matcherOpen, compareModalOpen, mobileMenuOpen])
+
+  useEffect(() => {
+    if (!searchModalOpen) return
+    setSearchIndex(0)
+    window.requestAnimationFrame(() => searchInputRef.current?.focus())
+  }, [searchModalOpen])
+
+  // Coloca cada ficha en su cabecera antes de que el navegador llegue a
+  // mostrarla, incluso si el café se abrió desde el final del catálogo.
+  useLayoutEffect(() => {
+    if (view === "product") window.scrollTo(0, 0)
+  }, [view, selectedLot.id])
+
   // Atajo de teclado Cmd+K / Ctrl+K y Escape (Heurística de Nielsen #7)
   useEffect(() => {
     const onKeyDown = (e: KeyboardEvent) => {
       if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === "k") {
         e.preventDefault()
-        setSearchModalOpen((o) => !o)
+        setMobileMenuOpen(true)
+        setSearchModalOpen(true)
       } else if (e.key === "Escape") {
         setSearchModalOpen(false)
         setMatcherOpen(false)
@@ -119,9 +148,14 @@ export default function KilnApp() {
   }
 
   const openLotDetail = (lot: CoffeeLot) => {
-    setSelectedLot(lot)
-    setView("product")
-    window.scrollTo({ top: 0, behavior: "smooth" })
+    setMobileMenuOpen(false)
+    setRouteTransition(true)
+    window.setTimeout(() => {
+      setSelectedLot(lot)
+      setView("product")
+      window.scrollTo(0, 0)
+    }, 260)
+    window.setTimeout(() => setRouteTransition(false), 760)
   }
 
   const handleAddToCart = (
@@ -134,7 +168,8 @@ export default function KilnApp() {
   ) => {
     const sizeObj = BAG_SIZES.find((s) => s.id === size) ?? BAG_SIZES[0]
     const raw = Math.round(lot.price250 * sizeObj.multiplier * 100) / 100
-    const unitPrice = purchaseMode === "suscripcion" ? Math.round(raw * 0.88 * 100) / 100 : raw
+    // Suscripción o miembro con suscripción activa: 12% de descuento
+    const unitPrice = purchaseMode === "suscripcion" || isMember ? Math.round(raw * 0.88 * 100) / 100 : raw
     const key = `${lot.id}-${size}-${grind}-${purchaseMode}`
 
     const prevSnapshot = [...cart]
@@ -179,6 +214,20 @@ export default function KilnApp() {
     })
   }
 
+  // Si el usuario se suscribe (o pausa) con productos en la cesta, los precios se recalculan
+  useEffect(() => {
+    setCart((prev) =>
+      prev.map((item) => {
+        const lot = COFFEE_LOTS.find((l) => l.id === item.lotId)
+        const sizeObj = BAG_SIZES.find((s) => s.id === item.size)
+        if (!lot || !sizeObj || item.purchaseMode === "suscripcion") return item
+        const raw = Math.round(lot.price250 * sizeObj.multiplier * 100) / 100
+        const unitPrice = isMember ? Math.round(raw * 0.88 * 100) / 100 : raw
+        return unitPrice === item.unitPrice ? item : { ...item, unitPrice }
+      })
+    )
+  }, [isMember])
+
   const cartCount = useMemo(() => cart.reduce((acc, item) => acc + item.qty, 0), [cart])
   const cartSubtotal = useMemo(
     () => cart.reduce((acc, item) => acc + item.unitPrice * item.qty, 0),
@@ -190,6 +239,12 @@ export default function KilnApp() {
       ? 0
       : 3.9
   const cartTotal = cartSubtotal + shippingCost
+  const checkoutErrors = {
+    name: customerName.trim().length < 2 ? "Indica tu nombre completo." : "",
+    email: /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(customerEmail.trim()) ? "" : "Introduce un email válido.",
+    address: deliveryMethod === "shipping" && customerAddress.trim().length < 6 ? "Indica calle, número y ciudad." : "",
+  }
+  const checkoutValid = !checkoutErrors.name && !checkoutErrors.email && !checkoutErrors.address
 
   // Recomendación del Asistente Sensorial
   const recommendedLot = useMemo(() => {
@@ -208,11 +263,17 @@ export default function KilnApp() {
   )
 
   const quickSearchResults = useMemo(() => {
-    if (!quickQuery.trim()) return COFFEE_LOTS.slice(0, 5)
-    const q = quickQuery.toLowerCase()
-    return COFFEE_LOTS.filter((l) =>
-      `${l.name} ${l.origin} ${l.notes.join(" ")} ${l.variety} ${l.process}`.toLowerCase().includes(q)
+    const normalize = (value: string) =>
+      value.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase()
+    const q = normalize(quickQuery.trim())
+    if (!q) return []
+    return COFFEE_LOTS.filter((lot) =>
+      normalize(
+        `${lot.name} ${lot.origin} ${lot.country} ${lot.region} ${lot.notes.join(" ")} ${lot.variety} ${lot.process} ${lot.roast}`
+      ).includes(q)
     )
+      .sort((a, b) => Number(normalize(b.name).startsWith(q)) - Number(normalize(a.name).startsWith(q)))
+      .slice(0, 10)
   }, [quickQuery])
 
   const viewLabels: Record<ViewName, string> = {
@@ -227,7 +288,7 @@ export default function KilnApp() {
   }
 
   return (
-    <div className={`kiln-shell ${mobileMenuOpen ? "is-menu-open" : ""}`}>
+    <div className={`kiln-shell ${mobileMenuOpen ? "is-menu-open" : ""} ${view === "shop" || view === "product" ? "is-dark" : ""}`}>
       {/* 1. BARRA SUPERIOR DE ESTADO DE TUESTE EN VIVO (Heurística #1) */}
       <div className="k-roast-bar">
         <div className="k-roast-bar-left">
@@ -286,10 +347,24 @@ export default function KilnApp() {
         </div>
       </header>
 
-      <div className={`k-side-backdrop ${mobileMenuOpen ? "open" : ""}`} onClick={() => setMobileMenuOpen(false)} />
+      <div
+        className={`k-side-backdrop ${mobileMenuOpen ? "open" : ""}`}
+        onClick={() => {
+          setMobileMenuOpen(false)
+          setSearchModalOpen(false)
+        }}
+      />
       <aside id="k-side-menu" className={`k-side-menu ${mobileMenuOpen ? "open" : ""}`} aria-label="Menú principal" aria-hidden={!mobileMenuOpen}>
         <div className="k-side-menu-head">
-          <button type="button" className="k-side-close" onClick={() => setMobileMenuOpen(false)} tabIndex={mobileMenuOpen ? 0 : -1}>
+          <button
+            type="button"
+            className="k-side-close"
+            onClick={() => {
+              setMobileMenuOpen(false)
+              setSearchModalOpen(false)
+            }}
+            tabIndex={mobileMenuOpen ? 0 : -1}
+          >
             Cerrar
           </button>
           <div className="k-side-actions">
@@ -298,8 +373,7 @@ export default function KilnApp() {
               className="k-side-close"
               tabIndex={mobileMenuOpen ? 0 : -1}
               onClick={() => {
-                setMobileMenuOpen(false)
-                setSearchModalOpen(true)
+                setSearchModalOpen((open) => !open)
               }}
             >
               Buscar
@@ -310,6 +384,7 @@ export default function KilnApp() {
               tabIndex={mobileMenuOpen ? 0 : -1}
               onClick={() => {
                 setMobileMenuOpen(false)
+                setSearchModalOpen(false)
                 setCheckoutStep("cart")
                 setCartOpen(true)
               }}
@@ -318,6 +393,60 @@ export default function KilnApp() {
             </button>
           </div>
         </div>
+        {searchModalOpen && (
+          <div className="k-side-search">
+            <div className="k-side-search-field">
+              <input
+                id="kiln-menu-search"
+                ref={searchInputRef}
+                type="search"
+                placeholder="Buscar café…"
+                value={quickQuery}
+                onChange={(e) => {
+                  setQuickQuery(e.target.value)
+                  setSearchIndex(0)
+                }}
+                onKeyDown={(e) => {
+                  if (!quickSearchResults.length) return
+                  if (e.key === "ArrowDown") {
+                    e.preventDefault()
+                    setSearchIndex((i) => (i + 1) % quickSearchResults.length)
+                  } else if (e.key === "ArrowUp") {
+                    e.preventDefault()
+                    setSearchIndex((i) => (i - 1 + quickSearchResults.length) % quickSearchResults.length)
+                  } else if (e.key === "Enter") {
+                    e.preventDefault()
+                    setSearchModalOpen(false)
+                    openLotDetail(quickSearchResults[searchIndex])
+                  }
+                }}
+              />
+              {quickQuery && <button type="button" onClick={() => setQuickQuery("")}>Limpiar</button>}
+            </div>
+            {quickQuery.trim() && (quickSearchResults.length ? (
+              <div className="k-side-search-results" role="listbox" aria-label={`${quickSearchResults.length} resultados`}>
+                {quickSearchResults.map((lot, index) => (
+                  <button
+                    key={lot.id}
+                    type="button"
+                    role="option"
+                    aria-selected={index === searchIndex}
+                    onMouseEnter={() => setSearchIndex(index)}
+                    onClick={() => {
+                      setSearchModalOpen(false)
+                      openLotDetail(lot)
+                    }}
+                  >
+                    <strong>{lot.name}</strong>
+                    <small>{lot.origin} · {lot.process} · {lot.notes.slice(0, 2).join(" · ")}</small>
+                  </button>
+                ))}
+              </div>
+            ) : (
+              <p>No encontramos “{quickQuery}”. Prueba con otro origen o sabor.</p>
+            ))}
+          </div>
+        )}
         <nav className="k-side-nav">
           {(
             [
@@ -338,6 +467,7 @@ export default function KilnApp() {
               tabIndex={mobileMenuOpen ? 0 : -1}
               onClick={() => {
                 setMobileMenuOpen(false)
+                setSearchModalOpen(false)
                 navigateWithTransition(id)
               }}
             >
@@ -390,6 +520,17 @@ export default function KilnApp() {
             onBack={() => navigateTo("shop")}
             onAddToCart={handleAddToCart}
             onSelectLot={openLotDetail}
+            isMember={isMember}
+            showSubscriptionOffer={activeSub === null && !subOfferSeen}
+            onSubscriptionOfferSeen={() => setSubOfferSeen(true)}
+            onOpenCart={() => {
+              setCheckoutStep("cart")
+              setCartOpen(true)
+            }}
+            onOpenSubscriptions={() => {
+              setSubTab("personal")
+              navigateWithTransition("subscriptions")
+            }}
           />
         )}
 
@@ -505,7 +646,7 @@ export default function KilnApp() {
               <h3 className="k-title-md">Comparativa Técnica de Lotes</h3>
             </div>
             <button type="button" className="k-btn-secondary" style={{ padding: "0.45rem 0.9rem" }} onClick={() => setCompareModalOpen(false)}>
-              Cerrar ✕
+              Cerrar
             </button>
           </div>
 
@@ -540,73 +681,6 @@ export default function KilnApp() {
                 >
                   Abrir ficha
                 </button>
-              </div>
-            ))}
-          </div>
-        </div>
-      </div>
-
-      {/* 7. MODAL BUSCADOR RÁPIDO CMD+K */}
-      <div
-        className={`k-backdrop ${searchModalOpen ? "open" : ""}`}
-        onClick={() => setSearchModalOpen(false)}
-      />
-      <div className={`k-modal-center ${searchModalOpen ? "open" : ""}`} role="dialog" aria-label="Buscador instantáneo">
-        <div style={{ padding: "1.75rem" }}>
-          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "1rem" }}>
-            <span className="k-eyebrow">BUSCADOR INSTANTÁNEO DE LOTES, NOTAS Y REGIONES (ESC PARA CERRAR)</span>
-            <button type="button" onClick={() => setSearchModalOpen(false)} style={{ fontSize: "0.8rem" }}>
-              Cerrar ✕
-            </button>
-          </div>
-          <input
-            type="search"
-            placeholder="Escribe una nota (jazmín, grosella, cacao), variedad (Geisha, SL28) o país..."
-            value={quickQuery}
-            onChange={(e) => setQuickQuery(e.target.value)}
-            autoFocus
-            style={{
-              width: "100%",
-              padding: "0.9rem 1rem",
-              fontSize: "1rem",
-              border: "1px solid var(--line-strong)",
-              background: "var(--bg-primary)",
-              marginBottom: "1.25rem",
-            }}
-          />
-
-          <div style={{ display: "flex", flexDirection: "column", gap: "0.6rem" }}>
-            {quickSearchResults.map((lot) => (
-              <div
-                key={lot.id}
-                onClick={() => {
-                  setSearchModalOpen(false)
-                  openLotDetail(lot)
-                }}
-                style={{
-                  cursor: "pointer",
-                  padding: "0.85rem 1rem",
-                  border: "1px solid var(--line-subtle)",
-                  background: "var(--bg-primary)",
-                  display: "flex",
-                  justifyContent: "space-between",
-                  alignItems: "center",
-                }}
-              >
-                <div>
-                  <div style={{ fontWeight: 600 }}>
-                    Lote {lot.no} · {lot.name}{" "}
-                    <span className="font-mono" style={{ fontSize: "0.72rem", color: "var(--ink-muted)" }}>
-                      ({lot.origin})
-                    </span>
-                  </div>
-                  <div style={{ fontSize: "0.78rem", color: "var(--ink-secondary)" }}>
-                    {lot.process} · Notas: {lot.notes.join(" · ")}
-                  </div>
-                </div>
-                <span className="font-mono" style={{ fontWeight: 600 }}>
-                  {formatEur(lot.price250)} →
-                </span>
               </div>
             ))}
           </div>
@@ -742,7 +816,7 @@ export default function KilnApp() {
 
       {/* 9. DRAWER DE CESTA Y CHECKOUT COMPLETO EN 3 PASOS */}
       <div className={`k-backdrop ${cartOpen ? "open" : ""}`} onClick={() => setCartOpen(false)} />
-      <aside className={`k-drawer ${cartOpen ? "open" : ""}`} aria-label="Cesta de compra y checkout">
+      <aside className={`k-drawer ${cartOpen ? "open" : ""} ${checkoutStep === "shipping" ? "is-shipping" : ""}`} aria-label="Cesta de compra y checkout">
         <div
           style={{
             padding: "1.5rem 1.75rem",
@@ -775,13 +849,13 @@ export default function KilnApp() {
 
         {/* Barra de progreso envío gratuito */}
         {checkoutStep !== "confirmed" && (
-          <div style={{ padding: "0.85rem 1.75rem", background: "var(--bg-secondary)", fontSize: "0.78rem" }}>
+          <div className="k-drawer-ship" style={{ padding: "0.85rem 1.75rem", background: "var(--bg-secondary)", fontSize: "0.78rem" }}>
             {cartSubtotal >= freeShippingThreshold || deliveryMethod === "pickup" ? (
-              <span>✓ Tienes <strong>envío urgente 24h gratuito</strong> activado en este pedido.</span>
+              <span>Tienes <strong>envío urgente 24 h gratis</strong> en este pedido.</span>
             ) : (
               <span>
                 Te faltan <strong>{formatEur(freeShippingThreshold - cartSubtotal)}</strong> para el envío urgente
-                gratuito (o selecciona recogida gratis ).
+                gratis (o elige recogida en el estudio).
               </span>
             )}
             <div style={{ height: "4px", background: "var(--line-medium)", marginTop: "0.45rem", borderRadius: "99px", overflow: "hidden" }}>
@@ -797,7 +871,7 @@ export default function KilnApp() {
         )}
 
         {/* Cuerpo del Drawer según el paso */}
-        <div style={{ flex: 1, overflowY: "auto", padding: "1.5rem 1.75rem" }}>
+        <div className="k-drawer-body" style={{ flex: 1, overflowY: "auto", padding: "1.5rem 1.75rem" }}>
           {checkoutStep === "cart" && (
             <>
               {cart.length === 0 ? (
@@ -806,7 +880,7 @@ export default function KilnApp() {
                     Tu cesta está vacía
                   </p>
                   <p style={{ fontSize: "0.85rem", color: "var(--ink-secondary)", marginBottom: "1.5rem" }}>
-                    Explora los micro-lotes recién tostados de esta semana .
+                    Explora los micro-lotes recién tostados de esta semana.
                   </p>
                   <button
                     type="button"
@@ -852,10 +926,14 @@ export default function KilnApp() {
                         </div>
                         <div className="font-mono" style={{ fontSize: "0.68rem", color: "var(--ink-muted)", margin: "0.15rem 0 0.5rem" }}>
                           {item.size} · {item.grind} ·{" "}
-                          {item.purchaseMode === "suscripcion" ? "Suscripción (−12%)" : "Compra única"}
+                          {item.purchaseMode === "suscripcion"
+                            ? "Suscripción (−12%)"
+                            : isMember && COFFEE_LOTS.some((l) => l.id === item.lotId)
+                            ? "Precio suscriptor (−12%)"
+                            : "Compra única"}
                         </div>
 
-                        <div style={{ display: "inline-flex", alignItems: "center", border: "1px solid var(--line-medium)" }}>
+                        <div className="k-drawer-qty" style={{ display: "inline-flex", alignItems: "center", border: "1px solid var(--line-medium)" }}>
                           <button
                             type="button"
                             style={{ padding: "0.15rem 0.55rem" }}
@@ -904,7 +982,7 @@ export default function KilnApp() {
           )}
 
           {checkoutStep === "shipping" && (
-            <div style={{ display: "flex", flexDirection: "column", gap: "1.2rem" }}>
+            <div className="k-shipping-form" style={{ display: "flex", flexDirection: "column", gap: "1.2rem" }}>
               <div>
                 <span className="k-eyebrow" style={{ display: "block", marginBottom: "0.5rem" }}>
                   MODALIDAD DE ENTREGA
@@ -941,8 +1019,14 @@ export default function KilnApp() {
                   type="text"
                   value={customerName}
                   onChange={(e) => setCustomerName(e.target.value)}
-                  style={{ width: "100%", padding: "0.7rem", border: "1px solid var(--line-medium)", background: "var(--bg-primary)" }}
+                  aria-invalid={checkoutTried && !!checkoutErrors.name}
+                  style={{ width: "100%", padding: "0.7rem", border: `1px solid ${checkoutTried && checkoutErrors.name ? "#ff8a70" : "var(--line-medium)"}`, background: "var(--bg-primary)" }}
                 />
+                {checkoutTried && checkoutErrors.name && (
+                  <p role="alert" style={{ marginTop: "0.35rem", fontSize: "0.72rem", color: "#ff8a70" }}>
+                    {checkoutErrors.name}
+                  </p>
+                )}
               </div>
 
               <div>
@@ -953,8 +1037,14 @@ export default function KilnApp() {
                   type="email"
                   value={customerEmail}
                   onChange={(e) => setCustomerEmail(e.target.value)}
-                  style={{ width: "100%", padding: "0.7rem", border: "1px solid var(--line-medium)", background: "var(--bg-primary)" }}
+                  aria-invalid={checkoutTried && !!checkoutErrors.email}
+                  style={{ width: "100%", padding: "0.7rem", border: `1px solid ${checkoutTried && checkoutErrors.email ? "#ff8a70" : "var(--line-medium)"}`, background: "var(--bg-primary)" }}
                 />
+                {checkoutTried && checkoutErrors.email && (
+                  <p role="alert" style={{ marginTop: "0.35rem", fontSize: "0.72rem", color: "#ff8a70" }}>
+                    {checkoutErrors.email}
+                  </p>
+                )}
               </div>
 
               {deliveryMethod === "shipping" && (
@@ -966,8 +1056,14 @@ export default function KilnApp() {
                     type="text"
                     value={customerAddress}
                     onChange={(e) => setCustomerAddress(e.target.value)}
-                    style={{ width: "100%", padding: "0.7rem", border: "1px solid var(--line-medium)", background: "var(--bg-primary)" }}
+                    aria-invalid={checkoutTried && !!checkoutErrors.address}
+                    style={{ width: "100%", padding: "0.7rem", border: `1px solid ${checkoutTried && checkoutErrors.address ? "#ff8a70" : "var(--line-medium)"}`, background: "var(--bg-primary)" }}
                   />
+                  {checkoutTried && checkoutErrors.address && (
+                    <p role="alert" style={{ marginTop: "0.35rem", fontSize: "0.72rem", color: "#ff8a70" }}>
+                      {checkoutErrors.address}
+                    </p>
+                  )}
                 </div>
               )}
 
@@ -989,7 +1085,7 @@ export default function KilnApp() {
                 }}
               >
                 <span className="k-eyebrow" style={{ color: "var(--accent-rust)" }}>
-                  ✓ PEDIDO REGISTRADO EN LA COLA DE TUESTE
+                  PEDIDO REGISTRADO EN LA COLA DE TUESTE
                 </span>
                 <h4 className="k-title-md" style={{ margin: "0.4rem 0 0.75rem" }}>
                   Gracias, {customerName}
@@ -1020,7 +1116,7 @@ export default function KilnApp() {
 
         {/* Pie del Drawer con desglose en Euros */}
         {cart.length > 0 && checkoutStep !== "confirmed" && (
-          <div style={{ padding: "1.5rem 1.75rem", borderTop: "1px solid var(--line-subtle)", background: "var(--bg-card)" }}>
+          <div className="k-drawer-summary" style={{ padding: "1.5rem 1.75rem", borderTop: "1px solid var(--line-subtle)", background: "var(--bg-card)" }}>
             <div style={{ display: "flex", justifyContent: "space-between", fontSize: "0.84rem", marginBottom: "0.35rem" }}>
               <span style={{ color: "var(--ink-secondary)" }}>Subtotal</span>
               <span>{formatEur(cartSubtotal)}</span>
@@ -1032,6 +1128,7 @@ export default function KilnApp() {
               <span>{shippingCost === 0 ? "Gratis (0,00 €)" : formatEur(shippingCost)}</span>
             </div>
             <div
+              className="k-drawer-total"
               style={{
                 display: "flex",
                 justifyContent: "space-between",
@@ -1069,6 +1166,11 @@ export default function KilnApp() {
                   className="k-btn-primary"
                   style={{ flex: 1 }}
                   onClick={() => {
+                    if (!checkoutValid) {
+                      setCheckoutTried(true)
+                      return
+                    }
+                    setCheckoutTried(false)
                     const orderNo = `KLN-${Math.floor(10000 + Math.random() * 89999)}`
                     setConfirmedOrderId(orderNo)
                     setCart([])
