@@ -2360,3 +2360,21 @@ body {
 @media(max-width:1120px){.kiln-shell.is-dark .k-shop-view .k-catalog-grid{grid-template-columns:repeat(2,1fr)}}
 @media(max-width:620px){.kiln-shell.is-dark .k-shop-view .k-catalog-grid{grid-template-columns:1fr}}
 @media(hover:none){.kiln-shell.is-dark .k-shop-view .k-lot-view{display:none}}
+
+/* Café oscuro: fotografía de origen en lugar de bolsa */
+.kiln-shell.is-dark .k-shop-view .k-lot-stage{position:static!important;padding:0!important;overflow:hidden}
+.k-lot-photo{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;filter:grayscale(1) contrast(1.15) brightness(.82);transform-origin:center;animation:kMediaSlow 26s ease-in-out infinite alternate;transition:filter .5s ease}
+.k-lot-card:nth-child(3n+2) .k-lot-photo{animation-delay:-9s}
+.k-lot-card:nth-child(3n) .k-lot-photo{animation-delay:-17s}
+.kiln-shell.is-dark .k-shop-view .k-lot-card:hover .k-lot-photo,.kiln-shell.is-dark .k-shop-view .k-lot-card:focus-within .k-lot-photo{filter:grayscale(1) contrast(1.15) blur(10px) brightness(.55)}
+.kiln-shell.is-dark .k-shop-view .k-lot-view{z-index:3}
+.kiln-shell.is-dark .k-shop-view .k-lot-body{background:linear-gradient(180deg,transparent,rgba(5,5,5,.78))}
+.kiln-shell.is-dark .k-shop-view .k-lot-meta-line{color:#9a9a9a!important}
+@media(prefers-reduced-motion:reduce){.k-lot-photo{animation:none;transform:scale(1.12)}}
+
+/* Etiquetas de uso y proceso: contorno fino sobre la portada */
+.k-lot-chips{position:absolute;top:1.1rem;right:1.1rem;z-index:3;display:flex;flex-direction:column;align-items:flex-end;gap:.4rem;pointer-events:none}
+.k-lot-chip{display:inline-flex;align-items:center;gap:.45rem;padding:.42rem .62rem;border:1px solid rgba(255,255,255,.6);background:rgba(5,5,5,.28);color:#fff;font:400 .58rem/1 var(--font-sans);letter-spacing:.16em;text-transform:uppercase;white-space:nowrap}
+.k-lot-chip i{width:6px;height:6px;border-radius:50%;background:#8fc27a}
+.k-lot-chip.is-espresso i{background:#e0925f}
+.k-lot-chip.is-omnitueste i{background:#a397ec}
