@@ -2537,3 +2537,23 @@ body {
 .kiln-shell .k-offer-secondary{padding:0 0 .3rem;border:0;border-bottom:1px solid #6b6b6b;background:none;color:#8a8a8a;font:400 .66rem/1 var(--font-sans);letter-spacing:.18em;text-transform:uppercase;cursor:pointer}
 .kiln-shell .k-offer-secondary:hover{color:#fff;border-bottom-color:#fff}
 @media(max-width:900px){.kiln-shell .k-pdp2-back{position:absolute;top:1rem;left:1rem}.k-pdp2-stage{padding-bottom:2rem}}
+
+/* Galería de bolsa: flechas laterales, puntos y transición */
+.k-pdp2-views{display:none}
+.k-pdp2-gallery{display:flex;align-items:center;justify-content:center;gap:clamp(1rem,4vw,3.5rem);width:100%}
+.k-pdp2-bag{animation:kBagInNext .7s cubic-bezier(.22,1,.36,1) both}
+.k-pdp2-bag.is-prev{animation-name:kBagInPrev}
+.kiln-shell .k-pdp2-arrow{display:grid;place-items:center;flex:none;width:2.75rem;height:2.75rem;padding:0;border:0;background:none;color:#6b6b6b;cursor:pointer;transition:color .25s,transform .25s}
+.k-pdp2-arrow svg{width:1.4rem;height:1.4rem;fill:none;stroke:currentColor;stroke-width:1.2}
+.kiln-shell .k-pdp2-arrow:hover,.kiln-shell .k-pdp2-arrow:focus-visible{color:#fff}
+.kiln-shell .k-pdp2-arrow:first-child:hover{transform:translateX(-3px)}
+.kiln-shell .k-pdp2-arrow:last-child:hover{transform:translateX(3px)}
+.k-pdp2-dots{display:flex;gap:.7rem}
+.kiln-shell .k-pdp2-dots button{width:6px;height:6px;padding:0;border:0;border-radius:50%;background:#4a4a4a;cursor:pointer;transition:background .3s,transform .3s}
+.kiln-shell .k-pdp2-dots button:hover{background:#8a8a8a}
+.kiln-shell .k-pdp2-dots button[aria-selected="true"]{background:#fff;transform:scale(1.15)}
+@keyframes kBagInNext{from{opacity:0;transform:translateX(18px) scale(.98);filter:blur(6px)}to{opacity:1;transform:none;filter:blur(0)}}
+@keyframes kBagInPrev{from{opacity:0;transform:translateX(-18px) scale(.98);filter:blur(6px)}to{opacity:1;transform:none;filter:blur(0)}}
+@media(prefers-reduced-motion:reduce){.k-pdp2-bag{animation:kFadeOnly .3s ease both}}
+@keyframes kFadeOnly{from{opacity:0}to{opacity:1}}
+@media(max-width:600px){.k-pdp2-gallery{gap:.25rem}}
