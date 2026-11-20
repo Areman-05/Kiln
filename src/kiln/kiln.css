@@ -2461,3 +2461,79 @@ body {
 .k-pdp2-related h2{margin:0 clamp(1.25rem,3vw,2.75rem) 2rem;color:#fff;font:400 clamp(1rem,1.8vw,1.4rem)/1.1 "Syncopate",var(--font-sans),sans-serif;letter-spacing:-.02em;text-transform:uppercase}
 @media(max-width:900px){.k-pdp2-grid{grid-template-columns:1fr}.k-pdp2-stage{position:relative;height:auto;min-height:0;padding:6rem 1rem 3rem;border-right:0;border-bottom:1px solid #1c1c1c}.k-pdp2-info{padding-top:3rem}.k-pdp2-stage .kiln-bag-wrap{width:240px!important;height:350px!important}}
 @media(max-width:560px){.k-pdp2-options.is-3{grid-template-columns:repeat(2,1fr)}.k-pdp2-more li{grid-template-columns:1fr;gap:.2rem}}
+
+/* Ficha v3: foto de origen, compra directa sin recuadros */
+.k-pdp2-grid{border-bottom:0}
+.k-pdp2-stage{overflow:hidden;border-right:0}
+.k-pdp2-photo{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;filter:grayscale(1) contrast(1.1) brightness(.42)}
+.k-pdp2-stage .kiln-bag-wrap{position:relative;z-index:1;filter:drop-shadow(0 30px 40px rgba(0,0,0,.55))}
+.k-pdp2-stage .k-lot-chip{z-index:2}
+.kiln-shell .k-pdp2-back{position:absolute;top:5.25rem;left:1.5rem;z-index:2;display:inline-flex;align-items:center;gap:.7rem;padding:.75rem 1.1rem;border:1px solid rgba(255,255,255,.7);background:rgba(5,5,5,.35);color:#fff;font:400 .68rem/1 var(--font-sans);letter-spacing:.18em;text-transform:uppercase;cursor:pointer;transition:background .2s,color .2s}
+.kiln-shell .k-pdp2-back:hover,.kiln-shell .k-pdp2-back:focus-visible{background:#fff;color:#050505;border-bottom-color:#fff;outline:none}
+.k-pdp2-back i{width:.5rem;height:.5rem;border-left:1px solid currentColor;border-bottom:1px solid currentColor;transform:rotate(45deg)}
+.k-pdp2-info{display:flex;flex-direction:column;justify-content:center;padding:7rem clamp(1.5rem,5vw,5rem) 4rem}
+.k-pdp2-head{display:flex;align-items:flex-start;justify-content:space-between;gap:2rem}
+.k-pdp2-head h1{margin:0}
+.k-pdp2-price{flex:none;margin:.35rem 0 0;color:#fff;font:400 clamp(1.1rem,1.8vw,1.5rem)/1 "Syncopate",var(--font-sans),sans-serif;text-align:right}
+.k-pdp2-price small{display:block;margin-top:.5rem;color:#6b6b6b;font:400 .62rem/1 var(--font-sans);letter-spacing:.16em;text-transform:uppercase}
+.k-pdp2-text{margin-top:1.4rem;color:#9a9a9a;font-size:1rem}
+.k-pdp2-facts{display:grid;grid-template-columns:repeat(3,1fr);gap:1.5rem;margin:2.75rem 0 0}
+.k-pdp2-facts span,.k-pdp2-field>span{display:block;margin-bottom:.6rem;color:#5f5f5f;font:400 .6rem/1 var(--font-sans);letter-spacing:.18em;text-transform:uppercase}
+.k-pdp2-facts p{margin:0;color:#f0f0f0;font:400 .92rem/1.45 var(--font-sans)}
+.k-pdp2-buy{gap:1.5rem;margin-top:3.25rem}
+.k-pdp2-toggle{display:flex;flex-wrap:wrap;align-items:baseline;gap:.5rem 1.75rem}
+.kiln-shell .k-pdp2-toggle button{padding:0 0 .35rem;border:0;border-bottom:1px solid transparent;border-radius:0;background:none;color:#6b6b6b;font:400 .82rem/1 var(--font-sans);letter-spacing:.14em;text-transform:uppercase;cursor:pointer;transition:color .2s,border-color .2s}
+.kiln-shell .k-pdp2-toggle button:hover{color:#fff}
+.kiln-shell .k-pdp2-toggle button[aria-pressed="true"]{color:#fff;border-bottom-color:#fff}
+.k-pdp2-toggle.is-sub{margin-top:1rem;gap:.5rem 1.25rem}
+.kiln-shell .k-pdp2-toggle.is-sub button{font-size:.7rem}
+.k-pdp2-toggle em{color:#5f5f5f;font:italic 400 .72rem/1 var(--font-sans)}
+.kiln-shell .k-pdp2-sub{display:inline-flex;align-items:center;gap:.75rem;justify-self:start;padding:0;border:0;background:none;color:#b8b8b8;font:400 .74rem/1 var(--font-sans);letter-spacing:.14em;text-transform:uppercase;cursor:pointer}
+.k-pdp2-sub i{position:relative;width:1rem;height:1rem;border:1px solid #6b6b6b;transition:background .2s,border-color .2s}
+.kiln-shell .k-pdp2-sub:hover{color:#fff}
+.kiln-shell .k-pdp2-sub[aria-pressed="true"]{color:#fff}
+.k-pdp2-sub[aria-pressed="true"] i{border-color:#fff;background:#fff;box-shadow:inset 0 0 0 3px #050505}
+.k-pdp2-action{margin-top:.75rem}
+.k-pdp2-qty{border-color:#333}
+.k-pdp2-ship{margin:.2rem 0 0;color:#5f5f5f;font:400 .64rem/1 var(--font-sans);letter-spacing:.14em;text-transform:uppercase}
+.k-pdp2-more{margin-top:2.75rem;border-top:0}
+.k-pdp2-more details{border-bottom:0}
+.k-pdp2-more summary{justify-content:flex-start;gap:.75rem;padding:.7rem 0;color:#8a8a8a}
+.k-pdp2-more summary:hover{color:#fff}
+.k-pdp2-more summary::after{order:-1}
+.k-pdp2-more p{max-width:34rem}
+@media(max-width:900px){.k-pdp2-stage{min-height:560px}.kiln-shell .k-pdp2-back{top:1rem;left:1rem}.k-pdp2-stage .k-lot-chip{top:1rem;right:1rem}.k-pdp2-info{padding-top:3rem}}
+@media(max-width:560px){.k-pdp2-head{flex-direction:column;gap:1rem}.k-pdp2-price{text-align:left}.k-pdp2-facts{grid-template-columns:1fr;gap:1.25rem}}
+
+/* Ficha v4: familia Home — sin foto, vistas de bolsa, botón trazado y aviso de suscripción */
+.k-pdp2-photo{display:none}
+.k-pdp2-stage{flex-direction:column;gap:2rem}
+.k-pdp2-stage .kiln-bag-wrap{filter:none}
+.kiln-shell .k-pdp2-back{padding:0 0 .3rem;border:0;border-bottom:1px solid transparent;background:none;color:#8a8a8a}
+.kiln-shell .k-pdp2-back:hover,.kiln-shell .k-pdp2-back:focus-visible{background:none;color:#fff;border-bottom-color:#fff}
+.k-pdp2-views{display:flex;gap:1.75rem}
+.kiln-shell .k-pdp2-views button{display:flex;flex-direction:column;align-items:center;gap:.6rem;padding:.4rem .5rem .5rem;border:0;background:none;color:#5f5f5f;font:400 .58rem/1 var(--font-sans);letter-spacing:.18em;text-transform:uppercase;cursor:pointer;opacity:.55;transition:opacity .2s,color .2s}
+.kiln-shell .k-pdp2-views button:hover{opacity:.85;color:#b8b8b8}
+.kiln-shell .k-pdp2-views button[aria-selected="true"]{opacity:1;color:#fff}
+.k-pdp2-views button span{padding-bottom:.25rem;border-bottom:1px solid transparent}
+.k-pdp2-views button[aria-selected="true"] span{border-bottom-color:#fff}
+.k-pdp2-views .kiln-bag-wrap{transform:none!important}
+.k-pdp2-views .kiln-bag-svg>ellipse{display:none}
+.k-pdp2-info h1{font-size:clamp(2rem,3.8vw,3.6rem)}
+.kiln-shell .k-pdp2-toggle button{font-family:"Syncopate",var(--font-sans),sans-serif;font-size:.68rem;letter-spacing:.06em}
+.kiln-shell .k-pdp2-toggle.is-sub button{font-family:var(--font-sans);font-size:.7rem;letter-spacing:.14em}
+.kiln-shell .k-pdp2-add{position:relative;border-color:rgba(255,255,255,.45);background:none;color:#fff;font-family:"Syncopate",var(--font-sans),sans-serif;font-size:.7rem;letter-spacing:.06em}
+.kiln-shell .k-pdp2-add::after{position:absolute;inset:-1px;content:"";pointer-events:none;background-image:linear-gradient(#fff,#fff),linear-gradient(#fff,#fff),linear-gradient(#fff,#fff),linear-gradient(#fff,#fff);background-repeat:no-repeat;background-size:0 1px,1px 0,0 1px,1px 0;background-position:left bottom,left bottom,left top,right bottom}
+.kiln-shell .k-pdp2-add:hover,.kiln-shell .k-pdp2-add:focus-visible{background:none;color:#fff}
+.kiln-shell .k-pdp2-add:hover::after,.kiln-shell .k-pdp2-add:focus-visible::after{animation:kBoxTrace 2.6s cubic-bezier(.65,0,.35,1) infinite}
+.k-offer{position:fixed;inset:0;z-index:120;display:flex;align-items:center;justify-content:center;padding:1.5rem;background:rgba(5,5,5,.55);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);animation:kSortIn .25s ease}
+.k-offer-panel{position:relative;width:min(460px,100%);padding:2.5rem;border:1px solid #fff;background:#050505;color:#b8b8b8}
+.k-offer-kicker{color:#6b6b6b;font:400 .6rem/1 var(--font-sans);letter-spacing:.2em;text-transform:uppercase}
+.k-offer-panel h2{margin:1.1rem 0 1rem;color:#fff;font:400 clamp(1.3rem,3vw,1.75rem)/1.1 "Syncopate",var(--font-sans),sans-serif;letter-spacing:-.03em;text-transform:uppercase}
+.k-offer-panel p{margin:0;color:#9a9a9a;font:400 .9rem/1.6 var(--font-sans)}
+.k-offer-actions{display:flex;flex-wrap:wrap;align-items:center;gap:1.5rem;margin-top:2rem}
+.kiln-shell .k-offer-primary{height:3.2rem;padding:0 1.4rem;border:1px solid #fff;background:#fff;color:#050505;font:400 .66rem/1 "Syncopate",var(--font-sans),sans-serif;letter-spacing:.06em;text-transform:uppercase;cursor:pointer;transition:background .2s,color .2s}
+.kiln-shell .k-offer-primary:hover{background:none;color:#fff}
+.kiln-shell .k-offer-secondary{padding:0 0 .3rem;border:0;border-bottom:1px solid #6b6b6b;background:none;color:#8a8a8a;font:400 .66rem/1 var(--font-sans);letter-spacing:.18em;text-transform:uppercase;cursor:pointer}
+.kiln-shell .k-offer-secondary:hover{color:#fff;border-bottom-color:#fff}
+@media(max-width:900px){.kiln-shell .k-pdp2-back{position:absolute;top:1rem;left:1rem}.k-pdp2-stage{padding-bottom:2rem}}
