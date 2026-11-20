@@ -1,7 +1,6 @@
 "use client"
 
 import React, { useEffect, useMemo, useState } from "react"
-import { Bag } from "./Bag"
 import {
   BAG_SIZES,
   CAFE_MENU,
@@ -9,6 +8,7 @@ import {
   GRIND_OPTIONS,
   PHOTOS,
   SUBSCRIPTION_PLANS,
+  lotPhoto,
   type BagSizeOption,
   type CoffeeLot,
   type GrindOption,
@@ -251,7 +251,10 @@ export function LotCard({
     return (
     <article className="k-lot-card">
       <button type="button" className="k-lot-stage" onClick={() => onSelectLot(lot)} aria-label={`Ver ${lot.name}`}>
-        <Bag lot={{ name: lot.name, no: lot.no, origin: lot.origin, process: lot.process, roast: lot.roast, notes: lot.notes, tone: lot.tone }} size="md" />
+        <span className="k-lot-chips">
+          <span className="k-lot-chip">{lot.roast}</span>
+        </span>
+        <img className="k-lot-photo" src={lotPhoto(lot)} alt={`Paisaje de origen: ${lot.region}, ${lot.country}`} loading="lazy" />
         <span className="k-lot-view" aria-hidden="true">Ver producto</span>
       </button>
 
