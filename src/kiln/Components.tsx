@@ -23,6 +23,8 @@ export type ViewName =
   | "visit"
   | "wholesale"
   | "brew"
+  | "checkout"
+  | "news"
 
 export type SubTab = "personal" | "gift" | "office"
 
@@ -249,7 +251,7 @@ export function LotCard({
   onToggleCompare: (lotId: string) => void
 }) {
     return (
-    <article className="k-lot-card">
+    <article className="k-lot-card" data-lot-id={lot.id}>
       <button type="button" className="k-lot-stage" onClick={() => onSelectLot(lot)} aria-label={`Ver ${lot.name}`}>
         <span className="k-lot-chips">
           <span className="k-lot-chip">{lot.roast}</span>

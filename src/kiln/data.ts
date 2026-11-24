@@ -829,4 +829,3 @@ const LOT_PHOTOS: Record<string, string> = {
 
 export const lotPhoto = (lot: CoffeeLot) =>
   LOT_PHOTOS[lot.id] ?? ORIGIN_PHOTOS[lot.country][Number.parseInt(lot.no, 10) % 2]
-
