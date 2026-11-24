@@ -210,8 +210,8 @@ export function ShopView({
   const resetFilters = () => {
     setFilters(EMPTY_FILTERS)
     setSearchQuery("")
-    setSortBy("no")
   }
+  const togglePanel = (next: "filter" | "sort") => setPanel((current) => (current === next ? null : next))
 
   return (
     <section className="k-section-sm k-shop-view">
@@ -220,84 +220,13 @@ export function ShopView({
           <h1>Todos los cafés</h1>
         </header>
 
-        <div className="k-shop-controls">
-          <button
-            type="button"
-            className="k-shop-control"
-            onClick={() => setFiltersOpen((open) => !open)}
-            aria-expanded={filtersOpen}
-            aria-controls="k-shop-filters"
-          >
-            <span>{filtersOpen ? "Cerrar filtros" : "Filtrar"}</span>
-          </button>
-        </div>
-
-        {filtersOpen && (
-          <div id="k-shop-filters" className="k-shop-filters">
-            {FILTER_GROUPS.map((group) => (
-              <fieldset key={group.key} className="k-shop-filter-row">
-                <legend>{group.label}</legend>
-                <div>
-                  <button type="button" aria-pressed={!filters[group.key]} onClick={() => setFilters((f) => ({ ...f, [group.key]: "" }))}>
-                    Todos
-                  </button>
-                  {group.options.map((option) => {
-                    const count = countFor(group, option.test)
-                    const selected = filters[group.key] === option.value
-                    return (
-                      <button
-                        key={option.value}
-                        type="button"
-                        aria-pressed={selected}
-                        disabled={count === 0 && !selected}
-                        onClick={() => toggleFilter(group.key, option.value)}
-                      >
-                        {option.value}
-                        <sup>{count}</sup>
-                      </button>
-                    )
-                  })}
-                </div>
-              </fieldset>
-            ))}
-
-            <div className="k-shop-filter-tools">
-              <label>
-                <span>Buscar</span>
-                <input
-                  type="search"
-                  placeholder="Nombre, nota, variedad"
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                />
-              </label>
-              <div className="k-sort">
-                <span id="k-sort-label">Ordenar</span>
-                <SortMenu value={sortBy} onChange={setSortBy} />
-              </div>
-              <span className="k-shop-results" aria-live="polite">
-                {filteredLots.length} {filteredLots.length === 1 ? "resultado" : "resultados"}
-              </span>
-              <button type="button" className="k-shop-reset" onClick={resetFilters} disabled={activeFilterCount === 0 && sortBy === "no"}>
-                Limpiar
-              </button>
-            </div>
-          </div>
-        )}
-
         {/* Estado vacío con recuperación (Heurística de Nielsen #9) */}
         {filteredLots.length === 0 ? (
           <div className="k-shop-empty">
-            <h3 className="k-title-md">No hay lotes que coincidan con esa combinación</h3>
-            <p>
-              Prueba a restablecer los filtros de proceso o perfil de tueste para ver toda la cosecha.
-            </p>
-            <button
-              type="button"
-              className="k-btn-primary"
-              onClick={resetFilters}
-            >
-              Restablecer todos los filtros
+            <h3 className="k-title-md">Sin resultados</h3>
+            <p>Ningún café coincide con estos filtros.</p>
+            <button type="button" className="k-btn-primary" onClick={resetFilters}>
+              Limpiar filtros
             </button>
           </div>
         ) : (
@@ -315,13 +244,117 @@ export function ShopView({
           </div>
         )}
       </div>
+
+      <BodyPortal>
+        <div className="k-dock" ref={dockRef}>
+          {panel === "filter" && (
+            <div id="k-dock-filter" className="k-dock-panel" role="dialog" aria-label="Filtrar">
+              {FILTER_GROUPS.map((group) => (
+                <div key={group.key} className="k-dock-group" role="group" aria-labelledby={`k-dock-${group.key}`}>
+                  <span id={`k-dock-${group.key}`}>{group.label}</span>
+                  <div>
+                    <button type="button" aria-pressed={!filters[group.key]} onClick={() => setFilters((f) => ({ ...f, [group.key]: "" }))}>
+                      Todos
+                    </button>
+                    {group.options.map((option) => {
+                      const count = countFor(group, option.test)
+                      const selected = filters[group.key] === option.value
+                      return (
+                        <button
+                          key={option.value}
+                          type="button"
+                          aria-pressed={selected}
+                          disabled={count === 0 && !selected}
+                          onClick={() => toggleFilter(group.key, option.value)}
+                        >
+                          {option.value}
+                          <sup>{count}</sup>
+                        </button>
+                      )
+                    })}
+                  </div>
+                </div>
+              ))}
+
+              <div className="k-dock-tools">
+                <label>
+                  <span>Buscar</span>
+                  <input
+                    type="search"
+                    placeholder="Nombre, nota, variedad"
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                  />
+                </label>
+                <span className="k-dock-results" aria-live="polite">
+                  {filteredLots.length} {filteredLots.length === 1 ? "café" : "cafés"}
+                </span>
+                <button type="button" className="k-dock-reset" onClick={resetFilters} disabled={activeFilterCount === 0}>
+                  Limpiar
+                </button>
+              </div>
+            </div>
+          )}
+
+          {panel === "sort" && (
+            <div id="k-dock-sort" className="k-dock-panel is-sort" role="listbox" aria-label="Ordenar">
+              {SORT_OPTIONS.map((option) => (
+                <button
+                  key={option.value}
+                  type="button"
+                  role="option"
+                  aria-selected={sortBy === option.value}
+                  onClick={() => {
+                    setSortBy(option.value)
+                    setPanel(null)
+                  }}
+                >
+                  {option.label}
+                </button>
+              ))}
+            </div>
+          )}
+
+          <div className="k-dock-bar">
+            <button type="button" aria-expanded={panel === "filter"} aria-controls="k-dock-filter" onClick={() => togglePanel("filter")}>
+              Filtrar
+              {activeFilterCount > 0 && <span className="k-dock-count">[ {activeFilterCount} ]</span>}
+            </button>
+            <button type="button" aria-expanded={panel === "sort"} aria-controls="k-dock-sort" onClick={() => togglePanel("sort")}>
+              Ordenar
+              {sortBy !== "no" && <span className="k-dock-count">[ 1 ]</span>}
+            </button>
+          </div>
+        </div>
+      </BodyPortal>
     </section>
   )
 }
 
 /* ==========================================================================
-   3. VISTA DETALLE DE PRODUCTO (PDP Completo con Radar SCA, Curva y Receta)
+   3. VISTA DETALLE DE PRODUCTO (galería de bolsa + ficha técnica y compra)
    ========================================================================== */
+
+/* Novedades: los 6 primeros lotes de Cosecha Estacional, 2 por fila */
+const NEW_ARRIVALS = COFFEE_LOTS.filter((lot) => lot.category === "Cosecha Estacional").slice(0, 6)
+
+export function NewArrivalsView({ onSelectLot }: { onSelectLot: (lot: CoffeeLot) => void }) {
+  return (
+    <section className="k-section-sm k-shop-view k-news-view">
+      <div className="k-container">
+        <header className="k-shop-head">
+          <h1>Novedades</h1>
+        </header>
+        <div className="k-catalog-grid is-editorial">
+          {NEW_ARRIVALS.map((lot) => (
+            <LotCard key={lot.id} lot={lot} onSelectLot={onSelectLot} onQuickAdd={() => {}} isCompared={false} onToggleCompare={() => {}} />
+          ))}
+        </div>
+      </div>
+    </section>
+  )
+}
+
 const GROUND_OPTIONS: { id: GrindOption; label: string }[] = [
   { id: "Filtro / V60", label: "Filtro" },
   { id: "Espresso", label: "Espresso" },
@@ -330,17 +363,24 @@ const GROUND_OPTIONS: { id: GrindOption; label: string }[] = [
   { id: "Prensa francesa", label: "Prensa francesa" },
 ]
 
-const IDEAL_FOR: Record<CoffeeLot["roast"], string> = {
-  Filtro: "V60, Chemex y Aeropress",
-  Espresso: "Espresso, italiana y con leche",
-  Omnitueste: "Filtro y espresso",
-}
-
 const BAG_VIEWS = [
   ["front", "Frente"],
   ["side", "Lateral"],
   ["back", "Dorso"],
 ] as const
+
+type BagView = (typeof BAG_VIEWS)[number][0]
+
+// "2.150 – 2.280 m" → "2.150 m"
+const minAltitude = (altitude: string) => `${altitude.split("–")[0].replace(/m\s*$/i, "").trim()} m`
+
+const joinUnits = (parts: string[]) =>
+  parts.map((part, i) => (
+    <React.Fragment key={part}>
+      {i > 0 && " · "}
+      <span className="k-nowrap">{part}</span>
+    </React.Fragment>
+  ))
 
 export function ProductDetailView({
   lot,
@@ -348,39 +388,27 @@ export function ProductDetailView({
   onAddToCart,
   onSelectLot,
   isMember,
-  showSubscriptionOffer,
-  onSubscriptionOfferSeen,
-  onOpenSubscriptions,
-  onOpenCart,
 }: {
   lot: CoffeeLot
   onBack: () => void
-  onAddToCart: (
-    lot: CoffeeLot,
-    size: BagSizeOption,
-    grind: GrindOption,
-    qty: number,
-    mode: " puntual" | "suscripcion",
-    cadenceWeeks?: number
-  ) => void
+  onAddToCart: (lot: CoffeeLot, size: BagSizeOption, grind: GrindOption) => void
   onSelectLot: (lot: CoffeeLot) => void
   isMember: boolean
-  showSubscriptionOffer: boolean
-  onSubscriptionOfferSeen: () => void
-  onOpenSubscriptions: () => void
-  onOpenCart: () => void
 }) {
   const [size, setSize] = useState<BagSizeOption>("250g")
   const [grind, setGrind] = useState<GrindOption>("En grano")
-  const [qty, setQty] = useState<number>(1)
-  const [bagView, setBagView] = useState<"front" | "side" | "back">("front")
-  const [offerOpen, setOfferOpen] = useState<boolean>(false)
+  const [bagView, setBagView] = useState<BagView>("front")
   const [viewDir, setViewDir] = useState<"next" | "prev">("next")
+  const [added, setAdded] = useState<boolean>(false)
+  const [openInfo, setOpenInfo] = useState<Record<"story" | "brew", boolean>>({ story: false, brew: false })
+  const addedTimer = useRef<number | undefined>(undefined)
 
-  const stepView = (dir: 1 | -1) => {
-    const i = BAG_VIEWS.findIndex(([v]) => v === bagView)
-    setViewDir(dir === 1 ? "next" : "prev")
-    setBagView(BAG_VIEWS[(i + dir + BAG_VIEWS.length) % BAG_VIEWS.length][0])
+  useEffect(() => () => window.clearTimeout(addedTimer.current), [])
+
+  const viewIndex = BAG_VIEWS.findIndex(([v]) => v === bagView)
+  const goToView = (index: number, dir: "next" | "prev") => {
+    setViewDir(dir)
+    setBagView(BAG_VIEWS[(index + BAG_VIEWS.length) % BAG_VIEWS.length][0])
   }
 
   const sizeObj = BAG_SIZES.find((s) => s.id === size) ?? BAG_SIZES[0]
