@@ -1,11 +1,11 @@
 "use client"
 
 import React, { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react"
+import { flushSync } from "react-dom"
 import { Bag } from "./Bag"
 import {
   BAG_SIZES,
   COFFEE_LOTS,
-  GRIND_OPTIONS,
   type BagSizeOption,
   type CoffeeLot,
   type GrindOption,
@@ -19,13 +19,31 @@ import {
   type SubTab,
   type ViewName,
 } from "./Components"
-import { HomeView, ProductDetailView, ShopView } from "./Views"
+import { HomeView, NewArrivalsView, ProductDetailView, ShopView } from "./Views"
 import { StudioView, SubscriptionsView, VisitView, WholesaleView } from "./ExtraViews"
+import {
+  CartDrawer,
+  CheckoutView,
+  SESSION_KEY,
+  loadAccounts,
+  persistAccounts,
+  type Account,
+  type DeliveryMethod,
+} from "./Checkout"
+
+type ViewTransitionDocument = Document & {
+  startViewTransition?: (update: () => void) => { finished: Promise<void>; ready: Promise<void> }
+}
+
+const prefersReducedMotion = () => window.matchMedia("(prefers-reduced-motion: reduce)").matches
+const supportsViewTransitions = () => typeof (document as ViewTransitionDocument).startViewTransition === "function"
 
 export default function KilnApp() {
   const [view, setView] = useState<ViewName>("home")
   const [shopCategory, setShopCategory] = useState<string>("Todos")
   const [selectedLot, setSelectedLot] = useState<CoffeeLot>(COFFEE_LOTS[0])
+  // Vista desde la que se abrió la ficha, para que «Volver» regrese allí
+  const [lotOrigin, setLotOrigin] = useState<"shop" | "news">("shop")
   const [subTab, setSubTab] = useState<SubTab>("personal")
 
   // Carrito con un lote inicial realista para poder probar el checkout de inmediato
@@ -45,17 +63,24 @@ export default function KilnApp() {
     },
   ])
   const [cartOpen, setCartOpen] = useState<boolean>(false)
-  const [checkoutStep, setCheckoutStep] = useState<"cart" | "shipping" | "confirmed">("cart")
-  const [deliveryMethod, setDeliveryMethod] = useState<"shipping" | "pickup">("shipping")
-  const [customerName, setCustomerName] = useState<string>("Marc Soler")
-  const [customerEmail, setCustomerEmail] = useState<string>("marc.soler@estudio22.cat")
-  const [customerAddress, setCustomerAddress] = useState<string>("Carrer de Pallars 190, 08005  ")
-  const [confirmedOrderId, setConfirmedOrderId] = useState<string>("")
+  const [deliveryMethod, setDeliveryMethod] = useState<DeliveryMethod>("shipping")
+
+  // Cuentas y sesión simuladas (persisten en el navegador hasta conectar Payload)
+  const [accounts, setAccounts] = useState<Account[]>(() => loadAccounts())
+  const [sessionEmail, setSessionEmail] = useState<string | null>(() => window.localStorage.getItem(SESSION_KEY))
+  const session = accounts.find((a) => a.email === sessionEmail) ?? null
+  useEffect(() => persistAccounts(accounts), [accounts])
+  useEffect(() => {
+    try {
+      if (sessionEmail) window.localStorage.setItem(SESSION_KEY, sessionEmail)
+      else window.localStorage.removeItem(SESSION_KEY)
+    } catch {
+      /* almacenamiento no disponible */
+    }
+  }, [sessionEmail])
 
   // Suscripción activa para el panel de usuario
   const [activeSub, setActiveSub] = useState<ActiveSubscription | null>(null)
-  const [subOfferSeen, setSubOfferSeen] = useState<boolean>(false)
-  const [checkoutTried, setCheckoutTried] = useState<boolean>(false)
   // Solo una suscripción activa da derecho al 12% en compras puntuales
   const isMember = activeSub?.status === "Activa"
 
@@ -76,7 +101,7 @@ export default function KilnApp() {
   const [toast, setToast] = useState<{ message: string; undo?: () => void } | null>(null)
   const [scrolled, setScrolled] = useState<boolean>(false)
   const [mobileMenuOpen, setMobileMenuOpen] = useState<boolean>(false)
-  const [routeTransition, setRouteTransition] = useState<boolean>(false)
+  const shellRef = useRef<HTMLDivElement>(null)
   const overlayOpen = cartOpen || searchModalOpen || matcherOpen || compareModalOpen || mobileMenuOpen
 
   useEffect(() => {
@@ -103,8 +128,37 @@ export default function KilnApp() {
   // Coloca cada ficha en su cabecera antes de que el navegador llegue a
   // mostrarla, incluso si el café se abrió desde el final del catálogo.
   useLayoutEffect(() => {
-    if (view === "product") window.scrollTo(0, 0)
+    if (view === "product") window.scrollTo({ top: 0, behavior: "instant" })
   }, [view, selectedLot.id])
+
+  // Las imágenes que aún cargan aparecen con un fundido sobre su fondo gris
+  // (su espacio ya está reservado por el contenedor, sin saltos).
+  useEffect(() => {
+    const root = shellRef.current
+    if (!root || prefersReducedMotion()) return
+    const prepare = (img: HTMLImageElement) => {
+      if (img.dataset.kFade || img.complete) return
+      img.dataset.kFade = "1"
+      img.style.opacity = "0"
+      const reveal = () => {
+        img.style.opacity = ""
+        img.animate([{ opacity: 0 }, { opacity: 1 }], { duration: 500, easing: "cubic-bezier(.16,1,.3,1)" })
+      }
+      img.addEventListener("load", reveal, { once: true })
+      img.addEventListener("error", () => (img.style.opacity = ""), { once: true })
+    }
+    root.querySelectorAll("img").forEach(prepare)
+    const observer = new MutationObserver((records) => {
+      for (const record of records) {
+        record.addedNodes.forEach((node) => {
+          if (node instanceof HTMLImageElement) prepare(node)
+          else if (node instanceof HTMLElement) node.querySelectorAll("img").forEach(prepare)
+        })
+      }
+    })
+    observer.observe(root, { childList: true, subtree: true })
+    return () => observer.disconnect()
+  }, [])
 
   // Atajo de teclado Cmd+K / Ctrl+K y Escape (Heurística de Nielsen #7)
   useEffect(() => {
@@ -132,30 +186,98 @@ export default function KilnApp() {
     }, 4500)
   }
 
+  /* Cambio de vista: fundido corto con View Transitions (o CSS si no hay soporte).
+     `shared` crece hasta el recuadro de la ficha; `suppress` evita nombres duplicados. */
+  const runViewChange = (update: () => void, shared?: HTMLElement | null, suppress?: HTMLElement | null) => {
+    const doc = document as ViewTransitionDocument
+    if (!doc.startViewTransition || prefersReducedMotion() || document.visibilityState !== "visible") {
+      update()
+      window.scrollTo({ top: 0, behavior: prefersReducedMotion() ? "instant" : "smooth" })
+      return
+    }
+    if (shared) {
+      if (suppress) suppress.style.viewTransitionName = "none"
+      shared.style.viewTransitionName = "k-lot-media"
+    }
+    const transition = doc.startViewTransition(() => {
+      flushSync(update)
+      // El fundido oculta el salto: la vista nueva entra ya arriba del todo
+      window.scrollTo({ top: 0, behavior: "instant" })
+    })
+    // Si el navegador aborta la animación, el cambio de vista ya se aplicó igualmente
+    transition.ready.catch(() => {})
+    transition.finished.finally(() => {
+      if (shared) shared.style.viewTransitionName = ""
+    })
+  }
+
   const navigateTo = (target: ViewName, category = "Todos") => {
-    setShopCategory(category)
-    setView(target)
-    setMobileMenuOpen(false)
-    window.scrollTo({ top: 0, behavior: "smooth" })
+    runViewChange(() => {
+      setShopCategory(category)
+      setView(target)
+      setMobileMenuOpen(false)
+      setSearchModalOpen(false)
+      setCartOpen(false)
+    })
   }
 
   const navigateWithTransition = (target: ViewName, category = "Todos") => {
-    if (target === view) return
-    setMobileMenuOpen(false)
-    setRouteTransition(true)
-    window.setTimeout(() => navigateTo(target, category), 260)
-    window.setTimeout(() => setRouteTransition(false), 760)
+    if (target === view && category === shopCategory) {
+      setMobileMenuOpen(false)
+      return
+    }
+    navigateTo(target, category)
   }
 
   const openLotDetail = (lot: CoffeeLot) => {
-    setMobileMenuOpen(false)
-    setRouteTransition(true)
-    window.setTimeout(() => {
-      setSelectedLot(lot)
-      setView("product")
-      window.scrollTo(0, 0)
-    }, 260)
-    window.setTimeout(() => setRouteTransition(false), 760)
+    // Imagen de origen de la tarjeta pulsada (si está visible) para la transición compartida
+    const source = Array.from(document.querySelectorAll<HTMLElement>(`[data-lot-id="${lot.id}"] .k-lot-stage`)).find((el) => {
+      const r = el.getBoundingClientRect()
+      return r.bottom > 0 && r.top < window.innerHeight
+    })
+    runViewChange(
+      () => {
+        if (view === "news" || view === "shop") setLotOrigin(view)
+        setSelectedLot(lot)
+        setView("product")
+        setMobileMenuOpen(false)
+        setSearchModalOpen(false)
+      },
+      source,
+      document.querySelector<HTMLElement>(".k-pdp2-frame")
+    )
+  }
+
+  const priceFor = (lot: CoffeeLot, size: BagSizeOption, purchaseMode: CartItem["purchaseMode"]) => {
+    const sizeObj = BAG_SIZES.find((s) => s.id === size) ?? BAG_SIZES[0]
+    const raw = Math.round(lot.price250 * sizeObj.multiplier * 100) / 100
+    // Suscripción o miembro con suscripción activa: 12% de descuento
+    return purchaseMode === "suscripcion" || isMember ? Math.round(raw * 0.88 * 100) / 100 : raw
+  }
+
+  const changeQty = (key: string, delta: number) =>
+    setCart((prev) => prev.map((i) => (i.key === key ? { ...i, qty: Math.max(1, i.qty + delta) } : i)))
+
+  const removeItem = (key: string) => setCart((prev) => prev.filter((i) => i.key !== key))
+
+  // Cambiar tamaño o molienda desde la cesta: recalcula precio y fusiona líneas iguales
+  const updateCartItem = (key: string, patch: { size?: BagSizeOption; grind?: GrindOption }) =>
+    setCart((prev) => {
+      const item = prev.find((i) => i.key === key)
+      const lot = item && COFFEE_LOTS.find((l) => l.id === item.lotId)
+      if (!item || !lot) return prev
+      const size = patch.size ?? item.size
+      const grind = patch.grind ?? item.grind
+      const nextKey = `${lot.id}-${size}-${grind}-${item.purchaseMode}`
+      if (nextKey !== key && prev.some((i) => i.key === nextKey)) {
+        return prev.filter((i) => i.key !== key).map((i) => (i.key === nextKey ? { ...i, qty: i.qty + item.qty } : i))
+      }
+      return prev.map((i) => (i.key === key ? { ...i, key: nextKey, size, grind, unitPrice: priceFor(lot, size, item.purchaseMode) } : i))
+    })
+
+  const openSubscriptions = () => {
+    setSubTab("personal")
+    navigateWithTransition("subscriptions")
   }
 
   const handleAddToCart = (
