@@ -286,12 +286,10 @@ export default function KilnApp() {
     grind: GrindOption,
     qty = 1,
     purchaseMode: " puntual" | "suscripcion" = " puntual",
-    cadenceWeeks?: number
+    cadenceWeeks?: number,
+    options?: { silent?: boolean }
   ) => {
-    const sizeObj = BAG_SIZES.find((s) => s.id === size) ?? BAG_SIZES[0]
-    const raw = Math.round(lot.price250 * sizeObj.multiplier * 100) / 100
-    // Suscripción o miembro con suscripción activa: 12% de descuento
-    const unitPrice = purchaseMode === "suscripcion" || isMember ? Math.round(raw * 0.88 * 100) / 100 : raw
+    const unitPrice = priceFor(lot, size, purchaseMode)
     const key = `${lot.id}-${size}-${grind}-${purchaseMode}`
 
     const prevSnapshot = [...cart]
@@ -319,7 +317,8 @@ export default function KilnApp() {
       ]
     })
 
-    setCheckoutStep("cart")
+    // La ficha confirma en el propio botón; el resto de vistas usan el aviso con deshacer
+    if (options?.silent) return
     showToast(`Añadido: ${qty} × ${lot.name} (${size}, ${grind})`, () => {
       setCart(prevSnapshot)
     })
@@ -361,12 +360,6 @@ export default function KilnApp() {
       ? 0
       : 3.9
   const cartTotal = cartSubtotal + shippingCost
-  const checkoutErrors = {
-    name: customerName.trim().length < 2 ? "Indica tu nombre completo." : "",
-    email: /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(customerEmail.trim()) ? "" : "Introduce un email válido.",
-    address: deliveryMethod === "shipping" && customerAddress.trim().length < 6 ? "Indica calle, número y ciudad." : "",
-  }
-  const checkoutValid = !checkoutErrors.name && !checkoutErrors.email && !checkoutErrors.address
 
   // Recomendación del Asistente Sensorial
   const recommendedLot = useMemo(() => {
@@ -407,10 +400,15 @@ export default function KilnApp() {
     visit: "Visítanos · nuestro estudio",
     wholesale: "Profesionales B2B",
     brew: "Laboratorio de Extracción",
+    checkout: "Pedido",
+    news: "Novedades",
   }
 
   return (
-    <div className={`kiln-shell ${mobileMenuOpen ? "is-menu-open" : ""} ${view === "shop" || view === "product" ? "is-dark" : ""}`}>
+    <div
+      ref={shellRef}
+      className={`kiln-shell ${mobileMenuOpen ? "is-menu-open" : ""} ${view === "shop" || view === "news" || view === "product" || view === "checkout" ? "is-dark" : ""} ${supportsViewTransitions() ? "" : "no-vt"}`}
+    >
       {/* 1. BARRA SUPERIOR DE ESTADO DE TUESTE EN VIVO (Heurística #1) */}
       <div className="k-roast-bar">
         <div className="k-roast-bar-left">
@@ -426,14 +424,7 @@ export default function KilnApp() {
         </div>
       </div>
 
-      {routeTransition && (
-        <div className="k-route-transition" aria-hidden="true">
-          <span className="k-logo-mark"><i /><b /><b /><b /><b /></span>
-          <span>KILN</span>
-        </div>
-      )}
-
-      {/* 2. NAVBAR: Menú · Marca · Cuenta */}
+      {/* 2. NAVBAR: Menú — Marca — Cesta */}
       <header className={`k-topnav ${view === "home" ? "is-overlay" : ""}`}>
         <button
           type="button"
@@ -455,18 +446,14 @@ export default function KilnApp() {
           <span>KILN</span>
         </button>
 
-        <div className="k-topnav-right">
-          <button
-            type="button"
-            className="k-topnav-link"
-            onClick={() => {
-              setSubTab("personal")
-              navigateWithTransition("subscriptions")
-            }}
-          >
-            Cuenta
-          </button>
-        </div>
+        <button
+          type="button"
+          className="k-topnav-link k-topnav-cart"
+          onClick={() => setCartOpen(true)}
+          aria-label={`Cesta, ${cartCount} ${cartCount === 1 ? "artículo" : "artículos"}`}
+        >
+          Cesta <span className="k-topnav-count">[ {cartCount} ]</span>
+        </button>
       </header>
 
       <div
