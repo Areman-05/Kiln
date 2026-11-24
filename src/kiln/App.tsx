@@ -476,31 +476,70 @@ export default function KilnApp() {
           >
             Cerrar
           </button>
-          <div className="k-side-actions">
+        </div>
+        <nav className="k-side-nav">
+          {(
+            [
+              ["home", "Inicio", view === "home", () => navigateWithTransition("home")],
+              ["news", "Novedades", view === "news" || (view === "product" && lotOrigin === "news"), () => navigateWithTransition("news")],
+              ["shop", "Café", view === "shop" || (view === "product" && lotOrigin === "shop"), () => navigateWithTransition("shop")],
+              [
+                "subscriptions",
+                "Suscripciones",
+                view === "subscriptions" && subTab !== "gift",
+                () => {
+                  setSubTab("personal")
+                  navigateTo("subscriptions")
+                },
+              ],
+              [
+                "gifts",
+                "Regalos",
+                view === "subscriptions" && subTab === "gift",
+                () => {
+                  setSubTab("gift")
+                  navigateTo("subscriptions")
+                },
+              ],
+            ] as [string, string, boolean, () => void][]
+          ).map(([id, label, active, go], index) => (
             <button
+              key={id}
               type="button"
-              className="k-side-close"
-              tabIndex={mobileMenuOpen ? 0 : -1}
-              onClick={() => {
-                setSearchModalOpen((open) => !open)
-              }}
-            >
-              Buscar
-            </button>
-            <button
-              type="button"
-              className="k-side-close"
+              className={active ? "active" : ""}
+              aria-current={active ? "page" : undefined}
+              style={{ transitionDelay: mobileMenuOpen ? `${120 + index * 45}ms` : "0ms" }}
               tabIndex={mobileMenuOpen ? 0 : -1}
               onClick={() => {
                 setMobileMenuOpen(false)
                 setSearchModalOpen(false)
-                setCheckoutStep("cart")
-                setCartOpen(true)
+                go()
               }}
             >
-              Cesta ({cartCount})
+              {label}
             </button>
-          </div>
+          ))}
+        </nav>
+        <div className="k-side-secondary">
+          <button
+            type="button"
+            tabIndex={mobileMenuOpen ? 0 : -1}
+            aria-expanded={searchModalOpen}
+            onClick={() => setSearchModalOpen((open) => !open)}
+          >
+            Buscar
+          </button>
+          <button
+            type="button"
+            tabIndex={mobileMenuOpen ? 0 : -1}
+            onClick={() => {
+              setSearchModalOpen(false)
+              setSubTab("personal")
+              navigateTo("subscriptions")
+            }}
+          >
+            Cuenta
+          </button>
         </div>
         {searchModalOpen && (
           <div className="k-side-search">
@@ -556,38 +595,10 @@ export default function KilnApp() {
             ))}
           </div>
         )}
-        <nav className="k-side-nav">
-          {(
-            [
-              ["home", "Inicio"],
-              ["shop", "Café"],
-              ["subscriptions", "Suscripciones"],
-              ["studio", "El estudio"],
-              ["visit", "Visítanos"],
-              ["brew", "Guías"],
-              ["wholesale", "Profesionales"],
-            ] as [ViewName, string][]
-          ).map(([id, label], index) => (
-            <button
-              key={id}
-              type="button"
-              className={view === id || (id === "shop" && view === "product") ? "active" : ""}
-              style={{ transitionDelay: mobileMenuOpen ? `${120 + index * 45}ms` : "0ms" }}
-              tabIndex={mobileMenuOpen ? 0 : -1}
-              onClick={() => {
-                setMobileMenuOpen(false)
-                setSearchModalOpen(false)
-                navigateWithTransition(id)
-              }}
-            >
-              {label}
-            </button>
-          ))}
-        </nav>
       </aside>
 
       {/* 3. BARRA DE RASTRO (BREADCRUMBS) EN VISTAS INTERNAS */}
-      {view !== "home" && view !== "shop" && view !== "product" && (
+      {view !== "home" && view !== "shop" && view !== "news" && view !== "product" && view !== "checkout" && (
         <div className="k-breadcrumb-bar">
           <div className="k-container">
             <div className="k-breadcrumbs">
@@ -602,11 +613,11 @@ export default function KilnApp() {
       )}
 
       {/* 4. CONTENIDO PRINCIPAL DE CADA VISTA */}
-      <main style={{ flex: 1 }}>
+      <main key={view} className="k-main">
         {view === "home" && (
           <HomeView
             onNavigate={(target) => navigateWithTransition(target)}
-            onOpenSeason={() => navigateWithTransition("shop", "Cosecha Estacional")}
+            onOpenSeason={() => navigateWithTransition("news")}
             onOpenSubTab={(t) => setSubTab(t)}
           />
         )}
@@ -623,23 +634,16 @@ export default function KilnApp() {
           />
         )}
 
+        {view === "news" && <NewArrivalsView onSelectLot={openLotDetail} />}
+
         {view === "product" && (
           <ProductDetailView
+            key={selectedLot.id}
             lot={selectedLot}
-            onBack={() => navigateTo("shop")}
-            onAddToCart={handleAddToCart}
+            onBack={() => navigateTo(lotOrigin)}
+            onAddToCart={(l, s, g) => handleAddToCart(l, s, g, 1, " puntual", undefined, { silent: true })}
             onSelectLot={openLotDetail}
             isMember={isMember}
-            showSubscriptionOffer={activeSub === null && !subOfferSeen}
-            onSubscriptionOfferSeen={() => setSubOfferSeen(true)}
-            onOpenCart={() => {
-              setCheckoutStep("cart")
-              setCartOpen(true)
-            }}
-            onOpenSubscriptions={() => {
-              setSubTab("personal")
-              navigateWithTransition("subscriptions")
-            }}
           />
         )}
 
@@ -712,6 +716,26 @@ export default function KilnApp() {
         {view === "visit" && <VisitView onNotify={(m) => showToast(m)} />}
 
         {view === "wholesale" && <WholesaleView onNotify={(m) => showToast(m)} />}
+
+        {view === "checkout" && (
+          <CheckoutView
+            items={cart}
+            subtotal={cartSubtotal}
+            threshold={freeShippingThreshold}
+            delivery={deliveryMethod}
+            onDeliveryChange={setDeliveryMethod}
+            session={session}
+            findAccount={(email) => accounts.find((a) => a.email === email)}
+            onSignIn={(account) => setSessionEmail(account.email)}
+            onSignOut={() => setSessionEmail(null)}
+            onSaveAccount={(account) => setAccounts((prev) => [...prev.filter((a) => a.email !== account.email), account])}
+            onPlaceOrder={() => setCart([])}
+            onEditCart={() => setCartOpen(true)}
+            onShop={() => navigateWithTransition("shop")}
+            onSubscribe={openSubscriptions}
+            isMember={isMember}
+          />
+        )}
       </main>
 
       {/* 5. DOCK FLOTANTE DE COMPARACIÓN DE LOTES */}
@@ -923,376 +947,24 @@ export default function KilnApp() {
         </div>
       </div>
 
-      {/* 9. DRAWER DE CESTA Y CHECKOUT COMPLETO EN 3 PASOS */}
-      <div className={`k-backdrop ${cartOpen ? "open" : ""}`} onClick={() => setCartOpen(false)} />
-      <aside className={`k-drawer ${cartOpen ? "open" : ""} ${checkoutStep === "shipping" ? "is-shipping" : ""}`} aria-label="Cesta de compra y checkout">
-        <div
-          style={{
-            padding: "1.5rem 1.75rem",
-            borderBottom: "1px solid var(--line-subtle)",
-            display: "flex",
-            justifyContent: "space-between",
-            alignItems: "center",
-          }}
-        >
-          <div>
-            <span className="k-eyebrow">
-              {checkoutStep === "cart"
-                ? "PASO 1 DE 2 · TU SELECCIÓN"
-                : checkoutStep === "shipping"
-                ? "PASO 2 DE 2 · ENTREGA Y PAGO"
-                : "PEDIDO CONFIRMADO"}
-            </span>
-            <h3 className="font-serif" style={{ fontSize: "1.45rem", fontWeight: 400 }}>
-              {checkoutStep === "cart"
-                ? `Cesta (${cartCount})`
-                : checkoutStep === "shipping"
-                ? "Finalizar Pedido"
-                : `Orden #${confirmedOrderId}`}
-            </h3>
-          </div>
-          <button type="button" onClick={() => setCartOpen(false)} style={{ fontSize: "0.85rem" }}>
-            Cerrar ✕
-          </button>
-        </div>
-
-        {/* Barra de progreso envío gratuito */}
-        {checkoutStep !== "confirmed" && (
-          <div className="k-drawer-ship" style={{ padding: "0.85rem 1.75rem", background: "var(--bg-secondary)", fontSize: "0.78rem" }}>
-            {cartSubtotal >= freeShippingThreshold || deliveryMethod === "pickup" ? (
-              <span>Tienes <strong>envío urgente 24 h gratis</strong> en este pedido.</span>
-            ) : (
-              <span>
-                Te faltan <strong>{formatEur(freeShippingThreshold - cartSubtotal)}</strong> para el envío urgente
-                gratis (o elige recogida en el estudio).
-              </span>
-            )}
-            <div style={{ height: "4px", background: "var(--line-medium)", marginTop: "0.45rem", borderRadius: "99px", overflow: "hidden" }}>
-              <div
-                style={{
-                  height: "100%",
-                  width: `${Math.min(100, (cartSubtotal / freeShippingThreshold) * 100)}%`,
-                  background: "var(--accent-rust)",
-                }}
-              />
-            </div>
-          </div>
-        )}
-
-        {/* Cuerpo del Drawer según el paso */}
-        <div className="k-drawer-body" style={{ flex: 1, overflowY: "auto", padding: "1.5rem 1.75rem" }}>
-          {checkoutStep === "cart" && (
-            <>
-              {cart.length === 0 ? (
-                <div style={{ textAlign: "center", padding: "3.5rem 1rem" }}>
-                  <p className="font-serif" style={{ fontSize: "1.35rem", marginBottom: "0.5rem" }}>
-                    Tu cesta está vacía
-                  </p>
-                  <p style={{ fontSize: "0.85rem", color: "var(--ink-secondary)", marginBottom: "1.5rem" }}>
-                    Explora los micro-lotes recién tostados de esta semana.
-                  </p>
-                  <button
-                    type="button"
-                    className="k-btn-primary"
-                    onClick={() => {
-                      setCartOpen(false)
-                      navigateTo("shop")
-                    }}
-                  >
-                    Explorar Cafés
-                  </button>
-                </div>
-              ) : (
-                <div style={{ display: "flex", flexDirection: "column", gap: "1.25rem" }}>
-                  {cart.map((item) => (
-                    <div
-                      key={item.key}
-                      style={{
-                        display: "grid",
-                        gridTemplateColumns: "68px 1fr auto",
-                        gap: "1rem",
-                        paddingBottom: "1.25rem",
-                        borderBottom: "1px solid var(--line-subtle)",
-                        alignItems: "center",
-                      }}
-                    >
-                      <div style={{ display: "flex", justifyContent: "center" }}>
-                        <Bag
-                          lot={{
-                            name: item.name,
-                            no: item.no,
-                            origin: item.origin,
-                            tone: item.tone,
-                          }}
-                          size="sm"
-                          style={{ width: "62px", height: "90px" }}
-                        />
-                      </div>
-
-                      <div>
-                        <div className="font-serif" style={{ fontSize: "1.1rem" }}>
-                          {item.name}
-                        </div>
-                        <div className="font-mono" style={{ fontSize: "0.68rem", color: "var(--ink-muted)", margin: "0.15rem 0 0.5rem" }}>
-                          {item.size} · {item.grind} ·{" "}
-                          {item.purchaseMode === "suscripcion"
-                            ? "Suscripción (−12%)"
-                            : isMember && COFFEE_LOTS.some((l) => l.id === item.lotId)
-                            ? "Precio suscriptor (−12%)"
-                            : "Compra única"}
-                        </div>
-
-                        <div className="k-drawer-qty" style={{ display: "inline-flex", alignItems: "center", border: "1px solid var(--line-medium)" }}>
-                          <button
-                            type="button"
-                            style={{ padding: "0.15rem 0.55rem" }}
-                            onClick={() =>
-                              setCart((prev) =>
-                                prev
-                                  .map((x) => (x.key === item.key ? { ...x, qty: x.qty - 1 } : x))
-                                  .filter((x) => x.qty > 0)
-                              )
-                            }
-                          >
-                            −
-                          </button>
-                          <span className="font-mono" style={{ fontSize: "0.75rem", padding: "0 0.5rem" }}>
-                            {item.qty}
-                          </span>
-                          <button
-                            type="button"
-                            style={{ padding: "0.15rem 0.55rem" }}
-                            onClick={() =>
-                              setCart((prev) =>
-                                prev.map((x) => (x.key === item.key ? { ...x, qty: x.qty + 1 } : x))
-                              )
-                            }
-                          >
-                            +
-                          </button>
-                        </div>
-                      </div>
-
-                      <div style={{ textAlign: "right" }}>
-                        <div style={{ fontWeight: 600 }}>{formatEur(item.unitPrice * item.qty)}</div>
-                        <button
-                          type="button"
-                          style={{ fontSize: "0.7rem", color: "var(--ink-muted)", textDecoration: "underline", marginTop: "0.4rem" }}
-                          onClick={() => setCart((prev) => prev.filter((x) => x.key !== item.key))}
-                        >
-                          Quitar
-                        </button>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              )}
-            </>
-          )}
-
-          {checkoutStep === "shipping" && (
-            <div className="k-shipping-form" style={{ display: "flex", flexDirection: "column", gap: "1.2rem" }}>
-              <div>
-                <span className="k-eyebrow" style={{ display: "block", marginBottom: "0.5rem" }}>
-                  MODALIDAD DE ENTREGA
-                </span>
-                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "0.65rem" }}>
-                  <button
-                    type="button"
-                    className={`k-selector-option ${deliveryMethod === "shipping" ? "active" : ""}`}
-                    onClick={() => setDeliveryMethod("shipping")}
-                  >
-                    <div style={{ fontWeight: 600, fontSize: "0.84rem" }}>Mensajería 24h</div>
-                    <div className="sub" style={{ fontSize: "0.68rem", color: "var(--ink-muted)" }}>
-                      {cartSubtotal >= freeShippingThreshold ? "Gratis" : "3,90 €"}
-                    </div>
-                  </button>
-                  <button
-                    type="button"
-                    className={`k-selector-option ${deliveryMethod === "pickup" ? "active" : ""}`}
-                    onClick={() => setDeliveryMethod("pickup")}
-                  >
-                    <div style={{ fontWeight: 600, fontSize: "0.84rem" }}>Recogida en nuestro estudio</div>
-                    <div className="sub" style={{ fontSize: "0.68rem", color: "var(--ink-muted)" }}>
-                      Gratis · Listo en 2 horas
-                    </div>
-                  </button>
-                </div>
-              </div>
-
-              <div>
-                <label className="k-eyebrow" style={{ display: "block", marginBottom: "0.3rem" }}>
-                  NOMBRE COMPLETO
-                </label>
-                <input
-                  type="text"
-                  value={customerName}
-                  onChange={(e) => setCustomerName(e.target.value)}
-                  aria-invalid={checkoutTried && !!checkoutErrors.name}
-                  style={{ width: "100%", padding: "0.7rem", border: `1px solid ${checkoutTried && checkoutErrors.name ? "#ff8a70" : "var(--line-medium)"}`, background: "var(--bg-primary)" }}
-                />
-                {checkoutTried && checkoutErrors.name && (
-                  <p role="alert" style={{ marginTop: "0.35rem", fontSize: "0.72rem", color: "#ff8a70" }}>
-                    {checkoutErrors.name}
-                  </p>
-                )}
-              </div>
-
-              <div>
-                <label className="k-eyebrow" style={{ display: "block", marginBottom: "0.3rem" }}>
-                  EMAIL PARA SEGUIMIENTO DE TUESTE
-                </label>
-                <input
-                  type="email"
-                  value={customerEmail}
-                  onChange={(e) => setCustomerEmail(e.target.value)}
-                  aria-invalid={checkoutTried && !!checkoutErrors.email}
-                  style={{ width: "100%", padding: "0.7rem", border: `1px solid ${checkoutTried && checkoutErrors.email ? "#ff8a70" : "var(--line-medium)"}`, background: "var(--bg-primary)" }}
-                />
-                {checkoutTried && checkoutErrors.email && (
-                  <p role="alert" style={{ marginTop: "0.35rem", fontSize: "0.72rem", color: "#ff8a70" }}>
-                    {checkoutErrors.email}
-                  </p>
-                )}
-              </div>
-
-              {deliveryMethod === "shipping" && (
-                <div>
-                  <label className="k-eyebrow" style={{ display: "block", marginBottom: "0.3rem" }}>
-                    DIRECCIÓN DE ENTREGA
-                  </label>
-                  <input
-                    type="text"
-                    value={customerAddress}
-                    onChange={(e) => setCustomerAddress(e.target.value)}
-                    aria-invalid={checkoutTried && !!checkoutErrors.address}
-                    style={{ width: "100%", padding: "0.7rem", border: `1px solid ${checkoutTried && checkoutErrors.address ? "#ff8a70" : "var(--line-medium)"}`, background: "var(--bg-primary)" }}
-                  />
-                  {checkoutTried && checkoutErrors.address && (
-                    <p role="alert" style={{ marginTop: "0.35rem", fontSize: "0.72rem", color: "#ff8a70" }}>
-                      {checkoutErrors.address}
-                    </p>
-                  )}
-                </div>
-              )}
-
-              <div style={{ padding: "1rem", background: "var(--bg-secondary)", fontSize: "0.8rem" }}>
-                <strong>Garantía de Frescura Kiln:</strong> Todos los paquetes se sellan en atmósfera de
-                nitrógeno con fecha de tueste impresa en el reverso.
-              </div>
-            </div>
-          )}
-
-          {checkoutStep === "confirmed" && (
-            <div style={{ padding: "1.5rem 0" }}>
-              <div
-                style={{
-                  background: "var(--bg-secondary)",
-                  padding: "1.75rem",
-                  borderRadius: "var(--radius-sm)",
-                  marginBottom: "1.5rem",
-                }}
-              >
-                <span className="k-eyebrow" style={{ color: "var(--accent-rust)" }}>
-                  PEDIDO REGISTRADO EN LA COLA DE TUESTE
-                </span>
-                <h4 className="k-title-md" style={{ margin: "0.4rem 0 0.75rem" }}>
-                  Gracias, {customerName}
-                </h4>
-                <p style={{ fontSize: "0.88rem", color: "var(--ink-secondary)", lineHeight: 1.6 }}>
-                  Hemos enviado el recibo y la curva de tueste de tus lotes a{" "}
-                  <strong>{customerEmail}</strong>.{" "}
-                  {deliveryMethod === "pickup"
-                    ? "Puedes pasar a recoger tu pedido hoy mismo por nuestra barra de  118 (con un espresso de cortesía al recoger)."
-                    : `Tu pedido saldrá del tostador rumbo a ${customerAddress}.`}
-                </p>
-              </div>
-
-              <button
-                type="button"
-                className="k-btn-primary"
-                style={{ width: "100%" }}
-                onClick={() => {
-                  setCartOpen(false)
-                  setCheckoutStep("cart")
-                }}
-              >
-                Seguir explorando Kiln
-              </button>
-            </div>
-          )}
-        </div>
-
-        {/* Pie del Drawer con desglose en Euros */}
-        {cart.length > 0 && checkoutStep !== "confirmed" && (
-          <div className="k-drawer-summary" style={{ padding: "1.5rem 1.75rem", borderTop: "1px solid var(--line-subtle)", background: "var(--bg-card)" }}>
-            <div style={{ display: "flex", justifyContent: "space-between", fontSize: "0.84rem", marginBottom: "0.35rem" }}>
-              <span style={{ color: "var(--ink-secondary)" }}>Subtotal</span>
-              <span>{formatEur(cartSubtotal)}</span>
-            </div>
-            <div style={{ display: "flex", justifyContent: "space-between", fontSize: "0.84rem", marginBottom: "0.75rem" }}>
-              <span style={{ color: "var(--ink-secondary)" }}>
-                {deliveryMethod === "pickup" ? "Recogida en nuestro estudio" : "Envío urgente 24h"}
-              </span>
-              <span>{shippingCost === 0 ? "Gratis (0,00 €)" : formatEur(shippingCost)}</span>
-            </div>
-            <div
-              className="k-drawer-total"
-              style={{
-                display: "flex",
-                justifyContent: "space-between",
-                fontSize: "1.15rem",
-                fontWeight: 600,
-                paddingTop: "0.75rem",
-                borderTop: "1px solid var(--line-subtle)",
-                marginBottom: "1rem",
-              }}
-            >
-              <span>Total (IVA incl.)</span>
-              <span>{formatEur(cartTotal)}</span>
-            </div>
-
-            {checkoutStep === "cart" ? (
-              <button
-                type="button"
-                className="k-btn-primary"
-                style={{ width: "100%" }}
-                onClick={() => setCheckoutStep("shipping")}
-              >
-                Continuar a Datos de Entrega →
-              </button>
-            ) : (
-              <div style={{ display: "flex", gap: "0.6rem" }}>
-                <button
-                  type="button"
-                  className="k-btn-secondary"
-                  onClick={() => setCheckoutStep("cart")}
-                >
-                  ← Atrás
-                </button>
-                <button
-                  type="button"
-                  className="k-btn-primary"
-                  style={{ flex: 1 }}
-                  onClick={() => {
-                    if (!checkoutValid) {
-                      setCheckoutTried(true)
-                      return
-                    }
-                    setCheckoutTried(false)
-                    const orderNo = `KLN-${Math.floor(10000 + Math.random() * 89999)}`
-                    setConfirmedOrderId(orderNo)
-                    setCart([])
-                    setCheckoutStep("confirmed")
-                  }}
-                >
-                  Confirmar y Pagar {formatEur(cartTotal)}
-                </button>
-              </div>
-            )}
-          </div>
-        )}
-      </aside>
+      {/* 9. CESTA: panel lateral solo con los productos */}
+      <CartDrawer
+        open={cartOpen}
+        items={cart}
+        count={cartCount}
+        subtotal={cartSubtotal}
+        shippingCost={shippingCost}
+        total={cartTotal}
+        threshold={freeShippingThreshold}
+        isMember={isMember}
+        onClose={() => setCartOpen(false)}
+        onQty={changeQty}
+        onRemove={removeItem}
+        onUpdate={updateCartItem}
+        onCheckout={() => navigateTo("checkout")}
+        onShop={() => navigateWithTransition("shop")}
+        onSubscribe={openSubscriptions}
+      />
 
       {/* 10. FOOTER */}
       <footer className="k-footer k-footer-v2">
