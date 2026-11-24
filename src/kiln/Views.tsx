@@ -418,92 +418,97 @@ export function ProductDetailView({
   const ground = grind !== "En grano"
   const bagLot = { name: lot.name, no: lot.no, origin: lot.origin, process: lot.process, roast: lot.roast, variety: lot.variety, notes: lot.notes, tone: lot.tone, weight: sizeObj.label }
 
+  // El botón confirma por sí mismo durante 1,5 s: sin avisos ni saltos de maquetación
   const handleAdd = () => {
-    onAddToCart(lot, size, grind, qty, " puntual")
-    if (showSubscriptionOffer) {
-      setOfferOpen(true)
-      onSubscriptionOfferSeen()
-    }
+    onAddToCart(lot, size, grind)
+    setAdded(true)
+    window.clearTimeout(addedTimer.current)
+    addedTimer.current = window.setTimeout(() => setAdded(false), 1500)
   }
-
-  useEffect(() => {
-    if (!offerOpen) return
-    const onKey = (e: KeyboardEvent) => e.key === "Escape" && setOfferOpen(false)
-    window.addEventListener("keydown", onKey)
-    return () => window.removeEventListener("keydown", onKey)
-  }, [offerOpen])
+  const addLabel = added ? "Añadido ✓" : `Añadir — ${formatEur(unitPrice)}`
 
   const relatedLots = [
     ...COFFEE_LOTS.filter((item) => item.id !== lot.id && item.roast === lot.roast),
     ...COFFEE_LOTS.filter((item) => item.id !== lot.id && item.roast !== lot.roast),
   ].slice(0, 3)
 
+  const infoBlocks: { id: "story" | "brew"; label: string; body: React.ReactNode }[] = [
+    { id: "story", label: "Historia del café", body: <p>{lot.story}</p> },
+    {
+      id: "brew",
+      label: "Cómo prepararlo",
+      body: (
+        <>
+          <p className="k-pdp2-recipe">
+            {lot.recipe.method} · {lot.recipe.doseG} g · {lot.recipe.waterMl} ml · {lot.recipe.tempC} °C · {lot.recipe.totalTime} min
+          </p>
+          {lot.recipe.steps.length > 0 && (
+            <ol className="k-pdp2-steps">
+              {lot.recipe.steps.map((step) => (
+                <li key={`${step.time}-${step.water}`}>
+                  <span>{step.time}</span>
+                  <span>{step.water}</span>
+                  <span>{step.note}</span>
+                </li>
+              ))}
+            </ol>
+          )}
+        </>
+      ),
+    },
+  ]
+
   return (
     <section className="k-pdp2">
-      <div className="k-pdp2-grid">
-        <div className="k-pdp2-stage">
+      <div className="k-pdp2-layout">
+        <div className="k-pdp2-media">
           <button type="button" className="k-pdp2-back" onClick={onBack}>
             ← Volver
           </button>
-          <div className="k-pdp2-gallery">
-            <button type="button" className="k-pdp2-arrow" aria-label="Vista anterior" onClick={() => stepView(-1)}>
-              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 5l-7 7 7 7" /></svg>
+          <div className="k-pdp2-frame">
+            <button type="button" className="k-pdp2-arrow is-prev" aria-label="Vista anterior" onClick={() => goToView(viewIndex - 1, "prev")}>
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 4l-8 8 8 8" /></svg>
             </button>
             <div key={bagView} className={`k-pdp2-bag is-${viewDir}`}>
-              <Bag lot={{ ...bagLot, view: bagView }} size="lg" />
+              <Bag lot={{ ...bagLot, view: bagView }} size="xl" />
             </div>
-            <button type="button" className="k-pdp2-arrow" aria-label="Vista siguiente" onClick={() => stepView(1)}>
-              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 5l7 7-7 7" /></svg>
+            <button type="button" className="k-pdp2-arrow is-next" aria-label="Vista siguiente" onClick={() => goToView(viewIndex + 1, "next")}>
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 4l8 8-8 8" /></svg>
             </button>
-          </div>
-          <div className="k-pdp2-dots" role="tablist" aria-label="Vistas de la bolsa">
-            {BAG_VIEWS.map(([id, label], i) => (
-              <button
-                key={id}
-                type="button"
-                role="tab"
-                aria-label={label}
-                aria-selected={bagView === id}
-                onClick={() => {
-                  setViewDir(i >= BAG_VIEWS.findIndex(([v]) => v === bagView) ? "next" : "prev")
-                  setBagView(id)
-                }}
-              />
-            ))}
+            <div className="k-pdp2-dots" role="tablist" aria-label="Vistas de la bolsa">
+              {BAG_VIEWS.map(([id, label], i) => (
+                <button
+                  key={id}
+                  type="button"
+                  role="tab"
+                  aria-label={label}
+                  aria-selected={bagView === id}
+                  onClick={() => goToView(i, i >= viewIndex ? "next" : "prev")}
+                />
+              ))}
+            </div>
           </div>
         </div>
 
-        <div className="k-pdp2-info">
-          <div className="k-pdp2-head">
+        <div className="k-pdp2-panel">
+          <div className="k-pdp2-title">
             <h1>{lot.name}</h1>
-            <p className="k-pdp2-price">
+            <p className="k-pdp2-cost">
               {formatEur(unitPrice)}
-              <small>{isMember ? `Precio suscriptor · ${sizeObj.label}` : sizeObj.label}</small>
+              <small>{isMember ? `${sizeObj.label} · −12%` : sizeObj.label}</small>
             </p>
           </div>
-          <p className="k-pdp2-text">{lot.subtitle}.</p>
 
-          <div className="k-pdp2-facts">
-            <div>
-              <span>Sabe a</span>
-              <p>{lot.notes.join(", ")}</p>
-            </div>
-            <div>
-              <span>Ideal para</span>
-              <p>{IDEAL_FOR[lot.roast]}</p>
-            </div>
-            <div>
-              <span>Origen</span>
-              <p>
-                {lot.country} · {lot.process}
-              </p>
-            </div>
+          <div className="k-pdp2-spec">
+            {/* Cada dato es una unidad que no se parte; solo se salta línea entre separadores */}
+            <p>{joinUnits([lot.country, lot.process, minAltitude(lot.altitude)])}</p>
+            <p className="is-soft">{joinUnits(lot.notes)}</p>
           </div>
 
-          <div className="k-pdp2-buy">
-            <div className="k-pdp2-field">
-              <span>Tamaño</span>
-              <div className="k-pdp2-toggle">
+          <div className="k-pdp2-options">
+            <div className="k-pdp2-option" role="group" aria-labelledby="k-pdp2-size">
+              <span id="k-pdp2-size">Tamaño</span>
+              <div>
                 {BAG_SIZES.map((s) => (
                   <button key={s.id} type="button" aria-pressed={size === s.id} onClick={() => setSize(s.id)}>
                     {s.label}
@@ -512,9 +517,9 @@ export function ProductDetailView({
               </div>
             </div>
 
-            <div className="k-pdp2-field">
-              <span>Café</span>
-              <div className="k-pdp2-toggle">
+            <div className="k-pdp2-option" role="group" aria-labelledby="k-pdp2-grind">
+              <span id="k-pdp2-grind">Café</span>
+              <div>
                 <button type="button" aria-pressed={!ground} onClick={() => setGrind("En grano")}>
                   En grano
                 </button>
@@ -522,101 +527,74 @@ export function ProductDetailView({
                   Molido
                 </button>
               </div>
-              {ground && (
-                <div className="k-pdp2-toggle is-sub" aria-label="Molido para">
-                  <em>Para</em>
+            </div>
+
+            {ground && (
+              <div className="k-pdp2-option is-method" role="group" aria-labelledby="k-pdp2-method">
+                <span id="k-pdp2-method">Método</span>
+                <div>
                   {GROUND_OPTIONS.map((g) => (
                     <button key={g.id} type="button" aria-pressed={grind === g.id} onClick={() => setGrind(g.id)}>
                       {g.label}
                     </button>
                   ))}
                 </div>
-              )}
-            </div>
-
-            <div className="k-pdp2-action">
-              <div className="k-pdp2-qty">
-                <button type="button" onClick={() => setQty((q) => Math.max(1, q - 1))} aria-label="Reducir cantidad">
-                  −
-                </button>
-                <span aria-live="polite">{qty}</span>
-                <button type="button" onClick={() => setQty((q) => q + 1)} aria-label="Aumentar cantidad">
-                  +
-                </button>
               </div>
-              <button type="button" className="k-pdp2-add" onClick={handleAdd}>
-                <span>Añadir a la cesta</span>
-                <span>{formatEur(unitPrice * qty)}</span>
-              </button>
-            </div>
-            <p className="k-pdp2-ship">Tostado esta semana · Envío 24 h gratis desde 38 €</p>
+            )}
           </div>
 
-          <div className="k-pdp2-more">
-            <details>
-              <summary>Historia del café</summary>
-              <p>{lot.story}</p>
-            </details>
-            <details>
-              <summary>Cómo prepararlo</summary>
-              <p>
-                {lot.recipe.method}: {lot.recipe.doseG} g de café, {lot.recipe.waterMl} ml de agua a {lot.recipe.tempC} °C, {lot.recipe.totalTime} min.
-              </p>
-            </details>
+          <button type="button" className={`k-pdp2-cta ${added ? "is-added" : ""}`} onClick={handleAdd} aria-live="polite">
+            {addLabel}
+          </button>
+          <p className="k-pdp2-note">Tostado esta semana · Envío 24 h gratis desde 38 €</p>
+
+          <div className="k-pdp2-info">
+            {infoBlocks.map((block) => {
+              const open = openInfo[block.id]
+              return (
+                <div key={block.id} className={`k-pdp2-acc ${open ? "is-open" : ""}`}>
+                  <button
+                    type="button"
+                    aria-expanded={open}
+                    aria-controls={`k-pdp2-${block.id}`}
+                    onClick={() => setOpenInfo((s) => ({ ...s, [block.id]: !s[block.id] }))}
+                  >
+                    {block.label}
+                    <i aria-hidden="true">{open ? "−" : "+"}</i>
+                  </button>
+                  <div id={`k-pdp2-${block.id}`} className="k-pdp2-acc-body" aria-hidden={!open}>
+                    <div>{block.body}</div>
+                  </div>
+                </div>
+              )
+            })}
           </div>
         </div>
       </div>
 
-      {offerOpen && (
-        <div className="k-offer" role="dialog" aria-modal="true" aria-labelledby="k-offer-title" onClick={() => setOfferOpen(false)}>
-          <div className="k-offer-panel" onClick={(e) => e.stopPropagation()}>
-            <span className="k-offer-kicker">Añadido a la cesta</span>
-            <h2 id="k-offer-title">12% menos en cada bolsa</h2>
-            <p>Suscríbete a Kiln y recibe tu café recién tostado cuando lo necesites. Sin permanencia, pausa o cancela cuando quieras.</p>
-            <div className="k-offer-actions">
-              <button
-                type="button"
-                className="k-offer-primary"
-                onClick={() => {
-                  setOfferOpen(false)
-                  onOpenSubscriptions()
-                }}
-              >
-                Quiero suscribirme
-              </button>
-              <button
-                type="button"
-                className="k-offer-secondary"
-                onClick={() => {
-                  setOfferOpen(false)
-                  onOpenCart()
-                }}
-              >
-                Ver cesta
-              </button>
-              <button type="button" className="k-offer-secondary" onClick={() => setOfferOpen(false)}>
-                Seguir comprando
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-
       <div className="k-shop-view k-pdp2-related">
-        <h2>También te puede gustar</h2>
+        <h2>Otros cafés</h2>
         <div className="k-catalog-grid">
           {relatedLots.map((r) => (
             <LotCard
               key={r.id}
               lot={r}
               onSelectLot={onSelectLot}
-              onQuickAdd={(l, s, g) => onAddToCart(l, s, g, 1, " puntual")}
+              onQuickAdd={(l, s, g) => onAddToCart(l, s, g)}
               isCompared={false}
               onToggleCompare={() => {}}
             />
           ))}
         </div>
       </div>
+
+      <BodyPortal>
+        <div className="k-pdp2-mobilebar">
+          <button type="button" className={added ? "is-added" : ""} onClick={handleAdd}>
+            {addLabel}
+          </button>
+        </div>
+      </BodyPortal>
     </section>
   )
 }
