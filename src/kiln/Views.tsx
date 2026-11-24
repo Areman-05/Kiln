@@ -1,29 +1,17 @@
 "use client"
 
-import React, { useEffect, useMemo, useState } from "react"
+import React, { useEffect, useRef, useState } from "react"
+import { createPortal } from "react-dom"
 import { Bag } from "./Bag"
 import {
   BAG_SIZES,
-  CAFE_MENU,
   COFFEE_LOTS,
-  GRIND_OPTIONS,
   PHOTOS,
-  SUBSCRIPTION_PLANS,
-  lotPhoto,
   type BagSizeOption,
   type CoffeeLot,
   type GrindOption,
 } from "./data"
-import {
-  InteractiveBrewStudio,
-  LotCard,
-  RoastCurveChart,
-  SensoryRadar,
-  formatEur,
-  type ActiveSubscription,
-  type SubTab,
-  type ViewName,
-} from "./Components"
+import { LotCard, formatEur, type SubTab, type ViewName } from "./Components"
 
 /* ==========================================================================
    1. VISTA HOME (Editorial, Fotográfica, Rica en Valor Real)
@@ -90,58 +78,10 @@ const SORT_OPTIONS: { value: SortKey; label: string }[] = [
   { value: "price-desc", label: "Precio: mayor a menor" },
 ]
 
-/* Desplegable propio de ordenación (el select nativo no admite diseño) */
-function SortMenu({ value, onChange }: { value: SortKey; onChange: (v: SortKey) => void }) {
-  const [open, setOpen] = useState(false)
-  const ref = React.useRef<HTMLDivElement>(null)
-
-  useEffect(() => {
-    if (!open) return
-    const onDown = (e: MouseEvent) => {
-      if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false)
-    }
-    const onKey = (e: KeyboardEvent) => e.key === "Escape" && setOpen(false)
-    document.addEventListener("mousedown", onDown)
-    document.addEventListener("keydown", onKey)
-    return () => {
-      document.removeEventListener("mousedown", onDown)
-      document.removeEventListener("keydown", onKey)
-    }
-  }, [open])
-
-  const current = SORT_OPTIONS.find((o) => o.value === value) ?? SORT_OPTIONS[0]
-  return (
-    <div className="k-sort-menu" ref={ref}>
-      <button
-        type="button"
-        className="k-sort-trigger"
-        aria-haspopup="listbox"
-        aria-expanded={open}
-        aria-labelledby="k-sort-label"
-        onClick={() => setOpen((o) => !o)}
-      >
-        {current.label}
-        <i aria-hidden="true" />
-      </button>
-      {open && (
-        <ul className="k-sort-list" role="listbox" aria-labelledby="k-sort-label">
-          {SORT_OPTIONS.map((option) => (
-            <li key={option.value} role="option" aria-selected={option.value === value}>
-              <button
-                type="button"
-                onClick={() => {
-                  onChange(option.value)
-                  setOpen(false)
-                }}
-              >
-                {option.label}
-              </button>
-            </li>
-          ))}
-        </ul>
-      )}
-    </div>
-  )
+/* Barras fijas inferiores: se montan en <body> para que el desenfoque del
+   menú lateral (filter en <main>) no altere su posición fija. */
+function BodyPortal({ children }: { children: React.ReactNode }) {
+  return createPortal(children, document.body)
 }
 
 type FilterKey = "uso" | "sabor" | "proceso" | "origen" | "coleccion" | "precio"
@@ -221,7 +161,23 @@ export function ShopView({
   const [filters, setFilters] = useState<Record<FilterKey, string>>(() => initialFilters(initialCategory))
   const [searchQuery, setSearchQuery] = useState<string>("")
   const [sortBy, setSortBy] = useState<SortKey>("no")
-  const [filtersOpen, setFiltersOpen] = useState<boolean>(initialCategory !== "Todos")
+  const [panel, setPanel] = useState<"filter" | "sort" | null>(null)
+  const dockRef = useRef<HTMLDivElement>(null)
+
+  // Cierre de paneles con clic fuera o Escape
+  useEffect(() => {
+    if (!panel) return
+    const onDown = (e: PointerEvent) => {
+      if (dockRef.current && !dockRef.current.contains(e.target as Node)) setPanel(null)
+    }
+    const onKey = (e: KeyboardEvent) => e.key === "Escape" && setPanel(null)
+    document.addEventListener("pointerdown", onDown)
+    document.addEventListener("keydown", onKey)
+    return () => {
+      document.removeEventListener("pointerdown", onDown)
+      document.removeEventListener("keydown", onKey)
+    }
+  }, [panel])
 
   const matches = (lot: CoffeeLot, skip?: FilterKey) => {
     for (const group of FILTER_GROUPS) {
