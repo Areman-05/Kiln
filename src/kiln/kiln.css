@@ -501,8 +501,8 @@ body {
   color: var(--bg-primary);
   font-size: 0.76rem;
   font-weight: 500;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
+  
+  
   transition: all 0.3s var(--ease-calm);
 }
 
@@ -511,7 +511,7 @@ body {
 }
 
 .k-cart-count {
-  font-family: var(--font-mono);
+  font-family: var(--font-geo);
   font-size: 0.7rem;
   padding: 0.08rem 0.42rem;
   border-radius: var(--radius-full);
@@ -525,15 +525,15 @@ body {
   border: 1px solid var(--line-medium);
   border-radius: var(--radius-xs);
   font-size: 0.75rem;
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
+  
+  
 }
 
 .k-mobile-nav-item {
   padding: 0.3rem 0;
   text-align: left;
   color: var(--ink-primary);
-  font-family: var(--font-serif);
+  font-family: var(--font-geo);
   font-size: 1.35rem;
   line-height: 1.2;
 }
@@ -594,10 +594,10 @@ body {
   align-items: center;
   flex-wrap: wrap;
   gap: 0.55rem;
-  font-family: var(--font-mono);
+  font-family: var(--font-geo);
   font-size: 0.7rem;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
+  
+  
   color: var(--ink-muted);
 }
 
@@ -660,20 +660,20 @@ body {
 .k-home-hero-kicker {
   display: block;
   margin-bottom: 1.5rem;
-  font-family: var(--font-mono);
+  font-family: var(--font-geo);
   font-size: 0.67rem;
-  letter-spacing: 0.18em;
+  
   color: #d9c6a2;
 }
 
 .k-home-hero h1 {
   max-width: 800px;
   margin: 0 0 2.35rem;
-  font-family: var(--font-serif);
+  font-family: var(--font-geo);
   font-size: clamp(3.4rem, 7vw, 6.6rem);
   font-weight: 400;
   line-height: 0.91;
-  letter-spacing: -0.04em;
+  
 }
 
 .k-home-hero-action {
@@ -684,7 +684,7 @@ body {
   border-top: 1px solid rgba(246, 243, 236, 0.65) !important;
   border-bottom: 1px solid rgba(246, 243, 236, 0.65) !important;
   color: #ffffff;
-  font-family: var(--font-serif);
+  font-family: var(--font-geo);
   font-size: 1.3rem;
   transition: color 0.25s, gap 0.25s;
 }
@@ -695,7 +695,7 @@ body {
 }
 
 .k-home-hero-action span {
-  font-family: var(--font-sans);
+  font-family: var(--font-geo);
   font-size: 1rem;
 }
 
@@ -712,10 +712,10 @@ body {
 .k-home-intro p {
   max-width: 690px;
   margin: 0 auto;
-  font-family: var(--font-serif);
+  font-family: var(--font-geo);
   font-size: clamp(1.45rem, 2.2vw, 2.15rem);
   line-height: 1.3;
-  letter-spacing: -0.02em;
+  
 }
 
 .k-home-intro-actions {
@@ -779,7 +779,7 @@ body {
   left: 1.8rem;
   z-index: 1;
   color: rgba(246, 243, 236, 0.1);
-  font-family: var(--font-serif);
+  font-family: var(--font-geo);
   font-size: clamp(10rem, 20vw, 19rem);
   font-style: italic;
   line-height: 1;
@@ -801,18 +801,18 @@ body {
 .k-season-drop-copy > span,
 .k-season-discoveries-title > span {
   color: #d9c6a2;
-  font-family: var(--font-mono);
+  font-family: var(--font-geo);
   font-size: 0.63rem;
-  letter-spacing: 0.13em;
+  
 }
 
 .k-season-drop-copy h3 {
   margin: 0.9rem 0 1rem;
-  font-family: var(--font-serif);
+  font-family: var(--font-geo);
   font-size: clamp(3rem, 5vw, 5.2rem);
   font-weight: 400;
   line-height: 0.84;
-  letter-spacing: -0.055em;
+  
 }
 
 .k-season-drop-copy p {
@@ -826,7 +826,7 @@ body {
   padding-bottom: 0.45rem;
   border-bottom: 1px solid #d9c6a2 !important;
   color: #ffffff;
-  font-family: var(--font-serif);
+  font-family: var(--font-geo);
   font-size: 1.25rem;
   transition: color 0.2s, padding 0.2s;
 }
@@ -849,10 +849,10 @@ body {
   right: 1.45rem;
   bottom: 1.45rem;
   color: #d9c6a2;
-  font-family: var(--font-mono);
+  font-family: var(--font-geo);
   font-size: 0.58rem;
   line-height: 1.55;
-  letter-spacing: 0.12em;
+  
   text-align: right;
 }
 
