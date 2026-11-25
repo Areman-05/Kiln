@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <rect width="64" height="64" fill="#050505"/>
+  <!-- "k" geométrica de Jost: asta y dos diagonales rectas -->
+  <path d="M22 12V52M42 26L24 40M28.5 36.5L43 52" fill="none" stroke="#ffffff" stroke-width="4.5" stroke-linecap="butt" stroke-linejoin="miter"/>
+</svg>
