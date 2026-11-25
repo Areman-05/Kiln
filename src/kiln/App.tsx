@@ -713,8 +713,10 @@ export default function KilnApp() {
 
         {view === "shop" && (
           <ShopView
-            key={shopCategory}
+            key={`${shopCategory}-${shopProducer?.id ?? "todos"}`}
             initialCategory={shopCategory}
+            producer={shopProducer}
+            onClearProducer={() => setShopProducer(null)}
             onSelectLot={openLotDetail}
             onQuickAdd={(l, s, g) => handleAddToCart(l, s, g, 1, " puntual")}
             comparedIds={comparedIds}
@@ -733,6 +735,23 @@ export default function KilnApp() {
             onAddToCart={(l, s, g) => handleAddToCart(l, s, g, 1, " puntual", undefined, { silent: true })}
             onSelectLot={openLotDetail}
             isMember={isMember}
+            onMeetProducer={meetProducer}
+          />
+        )}
+
+        {view === "origin" && (
+          <OriginView onViewCoffees={(producer) => navigateTo("shop", "Todos", { producer })} />
+        )}
+
+        {view === "objects" && <ObjectsView onSelect={openObject} />}
+
+        {view === "object" && (
+          <ObjectDetailView
+            key={selectedObject.id}
+            obj={selectedObject}
+            onBack={() => navigateTo("objects")}
+            onAdd={handleAddObject}
+            onSelect={openObject}
           />
         )}
 
@@ -789,7 +808,7 @@ export default function KilnApp() {
             <div className="k-container">
               <div className="k-section-head">
                 <div>
-                  <span className="k-eyebrow">PROTOCOLOS DE EXTRACCIÓN Y AGUA · KILN LAB</span>
+                  <span className="k-eyebrow">Protocolos de extracción y agua</span>
                   <h1 className="k-title-lg" style={{ marginTop: "0.35rem" }}>
                     Calculadora Barista y Cronómetro de Vertido
                   </h1>
@@ -821,6 +840,7 @@ export default function KilnApp() {
             onPlaceOrder={() => setCart([])}
             onEditCart={() => setCartOpen(true)}
             onShop={() => navigateWithTransition("shop")}
+            onBrew={() => navigateWithTransition("brew")}
             onSubscribe={openSubscriptions}
             isMember={isMember}
           />
@@ -831,7 +851,7 @@ export default function KilnApp() {
       {comparedLots.length > 0 && (
         <div className="k-compare-dock">
           <span className="font-mono" style={{ fontSize: "0.74rem" }}>
-            COMPARADOR SENSORIAL ({comparedLots.length}/3):{" "}
+            Comparador sensorial ({comparedLots.length}/3):{" "}
             {comparedLots.map((c) => c.name).join(" vs. ")}
           </span>
           <div style={{ display: "flex", gap: "0.6rem" }}>
@@ -864,7 +884,7 @@ export default function KilnApp() {
         <div style={{ padding: "2rem" }}>
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "1.5rem" }}>
             <div>
-              <span className="k-eyebrow">ANÁLISIS COMPARATIVO LADO A LADO</span>
+              <span className="k-eyebrow">Análisis comparativo</span>
               <h3 className="k-title-md">Comparativa Técnica de Lotes</h3>
             </div>
             <button type="button" className="k-btn-secondary" style={{ padding: "0.45rem 0.9rem" }} onClick={() => setCompareModalOpen(false)}>
@@ -874,7 +894,7 @@ export default function KilnApp() {
 
           {comparedLots.length >= 2 && (
             <div style={{ marginBottom: "1.5rem", background: "var(--bg-primary)", padding: "1rem", border: "1px solid var(--line-subtle)" }}>
-              <span className="k-eyebrow">SUPERPOSICIÓN DE RADAR SENSORIAL ({comparedLots[0].name} vs {comparedLots[1].name})</span>
+              <span className="k-eyebrow">Radar sensorial superpuesto ({comparedLots[0].name} vs {comparedLots[1].name})</span>
               <SensoryRadar sensory={comparedLots[0].sensory} compareSensory={comparedLots[1].sensory} />
             </div>
           )}
@@ -882,7 +902,7 @@ export default function KilnApp() {
           <div style={{ display: "grid", gridTemplateColumns: `repeat(${Math.max(1, comparedLots.length)}, 1fr)`, gap: "1rem" }}>
             {comparedLots.map((c) => (
               <div key={c.id} style={{ border: "1px solid var(--line-subtle)", padding: "1.25rem", background: "var(--bg-primary)" }}>
-                <span className="k-eyebrow">LOTE {c.no} · SCA {c.score}</span>
+                <span className="k-eyebrow">Lote {c.no} · SCA {c.score}</span>
                 <h4 className="font-serif" style={{ fontSize: "1.35rem", margin: "0.25rem 0" }}>{c.name}</h4>
                 <p style={{ fontSize: "0.78rem", color: "var(--ink-secondary)", marginBottom: "0.85rem" }}>{c.origin}</p>
                 <div style={{ fontSize: "0.78rem", display: "flex", flexDirection: "column", gap: "0.4rem", marginBottom: "1rem" }}>
@@ -918,7 +938,7 @@ export default function KilnApp() {
         <div style={{ padding: "2.25rem" }}>
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "1.25rem" }}>
             <div>
-              <span className="k-eyebrow">SOMMELIER DE CAFÉ INTERACTIVO</span>
+              <span className="k-eyebrow">Encuentra tu café</span>
               <h3 className="k-title-md">Encuentra tu lote ideal en dos preguntas</h3>
             </div>
             <button type="button" onClick={() => setMatcherOpen(false)}>
@@ -928,7 +948,7 @@ export default function KilnApp() {
 
           <div style={{ marginBottom: "1.25rem" }}>
             <span className="k-eyebrow" style={{ display: "block", marginBottom: "0.45rem" }}>
-              1. ¿CÓMO PREPARAS EL CAFÉ HABITUALMENTE?
+              1. ¿Cómo preparas el café habitualmente?
             </span>
             <div className="k-selector-grid">
               {[
@@ -950,7 +970,7 @@ export default function KilnApp() {
 
           <div style={{ marginBottom: "1.5rem" }}>
             <span className="k-eyebrow" style={{ display: "block", marginBottom: "0.45rem" }}>
-              2. ¿QUÉ PERFIL EN TAZA TE ATRAE MÁS HOY?
+              2. ¿Qué perfil en taza te atrae más hoy?
             </span>
             <div className="k-selector-grid">
               {[
@@ -996,7 +1016,7 @@ export default function KilnApp() {
               size="sm"
             />
             <div style={{ flex: 1, minWidth: "220px" }}>
-              <span className="k-eyebrow">NUESTRA RECOMENDACIÓN PARA TI</span>
+              <span className="k-eyebrow">Nuestra recomendación</span>
               <h4 className="k-title-md" style={{ margin: "0.2rem 0" }}>
                 Lote {recommendedLot.no} · {recommendedLot.name}
               </h4>
@@ -1051,21 +1071,42 @@ export default function KilnApp() {
         onRemove={removeItem}
         onUpdate={updateCartItem}
         onCheckout={() => navigateTo("checkout")}
-        onShop={() => navigateWithTransition("shop")}
+        onShop={() => navigateWithTransition("news")}
         onSubscribe={openSubscriptions}
       />
 
       {/* 10. FOOTER */}
       <footer className="k-footer k-footer-v2">
         <div className="k-footer-v2-top">
-          <button type="button" className="k-footer-v2-mark" onClick={() => navigateWithTransition("home")} aria-label="Ir a inicio de Kiln">
-            <span className="k-logo-mark" aria-hidden="true"><i /><b /><b /><b /><b /></span>
-          </button>
           {(
             [
-              ["Tienda", [["Café", () => navigateWithTransition("shop")], ["Suscripciones", () => { setSubTab("personal"); navigateWithTransition("subscriptions") }], ["Regalos", () => { setSubTab("gift"); navigateWithTransition("subscriptions") }]]],
-              ["Kiln", [["El estudio", () => navigateWithTransition("studio")], ["Visítanos", () => navigateWithTransition("visit")], ["Profesionales", () => navigateWithTransition("wholesale")]]],
-              ["Ayuda", [["Guías", () => navigateWithTransition("brew")], ["Encontrar mi café", () => setMatcherOpen(true)], ["hola@kilncoffee.es", () => { window.location.href = "mailto:hola@kilncoffee.es" }]]],
+              [
+                "Comprar",
+                [
+                  ["Novedades", () => navigateWithTransition("news")],
+                  ["Café", () => navigateWithTransition("shop")],
+                  ["Objetos", () => navigateWithTransition("objects")],
+                  ["Suscripciones", () => { setSubTab("personal"); navigateTo("subscriptions") }],
+                  ["Regalos", () => { setSubTab("gift"); navigateTo("subscriptions") }],
+                ],
+              ],
+              [
+                "Kiln",
+                [
+                  ["Origen", () => navigateWithTransition("origin")],
+                  ["Visítanos", () => navigateWithTransition("visit")],
+                  ["Profesionales", () => navigateWithTransition("wholesale")],
+                ],
+              ],
+              [
+                "Ayuda",
+                [
+                  ["Envíos", () => { window.location.href = "mailto:hola@kilncoffee.es?subject=Env%C3%ADos" }],
+                  ["Devoluciones", () => { window.location.href = "mailto:hola@kilncoffee.es?subject=Devoluciones" }],
+                  ["Preguntas frecuentes", () => { window.location.href = "mailto:hola@kilncoffee.es?subject=Preguntas%20frecuentes" }],
+                  ["Contacto", () => { window.location.href = "mailto:hola@kilncoffee.es" }],
+                ],
+              ],
             ] as [string, [string, () => void][]][]
           ).map(([title, links]) => (
             <nav key={title} className="k-footer-v2-col" aria-label={title}>
@@ -1077,11 +1118,60 @@ export default function KilnApp() {
               ))}
             </nav>
           ))}
+
+          {/* Carta de temporada: una sola línea, sin caja */}
+          <form
+            className="k-newsletter"
+            noValidate
+            onSubmit={(e) => {
+              e.preventDefault()
+              setNewsletterState(/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(newsletterEmail.trim()) ? "done" : "error")
+            }}
+          >
+            <label htmlFor="k-newsletter-email">Carta de temporada</label>
+            {newsletterState === "done" ? (
+              <p className="k-newsletter-done">Gracias. Te escribiremos cuando cambie la temporada.</p>
+            ) : (
+              <>
+                <div className="k-newsletter-row">
+                  <input
+                    id="k-newsletter-email"
+                    type="email"
+                    autoComplete="email"
+                    placeholder="Tu email"
+                    value={newsletterEmail}
+                    aria-invalid={newsletterState === "error"}
+                    aria-describedby={newsletterState === "error" ? "k-newsletter-error" : undefined}
+                    onChange={(e) => {
+                      setNewsletterEmail(e.target.value)
+                      if (newsletterState === "error") setNewsletterState("idle")
+                    }}
+                  />
+                  <button type="submit" className="k-text-link">
+                    — Suscribirse
+                  </button>
+                </div>
+                {newsletterState === "error" && (
+                  <p id="k-newsletter-error" className="k-field-error">
+                    Introduce un email válido.
+                  </p>
+                )}
+              </>
+            )}
+          </form>
         </div>
-        <div className="k-footer-v2-word" aria-hidden="true">KILN</div>
+
+        <div className="k-footer-v2-word" aria-hidden="true">
+          <KilnPattern className="k-footer-pattern" color="#ffffff" opacity={0.08} />
+          <span>kiln</span>
+        </div>
+
         <div className="k-footer-v2-bottom">
           <span>© 2026 Kiln</span>
-          <span>EUR (€) · ES</span>
+          <span>ES</span>
+          <a href="https://www.instagram.com/" target="_blank" rel="noreferrer">
+            Instagram
+          </a>
         </div>
       </footer>
 
@@ -1098,10 +1188,7 @@ export default function KilnApp() {
               }}
               style={{
                 color: "#c8a46e",
-                fontFamily: "var(--font-mono)",
                 fontSize: "0.75rem",
-                textTransform: "uppercase",
-                letterSpacing: "0.08em",
                 textDecoration: "underline",
               }}
             >
