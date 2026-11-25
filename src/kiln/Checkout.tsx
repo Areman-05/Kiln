@@ -4,6 +4,7 @@ import React, { useEffect, useId, useRef, useState } from "react"
 import { Bag } from "./Bag"
 import { BAG_SIZES, COFFEE_LOTS, GRIND_OPTIONS, type BagSizeOption, type GrindOption } from "./data"
 import { formatEur, type CartItem } from "./Components"
+import { KilnPattern } from "./Brand"
 
 /* ==========================================================================
    Cuentas y pago: simulación local en el navegador.
@@ -51,9 +52,18 @@ export function persistAccounts(accounts: Account[]) {
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
 const sizeLabel = (size: BagSizeOption) => BAG_SIZES.find((s) => s.id === size)?.label ?? size
 const isCoffee = (item: CartItem) => COFFEE_LOTS.some((l) => l.id === item.lotId)
+// Línea secundaria: «250 g · En grano» para cafés, el material para objetos
+const itemDetail = (item: CartItem) => (item.kind === "object" ? item.origin : `${sizeLabel(item.size)} · ${item.grind}`)
 
 /* Miniatura: bolsa sobre el mismo recuadro de yeso que la ficha */
-export function CoffeeThumb({ item }: { item: Pick<CartItem, "name" | "no" | "origin" | "tone" | "size"> }) {
+export function CoffeeThumb({ item }: { item: Pick<CartItem, "name" | "no" | "origin" | "tone" | "size" | "image"> }) {
+  if (item.image) {
+    return (
+      <span className="k-thumb is-photo" aria-hidden="true">
+        <img src={item.image} alt="" />
+      </span>
+    )
+  }
   return (
     <span className="k-plaster k-thumb" aria-hidden="true">
       <Bag lot={{ name: item.name, no: item.no, origin: item.origin, tone: item.tone, weight: sizeLabel(item.size) }} size="xs" />
@@ -161,7 +171,7 @@ export function CartDrawer({
       <aside className={`k-cart ${open ? "open" : ""}`} aria-label="Cesta" aria-hidden={!open} inert={!open}>
         <header className="k-cart-head">
           <h2>
-            Cesta <span>[ {count} ]</span>
+            Cesta{count > 0 && <span> {count}</span>}
           </h2>
           <button ref={closeRef} type="button" onClick={onClose}>
             Cerrar
@@ -170,9 +180,9 @@ export function CartDrawer({
 
         {items.length === 0 ? (
           <div className="k-cart-empty">
-            <p>Tu cesta está vacía</p>
-            <button type="button" onClick={onShop}>
-              Ver cafés
+            <p className="k-prose">Tu cesta está vacía. Empieza por los cafés de esta temporada.</p>
+            <button type="button" className="k-text-link" onClick={onShop}>
+              — Ver novedades
             </button>
           </div>
         ) : (
@@ -189,10 +199,11 @@ export function CartDrawer({
                           <strong>{item.name}</strong>
                           <span>{formatEur(item.unitPrice * item.qty)}</span>
                         </div>
-                        <p className="k-cart-meta">
-                          {item.origin}
-                          {item.purchaseMode === "suscripcion" && ` · Suscripción cada ${item.cadenceWeeks ?? 2} semanas`}
-                        </p>
+                        {(!editable || item.purchaseMode === "suscripcion") && (
+                          <p className="k-cart-meta">
+                            {editable ? `Suscripción cada ${item.cadenceWeeks ?? 2} semanas` : item.origin}
+                          </p>
+                        )}
                         {editable && (
                           <div className="k-cart-selects">
                             <TextSelect
@@ -220,7 +231,7 @@ export function CartDrawer({
                             </button>
                           </div>
                           <button type="button" className="k-cart-remove" onClick={() => onRemove(item.key)}>
-                            Quitar
+                            — Quitar
                           </button>
                         </div>
                       </div>
@@ -238,7 +249,7 @@ export function CartDrawer({
 
               {showSubscribe && (
                 <button type="button" className="k-text-link" onClick={onSubscribe}>
-                  {coffees.length === 1 ? "Suscríbete a este café y ahorra un 12 %" : "Suscríbete a estos cafés y ahorra un 12 %"}
+                  {coffees.length === 1 ? "— Suscríbete a este café y ahorra un 12 %" : "— Suscríbete a estos cafés y ahorra un 12 %"}
                 </button>
               )}
             </div>
@@ -249,7 +260,7 @@ export function CartDrawer({
                 Tramitar pedido
               </button>
               <button type="button" className="k-text-link is-center" onClick={onClose}>
-                Seguir comprando
+                — Seguir comprando
               </button>
             </footer>
           </>
@@ -351,7 +362,7 @@ function Field({
   )
 }
 
-/* Selector de texto: activo en blanco con subrayado fino, como en la ficha */
+/* Opciones como filas de texto: un marcador indica la elegida, detalle a la derecha */
 function TextChoice<T extends string>({
   label,
   value,
@@ -367,6 +378,7 @@ function TextChoice<T extends string>({
     <div className="k-choice" role="radiogroup" aria-label={label}>
       {options.map((o) => (
         <button key={o.value} type="button" role="radio" aria-checked={value === o.value} onClick={() => onChange(o.value)}>
+          <i aria-hidden="true">{value === o.value ? "●" : ""}</i>
           <span>{o.label}</span>
           {o.note && <small>{o.note}</small>}
         </button>
@@ -389,6 +401,7 @@ export function CheckoutView({
   onPlaceOrder,
   onEditCart,
   onShop,
+  onBrew,
   onSubscribe,
   isMember,
 }: {
@@ -405,6 +418,7 @@ export function CheckoutView({
   onPlaceOrder: () => void
   onEditCart: () => void
   onShop: () => void
+  onBrew: () => void
   onSubscribe: () => void
   isMember: boolean
 }) {
@@ -428,7 +442,6 @@ export function CheckoutView({
   const [busy, setBusy] = useState<null | "pay" | "applepay" | "googlepay">(null)
   const [placed, setPlaced] = useState<PlacedOrder | null>(null)
   const [summaryOpen, setSummaryOpen] = useState<boolean>(false)
-  const [trackingOpen, setTrackingOpen] = useState<boolean>(false)
   const [newPassword, setNewPassword] = useState<string>("")
   const [accountTried, setAccountTried] = useState<boolean>(false)
   const [accountCreated, setAccountCreated] = useState<boolean>(false)
@@ -611,43 +624,64 @@ export function CheckoutView({
   const stepsNav = (
     <nav className="k-steps" aria-label="Pasos del pedido">
       <ol>
-        {STEPS.map((s, i) => {
-          const done = finished ? i < current : i < current || (i < reached && i !== current && s.id !== "confirm")
+        {STEPS.filter((s) => s.id !== "done").map((s, i) => {
+          const done = i < current || (i < reached && i !== current && s.id !== "confirm")
           const state = i === current ? "is-current" : done ? "is-done" : "is-todo"
-          const canGo = done && !finished && s.id !== "done"
+          const label = (
+            <>
+              <span className="k-step-no">{String(i + 1).padStart(2, "0")}</span> <span className="k-step-label">{s.label}</span>
+            </>
+          )
           return (
             <li key={s.id} className={state} aria-current={i === current ? "step" : undefined}>
-              {canGo ? (
-                <button type="button" onClick={() => goTo(s.id)}>
-                  <span aria-hidden="true">✓ </span>
-                  <span className="k-step-label">{s.label}</span>
+              {done ? (
+                <button type="button" onClick={() => goTo(s.id)} aria-label={`${s.label}, completado. Editar`}>
+                  {label}
                 </button>
               ) : (
-                <span>
-                  {done && <span aria-hidden="true">✓ </span>}
-                  {!done && i !== current && (
-                    <span className="k-step-no" aria-hidden="true">
-                      {String(i + 1).padStart(2, "0")}
-                    </span>
-                  )}
-                  <span className="k-step-label">{s.label}</span>
-                </span>
+                <span>{label}</span>
               )}
             </li>
           )
         })}
       </ol>
-      <span className="k-steps-bar" aria-hidden="true">
-        <i style={{ transform: `scaleX(${current / (STEPS.length - 1)})` }} />
-      </span>
     </nav>
   )
+
+  // Pasos completados plegados en una línea: «Email   pablo@email.com   — Editar»
+  const recapRows: { step: Step; label: string; value: string }[] = [
+    { step: "id", label: "Email", value: session?.email ?? trimmedEmail },
+    {
+      step: "address",
+      label: "Entrega",
+      value:
+        delivery === "pickup"
+          ? `Recogida en el estudio · ${address.name}`
+          : [address.address, `${address.postal} ${address.city}`.trim()].filter(Boolean).join(", "),
+    },
+    { step: "payment", label: "Pago", value: paymentValid ? paymentDetails().label : "Pendiente" },
+  ]
+  const recap = (rowsToShow: typeof recapRows) =>
+    rowsToShow.length > 0 && (
+      <dl className="k-recap">
+        {rowsToShow.map((row) => (
+          <div key={row.step}>
+            <dt>{row.label}</dt>
+            <dd>{row.value}</dd>
+            <button type="button" className="k-text-link" onClick={() => goTo(row.step)} aria-label={`Editar ${row.label.toLowerCase()}`}>
+              — Editar
+            </button>
+          </div>
+        ))}
+      </dl>
+    )
+  const completedBefore = recapRows.filter((row) => stepIndex(row.step) < current)
 
   const summary = (
     <aside className={`k-co-summary ${summaryOpen ? "is-open" : ""}`} aria-label="Resumen del pedido">
       <button type="button" className="k-co-summary-toggle" aria-expanded={summaryOpen} onClick={() => setSummaryOpen((o) => !o)}>
         <span>Resumen · {formatEur(sums.total)}</span>
-        <i aria-hidden="true">{summaryOpen ? "−" : "+"}</i>
+        <i aria-hidden="true">{summaryOpen ? "—" : "+"}</i>
       </button>
       <div className="k-co-summary-body">
         <div>
