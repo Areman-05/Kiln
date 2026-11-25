@@ -613,10 +613,10 @@ export function SubscriptionsView({
             >
               <div style={{ display: "flex", justifyContent: "space-between", borderBottom: "1px solid rgba(246,243,236,0.16)", paddingBottom: "1.25rem" }}>
                 <div>
-                  <div className="font-serif" style={{ fontSize: "1.8rem", letterSpacing: "0.12em" }}>
+                  <div className="font-serif" style={{ fontSize: "1.8rem" }}>
                     KILN
                   </div>
-                  <div className="font-mono" style={{ fontSize: "0.62rem", color: "#c8a46e", letterSpacing: "0.18em" }}>
+                  <div className="font-mono" style={{ fontSize: "0.62rem", color: "#c8a46e" }}>
                     KILN COFFEE
                   </div>
                 </div>

@@ -25,6 +25,9 @@ export type ViewName =
   | "brew"
   | "checkout"
   | "news"
+  | "origin"
+  | "objects"
+  | "object"
 
 export type SubTab = "personal" | "gift" | "office"
 
@@ -41,6 +44,9 @@ export type CartItem = {
   cadenceWeeks?: number
   unitPrice: number
   qty: number
+  // Objetos (cerámica y equipo): sin tamaño ni molienda; `origin` guarda el material
+  kind?: "object"
+  image?: string
 }
 
 export type ActiveSubscription = {
@@ -128,9 +134,8 @@ export function SensoryRadar({
               y={ly + 3}
               textAnchor="middle"
               fill="#544e45"
-              fontFamily="'IBM Plex Mono', monospace"
+              fontFamily="Jost, system-ui, sans-serif"
               fontSize="8"
-              letterSpacing="0.5"
             >
               {a.label.toUpperCase()} ({sensory[a.key]}/10)
             </text>
@@ -219,19 +224,19 @@ export function RoastCurveChart({ lot }: { lot: CoffeeLot }) {
         />
         {/* Hitos: Punto de giro, Amarilleo, Primer Crack, Descarga */}
         <circle cx="92" cy="96" r="3" fill="#1a1916" />
-        <text x="92" y="112" textAnchor="middle" fontFamily="'IBM Plex Mono', monospace" fontSize="7" fill="#544e45">
+        <text x="92" y="112" textAnchor="middle" fontFamily="Jost, system-ui, sans-serif" fontSize="7" fill="#544e45">
           TP 1:22 (88°C)
         </text>
         <circle cx="205" cy="72" r="3" fill="#b89150" />
-        <text x="205" y="63" textAnchor="middle" fontFamily="'IBM Plex Mono', monospace" fontSize="7" fill="#544e45">
+        <text x="205" y="63" textAnchor="middle" fontFamily="Jost, system-ui, sans-serif" fontSize="7" fill="#544e45">
           Maillard 4:15
         </text>
         <circle cx="325" cy="36" r="3.5" fill="#a84c32" />
-        <text x="318" y="26" textAnchor="middle" fontFamily="'IBM Plex Mono', monospace" fontSize="7.2" fill="#a84c32">
+        <text x="318" y="26" textAnchor="middle" fontFamily="Jost, system-ui, sans-serif" fontSize="7.2" fill="#a84c32">
           1er Crack 7:48 (196°C)
         </text>
         <circle cx="392" cy="22" r="3.5" fill="#1a1916" />
-        <text x="378" y="13" textAnchor="end" fontFamily="'IBM Plex Mono', monospace" fontSize="7.2" fill="#1a1916">
+        <text x="378" y="13" textAnchor="end" fontFamily="Jost, system-ui, sans-serif" fontSize="7.2" fill="#1a1916">
           Descarga {lot.endTempCelsius}
         </text>
       </svg>
@@ -423,7 +428,7 @@ export function InteractiveBrewStudio({
           <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1.5rem", marginBottom: "1.75rem" }}>
             <div>
               <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "0.4rem" }}>
-                <span className="k-eyebrow">DOSIS DE CAFÉ SECO</span>
+                <span className="k-eyebrow">Dosis de café</span>
                 <strong className="font-mono">{dose.toFixed(1)} g</strong>
               </div>
               <input
@@ -466,7 +471,7 @@ export function InteractiveBrewStudio({
             }}
           >
             <div>
-              <span className="k-eyebrow">AGUA TOTAL</span>
+              <span className="k-eyebrow">Agua total</span>
               <div className="font-serif" style={{ fontSize: "1.75rem" }}>
                 {totalWater} {method === "espresso" ? "g" : "ml"}
               </div>
@@ -484,7 +489,7 @@ export function InteractiveBrewStudio({
               </div>
             </div>
             <div>
-              <span className="k-eyebrow">TIEMPO OBJETIVO</span>
+              <span className="k-eyebrow">Tiempo objetivo</span>
               <div className="font-serif" style={{ fontSize: "1.75rem" }}>
                 {formatClock(currentPreset.targetSec)}
               </div>
@@ -537,7 +542,7 @@ export function InteractiveBrewStudio({
         >
           <div>
             <span className="k-eyebrow" style={{ color: "#c8a46e" }}>
-              CRONÓMETRO DE BARRA EN TIEMPO REAL
+              Cronómetro de vertido
             </span>
             <p style={{ fontSize: "0.84rem", color: "var(--ink-light-sub)", marginTop: "0.35rem" }}>
               Molienda recomendada: {currentPreset.grind}. Agua filtrada recomendada: 55 – 75 ppm GH, 25 ppm KH.
