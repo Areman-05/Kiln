@@ -6,7 +6,11 @@ import { Bag } from "./Bag"
 import {
   BAG_SIZES,
   COFFEE_LOTS,
+  OBJECTS,
   PHOTOS,
+  PRODUCERS,
+  producerForLot,
+  type Producer,
   type BagSizeOption,
   type CoffeeLot,
   type GrindOption,
@@ -36,16 +40,8 @@ export function HomeView({
         onNavigate("subscriptions")
       },
     },
-    { label: "Sobre nosotros", image: PHOTOS.homeAbout, alt: "Superficie de bloques de hormigón", onClick: () => onNavigate("studio") },
-    {
-      label: "Regalos",
-      image: PHOTOS.homeGifts,
-      alt: "Formas abstractas en blanco y negro",
-      onClick: () => {
-        onOpenSubTab("gift")
-        onNavigate("subscriptions")
-      },
-    },
+    { label: "Origen", image: PRODUCERS[0].photo, alt: `Paisaje de ${PRODUCERS[0].region}, ${PRODUCERS[0].country}`, onClick: () => onNavigate("origin") },
+    { label: "Objetos", image: OBJECTS[0].photos[0], alt: OBJECTS[0].name, onClick: () => onNavigate("objects") },
   ]
 
   return (
@@ -150,7 +146,11 @@ export function ShopView({
   onQuickAdd,
   comparedIds,
   onToggleCompare,
+  producer = null,
+  onClearProducer,
 }: {
+  producer?: Producer | null
+  onClearProducer?: () => void
   initialCategory?: string
   onSelectLot: (lot: CoffeeLot) => void
   onQuickAdd: (lot: CoffeeLot, size: BagSizeOption, grind: GrindOption) => void
@@ -186,6 +186,7 @@ export function ShopView({
       const option = group.options.find((o) => o.value === selected)
       if (option && !option.test(lot)) return false
     }
+    if (producer && !producer.lotIds.includes(lot.id)) return false
     const q = searchQuery.trim().toLowerCase()
     if (q) {
       const hay = `${lot.name} ${lot.origin} ${lot.country} ${lot.variety} ${lot.notes.join(" ")} ${lot.producer} ${lot.process} ${lot.roast}`.toLowerCase()
@@ -218,6 +219,14 @@ export function ShopView({
       <div className="k-container">
         <header className="k-shop-head">
           <h1>Todos los cafés</h1>
+          {producer && (
+            <p className="k-shop-note">
+              Cafés de {producer.name}
+              <button type="button" className="k-text-link" onClick={onClearProducer}>
+                — Ver todos
+              </button>
+            </p>
+          )}
         </header>
 
         {/* Estado vacío con recuperación (Heurística de Nielsen #9) */}
@@ -388,7 +397,9 @@ export function ProductDetailView({
   onAddToCart,
   onSelectLot,
   isMember,
+  onMeetProducer,
 }: {
+  onMeetProducer: (producer: Producer) => void
   lot: CoffeeLot
   onBack: () => void
   onAddToCart: (lot: CoffeeLot, size: BagSizeOption, grind: GrindOption) => void
@@ -398,6 +409,7 @@ export function ProductDetailView({
   const [size, setSize] = useState<BagSizeOption>("250g")
   const [grind, setGrind] = useState<GrindOption>("En grano")
   const [bagView, setBagView] = useState<BagView>("front")
+  const producer = producerForLot(lot)
   const [viewDir, setViewDir] = useState<"next" | "prev">("next")
   const [added, setAdded] = useState<boolean>(false)
   const [openInfo, setOpenInfo] = useState<Record<"story" | "brew", boolean>>({ story: false, brew: false })
@@ -433,7 +445,7 @@ export function ProductDetailView({
   ].slice(0, 3)
 
   const infoBlocks: { id: "story" | "brew"; label: string; body: React.ReactNode }[] = [
-    { id: "story", label: "Historia del café", body: <p>{lot.story}</p> },
+    { id: "story", label: "Historia del café", body: <p className="k-prose">{lot.story}</p> },
     {
       id: "brew",
       label: "Cómo prepararlo",
@@ -463,7 +475,7 @@ export function ProductDetailView({
       <div className="k-pdp2-layout">
         <div className="k-pdp2-media">
           <button type="button" className="k-pdp2-back" onClick={onBack}>
-            ← Volver
+            — Volver
           </button>
           <div className="k-pdp2-frame">
             <button type="button" className="k-pdp2-arrow is-prev" aria-label="Vista anterior" onClick={() => goToView(viewIndex - 1, "prev")}>
@@ -475,18 +487,6 @@ export function ProductDetailView({
             <button type="button" className="k-pdp2-arrow is-next" aria-label="Vista siguiente" onClick={() => goToView(viewIndex + 1, "next")}>
               <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 4l8 8-8 8" /></svg>
             </button>
-            <div className="k-pdp2-dots" role="tablist" aria-label="Vistas de la bolsa">
-              {BAG_VIEWS.map(([id, label], i) => (
-                <button
-                  key={id}
-                  type="button"
-                  role="tab"
-                  aria-label={label}
-                  aria-selected={bagView === id}
-                  onClick={() => goToView(i, i >= viewIndex ? "next" : "prev")}
-                />
-              ))}
-            </div>
           </div>
         </div>
 
@@ -503,6 +503,11 @@ export function ProductDetailView({
             {/* Cada dato es una unidad que no se parte; solo se salta línea entre separadores */}
             <p>{joinUnits([lot.country, lot.process, minAltitude(lot.altitude)])}</p>
             <p className="is-soft">{joinUnits(lot.notes)}</p>
+            {producer && (
+              <button type="button" className="k-text-link" onClick={() => onMeetProducer(producer)}>
+                — Conoce al productor
+              </button>
+            )}
           </div>
 
           <div className="k-pdp2-options">
