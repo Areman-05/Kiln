@@ -2,10 +2,14 @@
 
 import React, { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react"
 import { flushSync } from "react-dom"
+import { KilnPattern, KilnWordmark } from "./Brand"
 import { Bag } from "./Bag"
 import {
   BAG_SIZES,
   COFFEE_LOTS,
+  OBJECTS,
+  type KilnObject,
+  type Producer,
   type BagSizeOption,
   type CoffeeLot,
   type GrindOption,
@@ -20,6 +24,8 @@ import {
   type ViewName,
 } from "./Components"
 import { HomeView, NewArrivalsView, ProductDetailView, ShopView } from "./Views"
+import { OriginView } from "./Origin"
+import { ObjectDetailView, ObjectsView } from "./Objects"
 import { StudioView, SubscriptionsView, VisitView, WholesaleView } from "./ExtraViews"
 import {
   CartDrawer,
@@ -44,6 +50,11 @@ export default function KilnApp() {
   const [selectedLot, setSelectedLot] = useState<CoffeeLot>(COFFEE_LOTS[0])
   // Vista desde la que se abrió la ficha, para que «Volver» regrese allí
   const [lotOrigin, setLotOrigin] = useState<"shop" | "news">("shop")
+  const [selectedObject, setSelectedObject] = useState<KilnObject>(OBJECTS[0])
+  const [newsletterEmail, setNewsletterEmail] = useState<string>("")
+  const [newsletterState, setNewsletterState] = useState<"idle" | "error" | "done">("idle")
+  // Café filtrado por los lotes de un productor (desde Origen)
+  const [shopProducer, setShopProducer] = useState<Producer | null>(null)
   const [subTab, setSubTab] = useState<SubTab>("personal")
 
   // Carrito con un lote inicial realista para poder probar el checkout de inmediato
@@ -137,7 +148,8 @@ export default function KilnApp() {
     const root = shellRef.current
     if (!root || prefersReducedMotion()) return
     const prepare = (img: HTMLImageElement) => {
-      if (img.dataset.kFade || img.complete) return
+      // Ya cargada (o con dimensiones desde la caché): se muestra tal cual
+      if (img.dataset.kFade || img.complete || img.naturalWidth > 0) return
       img.dataset.kFade = "1"
       img.style.opacity = "0"
       const reveal = () => {
@@ -188,11 +200,28 @@ export default function KilnApp() {
 
   /* Cambio de vista: fundido corto con View Transitions (o CSS si no hay soporte).
      `shared` crece hasta el recuadro de la ficha; `suppress` evita nombres duplicados. */
-  const runViewChange = (update: () => void, shared?: HTMLElement | null, suppress?: HTMLElement | null) => {
+  const runViewChange = (update: () => void, shared?: HTMLElement | null, suppress?: HTMLElement | null, anchor?: string) => {
+    // Tras el cambio: arriba del todo o, si se indica, al ancla (p. ej. un productor en Origen)
+    const land = (behavior: ScrollBehavior) => {
+      const target = anchor ? document.getElementById(anchor) : null
+      if (target) target.scrollIntoView({ behavior, block: "start" })
+      else window.scrollTo({ top: 0, behavior })
+    }
     const doc = document as ViewTransitionDocument
+    // Con ancla no se usa View Transitions: durante la transición el navegador no
+    // aplica el scroll del documento. Se salta al bloque y el contenido entra con
+    // el mismo fundido corto.
+    if (anchor) {
+      flushSync(update)
+      land("instant")
+      if (!prefersReducedMotion()) {
+        document.querySelector(".k-main")?.animate([{ opacity: 0 }, { opacity: 1 }], { duration: 300, easing: "cubic-bezier(.16,1,.3,1)" })
+      }
+      return
+    }
     if (!doc.startViewTransition || prefersReducedMotion() || document.visibilityState !== "visible") {
-      update()
-      window.scrollTo({ top: 0, behavior: prefersReducedMotion() ? "instant" : "smooth" })
+      flushSync(update)
+      land(prefersReducedMotion() ? "instant" : "smooth")
       return
     }
     if (shared) {
@@ -201,8 +230,8 @@ export default function KilnApp() {
     }
     const transition = doc.startViewTransition(() => {
       flushSync(update)
-      // El fundido oculta el salto: la vista nueva entra ya arriba del todo
-      window.scrollTo({ top: 0, behavior: "instant" })
+      // El fundido oculta el salto: la vista nueva entra ya en su sitio
+      land("instant")
     })
     // Si el navegador aborta la animación, el cambio de vista ya se aplicó igualmente
     transition.ready.catch(() => {})
@@ -211,30 +240,38 @@ export default function KilnApp() {
     })
   }
 
-  const navigateTo = (target: ViewName, category = "Todos") => {
-    runViewChange(() => {
-      setShopCategory(category)
-      setView(target)
-      setMobileMenuOpen(false)
-      setSearchModalOpen(false)
-      setCartOpen(false)
-    })
+  const navigateTo = (target: ViewName, category = "Todos", options: { producer?: Producer | null; anchor?: string } = {}) => {
+    runViewChange(
+      () => {
+        setShopCategory(category)
+        setShopProducer(options.producer ?? null)
+        setView(target)
+        setMobileMenuOpen(false)
+        setSearchModalOpen(false)
+        setCartOpen(false)
+      },
+      null,
+      null,
+      options.anchor
+    )
   }
 
   const navigateWithTransition = (target: ViewName, category = "Todos") => {
-    if (target === view && category === shopCategory) {
+    if (target === view && category === shopCategory && !shopProducer) {
       setMobileMenuOpen(false)
       return
     }
     navigateTo(target, category)
   }
 
-  const openLotDetail = (lot: CoffeeLot) => {
-    // Imagen de origen de la tarjeta pulsada (si está visible) para la transición compartida
-    const source = Array.from(document.querySelectorAll<HTMLElement>(`[data-lot-id="${lot.id}"] .k-lot-stage`)).find((el) => {
+  // Tarjeta visible pulsada: su imagen crece hasta el recuadro de la ficha
+  const visibleStage = (selector: string) =>
+    Array.from(document.querySelectorAll<HTMLElement>(selector)).find((el) => {
       const r = el.getBoundingClientRect()
       return r.bottom > 0 && r.top < window.innerHeight
     })
+
+  const openLotDetail = (lot: CoffeeLot) => {
     runViewChange(
       () => {
         if (view === "news" || view === "shop") setLotOrigin(view)
@@ -243,10 +280,52 @@ export default function KilnApp() {
         setMobileMenuOpen(false)
         setSearchModalOpen(false)
       },
-      source,
+      visibleStage(`[data-lot-id="${lot.id}"] .k-lot-stage`),
       document.querySelector<HTMLElement>(".k-pdp2-frame")
     )
   }
+
+  const openObject = (obj: KilnObject) => {
+    runViewChange(
+      () => {
+        setSelectedObject(obj)
+        setView("object")
+        setMobileMenuOpen(false)
+        setSearchModalOpen(false)
+      },
+      visibleStage(`[data-object-id="${obj.id}"] .k-lot-stage`),
+      document.querySelector<HTMLElement>(".k-pdp2-frame")
+    )
+  }
+
+  // Los objetos van a la misma cesta; `origin` guarda el material para la cesta y el checkout
+  const handleAddObject = (obj: KilnObject) => {
+    const key = `obj-${obj.id}`
+    setCart((prev) =>
+      prev.some((i) => i.key === key)
+        ? prev.map((i) => (i.key === key ? { ...i, qty: i.qty + 1 } : i))
+        : [
+            ...prev,
+            {
+              key,
+              lotId: obj.id,
+              kind: "object",
+              name: obj.name,
+              origin: obj.material,
+              tone: "ivory",
+              no: "OBJ",
+              size: "250g",
+              grind: "En grano",
+              purchaseMode: " puntual",
+              unitPrice: obj.price,
+              qty: 1,
+              image: obj.photos[0],
+            },
+          ]
+    )
+  }
+
+  const meetProducer = (producer: Producer) => navigateTo("origin", "Todos", { anchor: `productor-${producer.id}` })
 
   const priceFor = (lot: CoffeeLot, size: BagSizeOption, purchaseMode: CartItem["purchaseMode"]) => {
     const sizeObj = BAG_SIZES.find((s) => s.id === size) ?? BAG_SIZES[0]
@@ -402,23 +481,26 @@ export default function KilnApp() {
     brew: "Laboratorio de Extracción",
     checkout: "Pedido",
     news: "Novedades",
+    origin: "Origen",
+    objects: "Objetos",
+    object: selectedObject.name,
   }
 
   return (
     <div
       ref={shellRef}
-      className={`kiln-shell ${mobileMenuOpen ? "is-menu-open" : ""} ${view === "shop" || view === "news" || view === "product" || view === "checkout" ? "is-dark" : ""} ${supportsViewTransitions() ? "" : "no-vt"}`}
+      className={`kiln-shell ${mobileMenuOpen ? "is-menu-open" : ""} ${["shop", "news", "product", "checkout", "origin", "objects", "object"].includes(view) ? "is-dark" : ""} ${supportsViewTransitions() ? "" : "no-vt"}`}
     >
       {/* 1. BARRA SUPERIOR DE ESTADO DE TUESTE EN VIVO (Heurística #1) */}
       <div className="k-roast-bar">
         <div className="k-roast-bar-left">
           <span>
             <span className="k-pulse-dot" />
-            TUESTE EN CURSO: LORING S15 FALCON · LOTE #26-042 (GEDEB, ETIOPÍA)
+            Tueste en curso: Loring S15 Falcon · lote 26-042 (Gedeb, Etiopía)
           </span>
         </div>
         <div className="k-roast-bar-right">
-          <span>ENVÍO 24H SIN COSTE DESDE {formatEur(freeShippingThreshold)}</span>
+          <span>Envío 24 h gratis desde {formatEur(freeShippingThreshold)}</span>
           <span>·</span>
           <span>EUR (€) · ES</span>
         </div>
@@ -442,8 +524,7 @@ export default function KilnApp() {
           onClick={() => navigateWithTransition("home")}
           aria-label="Ir a inicio de Kiln"
         >
-          <span className="k-logo-mark" aria-hidden="true"><i /><b /><b /><b /><b /></span>
-          <span>KILN</span>
+          <KilnWordmark />
         </button>
 
         <button
@@ -452,7 +533,7 @@ export default function KilnApp() {
           onClick={() => setCartOpen(true)}
           aria-label={`Cesta, ${cartCount} ${cartCount === 1 ? "artículo" : "artículos"}`}
         >
-          Cesta <span className="k-topnav-count">[ {cartCount} ]</span>
+          Cesta{cartCount > 0 && <span className="k-topnav-count"> {cartCount}</span>}
         </button>
       </header>
 
@@ -464,6 +545,7 @@ export default function KilnApp() {
         }}
       />
       <aside id="k-side-menu" className={`k-side-menu ${mobileMenuOpen ? "open" : ""}`} aria-label="Menú principal" aria-hidden={!mobileMenuOpen}>
+        <KilnPattern className="k-side-pattern" color="#ffffff" opacity={0.06} />
         <div className="k-side-menu-head">
           <button
             type="button"
@@ -477,12 +559,12 @@ export default function KilnApp() {
             Cerrar
           </button>
         </div>
-        <nav className="k-side-nav">
+        <nav className="k-side-nav" aria-label="Secciones">
           {(
             [
-              ["home", "Inicio", view === "home", () => navigateWithTransition("home")],
               ["news", "Novedades", view === "news" || (view === "product" && lotOrigin === "news"), () => navigateWithTransition("news")],
               ["shop", "Café", view === "shop" || (view === "product" && lotOrigin === "shop"), () => navigateWithTransition("shop")],
+              ["objects", "Objetos", view === "objects" || view === "object", () => navigateWithTransition("objects")],
               [
                 "subscriptions",
                 "Suscripciones",
@@ -492,15 +574,7 @@ export default function KilnApp() {
                   navigateTo("subscriptions")
                 },
               ],
-              [
-                "gifts",
-                "Regalos",
-                view === "subscriptions" && subTab === "gift",
-                () => {
-                  setSubTab("gift")
-                  navigateTo("subscriptions")
-                },
-              ],
+              ["origin", "Origen", view === "origin", () => navigateWithTransition("origin")],
             ] as [string, string, boolean, () => void][]
           ).map(([id, label, active, go], index) => (
             <button
@@ -520,6 +594,21 @@ export default function KilnApp() {
             </button>
           ))}
         </nav>
+        <div className="k-side-minor">
+          <button
+            type="button"
+            className={view === "subscriptions" && subTab === "gift" ? "active" : ""}
+            aria-current={view === "subscriptions" && subTab === "gift" ? "page" : undefined}
+            tabIndex={mobileMenuOpen ? 0 : -1}
+            onClick={() => {
+              setSearchModalOpen(false)
+              setSubTab("gift")
+              navigateTo("subscriptions")
+            }}
+          >
+            Regalos
+          </button>
+        </div>
         <div className="k-side-secondary">
           <button
             type="button"
@@ -598,7 +687,7 @@ export default function KilnApp() {
       </aside>
 
       {/* 3. BARRA DE RASTRO (BREADCRUMBS) EN VISTAS INTERNAS */}
-      {view !== "home" && view !== "shop" && view !== "news" && view !== "product" && view !== "checkout" && (
+      {!["home", "shop", "news", "product", "checkout", "origin", "objects", "object"].includes(view) && (
         <div className="k-breadcrumb-bar">
           <div className="k-container">
             <div className="k-breadcrumbs">
