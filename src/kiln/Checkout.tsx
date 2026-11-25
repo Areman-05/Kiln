@@ -689,7 +689,7 @@ export function CheckoutView({
             <span>Resumen</span>
             {!finished && (
               <button type="button" className="k-text-link" onClick={onEditCart}>
-                Editar cesta
+                — Editar cesta
               </button>
             )}
           </div>
@@ -700,7 +700,7 @@ export function CheckoutView({
                 <div>
                   <strong>{item.name}</strong>
                   <span>
-                    {item.qty} × {sizeLabel(item.size)} · {item.grind}
+                    {item.qty} × {itemDetail(item)}
                   </span>
                 </div>
                 <span>{formatEur(item.unitPrice * item.qty)}</span>
@@ -715,18 +715,13 @@ export function CheckoutView({
 
   const express = (
     <div className="k-express">
-      <span className="k-co-label">Pago exprés</span>
-      <div>
-        <button type="button" onClick={() => payExpress("applepay")} disabled={!!busy}>
-          {busy === "applepay" ? "Procesando…" : "Apple Pay"}
-        </button>
-        <button type="button" onClick={() => payExpress("googlepay")} disabled={!!busy}>
-          {busy === "googlepay" ? "Procesando…" : "Google Pay"}
-        </button>
-      </div>
-      <p className="k-co-or">
-        <span>o paso a paso</span>
-      </p>
+      <button type="button" onClick={() => payExpress("applepay")} disabled={!!busy}>
+        {busy === "applepay" ? "Procesando…" : "Apple Pay →"}
+      </button>
+      <button type="button" onClick={() => payExpress("googlepay")} disabled={!!busy}>
+        {busy === "googlepay" ? "Procesando…" : "Google Pay →"}
+      </button>
+      <p className="k-co-or">o paso a paso</p>
     </div>
   )
 
@@ -751,7 +746,7 @@ export function CheckoutView({
               setReached(0)
             }}
           >
-            Cerrar sesión
+            — Cerrar sesión
           </button>
         </>
       ) : (
@@ -794,7 +789,7 @@ export function CheckoutView({
                     Entrar
                   </button>
                   <button type="button" className="k-text-link" onClick={() => setLinkSent(true)}>
-                    Enviarme un enlace de acceso
+                    — Enviarme un enlace de acceso
                   </button>
                 </>
               )}
@@ -817,7 +812,7 @@ export function CheckoutView({
                 setTouched({})
               }}
             >
-              Usar la cuenta de prueba
+              — Usar la cuenta de prueba
             </button>
           )}
         </>
@@ -831,7 +826,6 @@ export function CheckoutView({
   const addressStep = (
     <form onSubmit={submitAddress} noValidate>
       <h1 className="k-co-title">Dirección</h1>
-      <span className="k-co-label">Entrega</span>
       <TextChoice<DeliveryMethod>
         label="Método de entrega"
         value={delivery}
@@ -872,7 +866,7 @@ export function CheckoutView({
       </div>
       {delivery === "pickup" && <p className="k-co-hint">Listo para recoger el día del tueste, desde las 16:00.</p>}
       <button type="submit" className="k-btn-solid">
-        {reached >= stepIndex("confirm") ? "Guardar y revisar" : "Continuar al pago"}
+        Continuar
       </button>
     </form>
   )
@@ -885,9 +879,9 @@ export function CheckoutView({
         value={payMethod}
         onChange={setPayMethod}
         options={[
-          { value: "card", label: "Tarjeta" },
-          { value: "paypal", label: "PayPal" },
-          { value: "bizum", label: "Bizum" },
+          { value: "card", label: "Tarjeta", note: "Visa · Mastercard · Amex" },
+          { value: "paypal", label: "PayPal", note: "Cuenta PayPal" },
+          { value: "bizum", label: "Bizum", note: "Móvil" },
         ]}
       />
       {payMethod === "card" &&
@@ -897,7 +891,7 @@ export function CheckoutView({
               {savedCard.brand} ···· {savedCard.last4} · {savedCard.exp}
             </p>
             <button type="button" className="k-text-link" onClick={() => setSavedCard(null)}>
-              Usar otra tarjeta
+              — Usar otra tarjeta
             </button>
           </div>
         ) : (
@@ -939,128 +933,72 @@ export function CheckoutView({
       {payMethod === "paypal" && <p className="k-co-hint">Al pagar se abrirá PayPal para autorizar el cargo.</p>}
       {payMethod === "bizum" && <p className="k-co-hint">Recibirás la solicitud de pago en el {address.phone || "teléfono indicado"}.</p>}
       <button type="submit" className="k-btn-solid">
-        Revisar pedido
+        Continuar
       </button>
     </form>
-  )
-
-  const block = (title: string, target: Step | "cart", children: React.ReactNode) => (
-    <section className="k-co-block">
-      <header>
-        <h2>{title}</h2>
-        <button type="button" className="k-text-link" onClick={() => (target === "cart" ? onEditCart() : goTo(target))}>
-          Editar
-        </button>
-      </header>
-      {children}
-    </section>
   )
 
   const confirmStep = (
     <div>
       <h1 className="k-co-title">Confirmar</h1>
-      {block(
-        "Productos",
-        "cart",
+      {recap(recapRows)}
+      <div className="k-co-products">
+        <div className="k-co-products-head">
+          <span className="k-co-label">Productos</span>
+          <button type="button" className="k-text-link" onClick={onEditCart}>
+            — Editar
+          </button>
+        </div>
         <ul className="k-co-lines">
           {items.map((item) => (
             <li key={item.key}>
               <span>
-                {item.qty} × {item.name} · {sizeLabel(item.size)} · {item.grind}
+                {item.qty} × {item.name} · {itemDetail(item)}
               </span>
               <span>{formatEur(item.unitPrice * item.qty)}</span>
             </li>
           ))}
         </ul>
-      )}
-      {block("Contacto", "id", <p>{session?.email ?? trimmedEmail}</p>)}
-      {block("Entrega", "address", <p>{delivery === "pickup" ? "Recogida en el estudio · Gratis" : `Envío 24 h · ${shipping === 0 ? "Gratis" : formatEur(shipping)}`}</p>)}
-      {block(
-        delivery === "pickup" ? "Datos de recogida" : "Dirección",
-        "address",
-        <p>
-          {address.name}
-          {delivery === "shipping" && (
-            <>
-              <br />
-              {address.address}
-              <br />
-              {address.postal} {address.city}
-            </>
-          )}
-          <br />
-          {address.phone}
-        </p>
-      )}
-      {block("Pago", "payment", <p>{paymentValid ? paymentDetails().label : "Pendiente"}</p>)}
-      <div className="k-co-total">
-        <span>
-          Total <small>IVA incluido</small>
-        </span>
-        <span>{formatEur(total)}</span>
       </div>
+      <Totals subtotal={subtotal} shipping={shipping} total={total} />
       <button type="button" className="k-btn-solid" onClick={pay} disabled={!!busy}>
-        {busy === "pay" ? "Procesando…" : `Pagar — ${formatEur(total)}`}
+        {busy === "pay" ? "Procesando…" : `Pagar ${formatEur(total)}`}
       </button>
     </div>
   )
 
   const doneStep = placed && (
-    <div>
-      <p className="k-co-label">Pedido confirmado</p>
-      <h1 className="k-co-title">Pedido nº {placed.number}</h1>
-      <dl className="k-co-facts">
-        <div>
-          <dt>Tueste</dt>
-          <dd>{formatDay(placed.roastDate)}</dd>
-        </div>
-        <div>
-          <dt>{placed.delivery === "pickup" ? "Recogida desde" : "Envío"}</dt>
-          <dd>{formatDay(placed.shipDate)}</dd>
-        </div>
-        <div>
-          <dt>Confirmación</dt>
-          <dd>{placed.email}</dd>
-        </div>
-      </dl>
+    <div className="k-done">
+      <h1 className="k-done-title">Gracias{placed.address.name.trim() ? `, ${placed.address.name.trim().split(" ")[0]}` : ""}.</h1>
+      <p className="k-done-number">Pedido nº {placed.number}</p>
 
-      <div className={`k-acc ${trackingOpen ? "is-open" : ""}`}>
-        <button type="button" className="k-acc-trigger" aria-expanded={trackingOpen} aria-controls="k-co-tracking" onClick={() => setTrackingOpen((o) => !o)}>
-          Seguimiento del pedido <i aria-hidden="true">{trackingOpen ? "−" : "+"}</i>
-        </button>
-        <div id="k-co-tracking" className="k-acc-body" aria-hidden={!trackingOpen}>
-          <div>
-            <ol className="k-co-track">
-              <li className="is-done">
-                <span>✓ Recibido</span>
-                <span>{formatDay(placed.placedAt)}</span>
-              </li>
-              <li>
-                <span>Tueste</span>
-                <span>{formatDay(placed.roastDate)}</span>
-              </li>
-              <li>
-                <span>{placed.delivery === "pickup" ? "Listo para recoger" : "Enviado"}</span>
-                <span>{formatDay(placed.shipDate)}</span>
-              </li>
-              {placed.delivery === "shipping" && (
-                <li>
-                  <span>Entregado</span>
-                  <span>{formatDay(nextBusinessDay(placed.shipDate))}</span>
-                </li>
-              )}
-            </ol>
-          </div>
-        </div>
-      </div>
+      <ol className="k-timeline" aria-label="Estado del pedido">
+        <li className="is-current">
+          <span>Tostado</span>
+          <small>{formatDay(placed.roastDate)}</small>
+        </li>
+        <li>
+          <span>{placed.delivery === "pickup" ? "Listo para recoger" : "Enviado"}</span>
+          <small>{formatDay(placed.shipDate)}</small>
+        </li>
+        {placed.delivery === "shipping" && (
+          <li>
+            <span>Entregado</span>
+            <small>{formatDay(nextBusinessDay(placed.shipDate))}</small>
+          </li>
+        )}
+      </ol>
+
+      <p className="k-prose">
+        Hemos enviado la confirmación a {placed.email}. Tostamos tu café en el próximo lote y te avisaremos cuando salga del estudio.
+      </p>
 
       {placed.guest &&
         (accountCreated ? (
-          <p className="k-co-text k-co-gap">Cuenta creada. La próxima vez irás directo a confirmar.</p>
+          <p className="k-co-text">Cuenta creada. La próxima vez irás directo a confirmar.</p>
         ) : (
           <form className="k-co-account" onSubmit={createAccount} noValidate>
-            <h2 className="k-co-label">Crear cuenta con este email</h2>
-            <p className="k-co-text">{placed.email}</p>
+            <p className="k-co-label">Crear cuenta con este email</p>
             <Field
               label="Contraseña"
               type="password"
@@ -1069,21 +1007,24 @@ export function CheckoutView({
               onChange={(e) => setNewPassword(e.target.value)}
               error={accountTried && newPassword.length < 8 ? "Mínimo 8 caracteres." : undefined}
             />
-            <button type="submit" className="k-btn-outline">
-              Crear cuenta
+            <button type="submit" className="k-text-link">
+              — Crear cuenta
             </button>
           </form>
         ))}
 
       <div className="k-co-after">
+        <button type="button" className="k-text-link" onClick={onShop}>
+          — Seguir comprando
+        </button>
+        <button type="button" className="k-text-link" onClick={onBrew}>
+          — Cómo prepararlo
+        </button>
         {!isMember && (
           <button type="button" className="k-text-link" onClick={onSubscribe}>
-            Suscríbete y ahorra un 12 % en cada bolsa
+            — Suscríbete y ahorra un 12 %
           </button>
         )}
-        <button type="button" className="k-text-link is-muted" onClick={onShop}>
-          Volver a la tienda
-        </button>
       </div>
     </div>
   )
@@ -1094,7 +1035,7 @@ export function CheckoutView({
         <div className="k-co-empty">
           <p>Tu cesta está vacía</p>
           <button type="button" className="k-text-link" onClick={onShop}>
-            Ver cafés
+            — Ver cafés
           </button>
         </div>
       </section>
@@ -1102,11 +1043,13 @@ export function CheckoutView({
   }
 
   return (
-    <section className="k-co">
+    <section className={`k-co ${finished ? "is-finished" : ""}`}>
+      {finished && <KilnPattern className="k-co-pattern" color="#ffffff" opacity={0.08} />}
       <div className="k-co-layout">
         <div className="k-co-main">
-          {stepsNav}
-          {!finished && express}
+          {!finished && stepsNav}
+          {!finished && step !== "confirm" && completedBefore.length === 0 && express}
+          {(step === "address" || step === "payment") && recap(completedBefore)}
           <div key={step} className="k-co-step">
             {step === "id" && identity}
             {step === "address" && addressStep}
