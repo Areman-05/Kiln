@@ -829,3 +829,192 @@ const LOT_PHOTOS: Record<string, string> = {
 
 export const lotPhoto = (lot: CoffeeLot) =>
   LOT_PHOTOS[lot.id] ?? ORIGIN_PHOTOS[lot.country][Number.parseInt(lot.no, 10) % 2]
+
+/* ==========================================================================
+   ORIGEN: personas y fincas detrás de cada café (enlazadas a COFFEE_LOTS)
+   ========================================================================== */
+export type Producer = {
+  id: string
+  name: string
+  country: CoffeeLot["country"]
+  region: string
+  altitude: string
+  since: number
+  text: string
+  photo: string
+  lotIds: string[]
+}
+
+export const PRODUCERS: Producer[] = [
+  {
+    id: "halo-hartume",
+    name: "Halo Hartume",
+    country: "Etiopía",
+    region: "Worka Sakaro, Gedeb",
+    altitude: "2.150 – 2.280 m",
+    since: 2019,
+    text: "Doscientas cuarenta familias entregan su cereza a la estación de lavado de Halo Hartume. Fermentan en tanques de agua de manantial y secan en camas elevadas durante tres semanas. Fue nuestro primer café y sigue abriendo cada temporada.",
+    photo: ORIGIN_PHOTOS["Etiopía"][1],
+    lotIds: ["halo-hartume"],
+  },
+  {
+    id: "cooperativa-gitwe",
+    name: "Cooperativa Gitwe",
+    country: "Kenia",
+    region: "Kiambu, Monte Kenia",
+    altitude: "1.850 – 1.950 m",
+    since: 2020,
+    text: "Cuatrocientos ochenta socios con parcelas de menos de una hectárea. La cooperativa separa los lotes por calidad en la mesa de clasificación y paga una prima por cada AB. Compramos el mismo lote cada diciembre.",
+    photo: ORIGIN_PHOTOS["Kenia"][1],
+    lotIds: ["karinga-ab"],
+  },
+  {
+    id: "hacienda-la-esmeralda",
+    name: "Hacienda La Esmeralda",
+    country: "Panamá",
+    region: "Cañas Verdes, Boquete",
+    altitude: "1.780 m",
+    since: 2021,
+    text: "La familia Peterson cultiva Geisha en las laderas del Volcán Barú desde hace tres generaciones. Cada parcela se cosecha y procesa por separado. Reservamos un lote pequeño de Cañas Verdes cada año.",
+    photo: ORIGIN_PHOTOS["Panamá"][1],
+    lotIds: ["la-esmeralda-geisha"],
+  },
+  {
+    id: "finca-los-nogales",
+    name: "Finca Los Nogales",
+    country: "Colombia",
+    region: "Bruselas, Pitalito, Huila",
+    altitude: "1.820 m",
+    since: 2022,
+    text: "Óscar Hernández trabaja cuatro hectáreas de Bourbon Rosado con su hija. Recogen solo cereza madura en cinco pasadas por temporada. Pagamos su precio antes de catar el lote.",
+    photo: ORIGIN_PHOTOS["Colombia"][1],
+    lotIds: ["los-nogales-bourbon"],
+  },
+  {
+    id: "estacion-gitesi",
+    name: "Estación Gitesi",
+    country: "Ruanda",
+    region: "Karongi, Lago Kivu",
+    altitude: "1.800 m",
+    since: 2023,
+    text: "Alexis y Aime Gahizi dirigen la estación de lavado junto al lago Kivu. Pagan la cereza el mismo día y comparten con nosotros el registro de cada entrega. Es el café más limpio de nuestra carta.",
+    photo: ORIGIN_PHOTOS["Ruanda"][1],
+    lotIds: ["gitesi-bourbon"],
+  },
+  {
+    id: "finca-santa-irene",
+    name: "Finca Santa Irene",
+    country: "Guatemala",
+    region: "San Pedro Necta, Huehuetenango",
+    altitude: "1.750 – 1.880 m",
+    since: 2024,
+    text: "La familia Mérida cultiva Maragogipe a la sombra de ingas en Huehuetenango. Secan al sol en patios de ladrillo y reposan el café dos meses antes de exportarlo. Es nuestra relación más reciente.",
+    photo: ORIGIN_PHOTOS["Guatemala"][1],
+    lotIds: ["santa-irene-maragogipe"],
+  },
+]
+
+export const producerForLot = (lot: CoffeeLot) =>
+  PRODUCERS.find((p) => p.lotIds.includes(lot.id)) ?? PRODUCERS.find((p) => p.country === lot.country)
+
+/* ==========================================================================
+   OBJETOS: cerámica y equipo (fotografías en /public/kiln/objects)
+   ========================================================================== */
+export type KilnObject = {
+  id: string
+  name: string
+  collab?: string
+  price: number
+  material: string
+  dimensions: string
+  origin: string
+  text: string
+  photos: string[]
+}
+
+const objectPhotos = (id: string) => [`/kiln/objects/${id}-1.jpg`, `/kiln/objects/${id}-2.jpg`]
+
+export const OBJECTS: KilnObject[] = [
+  {
+    id: "taza-ceramica",
+    name: "Taza de cerámica",
+    collab: "Kiln × Estudio Barro",
+    price: 32,
+    material: "Gres esmaltado",
+    dimensions: "Ø 8 × 8,5 cm · 220 ml",
+    origin: "Torneada a mano en Valencia",
+    text: "Gres torneado a mano con esmalte mate y moteado. Cada pieza es ligeramente distinta.",
+    photos: objectPhotos("taza-ceramica"),
+  },
+  {
+    id: "taza-espresso",
+    name: "Taza de espresso",
+    collab: "Kiln × Estudio Barro",
+    price: 28,
+    material: "Gres esmaltado",
+    dimensions: "Ø 6,5 × 6 cm · 90 ml",
+    origin: "Torneada a mano en Valencia",
+    text: "Paredes gruesas para conservar la temperatura de un doble. Incluye plato.",
+    photos: objectPhotos("taza-espresso"),
+  },
+  {
+    id: "gotero-ceramica",
+    name: "Gotero de cerámica",
+    price: 48,
+    material: "Porcelana",
+    dimensions: "Ø 11,5 × 8 cm · 1–4 tazas",
+    origin: "Arita, Japón",
+    text: "Cono de porcelana con nervaduras finas para un flujo constante. Usa filtros cónicos 02.",
+    photos: objectPhotos("gotero-ceramica"),
+  },
+  {
+    id: "jarra-vidrio",
+    name: "Jarra de vidrio 600 ml",
+    price: 36,
+    material: "Vidrio borosilicato",
+    dimensions: "Ø 10 × 13 cm · 600 ml",
+    origin: "Fabricada en Chequia",
+    text: "Vidrio fino resistente al calor, con pico para servir sin goteo.",
+    photos: objectPhotos("jarra-vidrio"),
+  },
+  {
+    id: "balanza",
+    name: "Balanza de precisión",
+    price: 89,
+    material: "Aluminio anodizado",
+    dimensions: "15 × 15 × 1,8 cm · 0,1 g",
+    origin: "Diseñada en Taiwán",
+    text: "Pesa al décimo de gramo y cronometra la extracción. Batería recargable por USB-C.",
+    photos: objectPhotos("balanza"),
+  },
+  {
+    id: "hervidor",
+    name: "Hervidor de cuello de cisne",
+    price: 165,
+    material: "Acero inoxidable",
+    dimensions: "28 × 19 cm · 0,9 l",
+    origin: "Diseñado en Suecia",
+    text: "Control de temperatura al grado y caño fino para un vertido lento y preciso.",
+    photos: objectPhotos("hervidor"),
+  },
+  {
+    id: "lata",
+    name: "Lata para café 250 g",
+    price: 24,
+    material: "Acero con tapa hermética",
+    dimensions: "Ø 9 × 13 cm · 250 g",
+    origin: "Fabricada en Portugal",
+    text: "Cierre hermético que protege el café de la luz y el aire. Cabe una bolsa entera.",
+    photos: objectPhotos("lata"),
+  },
+  {
+    id: "molinillo",
+    name: "Molinillo manual",
+    price: 220,
+    material: "Acero inoxidable y nogal",
+    dimensions: "Ø 5 × 16 cm · 30 g",
+    origin: "Fabricado en Alemania",
+    text: "Muelas cónicas de acero y cuarenta ajustes por vuelta, de espresso a prensa francesa.",
+    photos: objectPhotos("molinillo"),
+  },
+]
