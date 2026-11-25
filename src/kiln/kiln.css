@@ -1,12 +1,13 @@
+@import url("https://fonts.googleapis.com/css2?family=Jost:wght@300;400;500&family=Newsreader:opsz,wght@6..72,300;6..72,400&display=swap");
+
 /* ==========================================================================
    KILN COFFEE
    Minimalismo Editorial ("Specialty Calm") · Tim Wendelboe / Assembly / Sey
    ========================================================================== */
 
 :root {
-  --font-serif: "DM Sans", -apple-system, BlinkMacSystemFont, sans-serif;
-  --font-sans: "DM Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-  --font-mono: "DM Mono", ui-monospace, monospace;
+  --font-geo: "Jost", system-ui, sans-serif; /* voz geométrica: estructura */
+  --font-serif: "Newsreader", Georgia, serif; /* voz editorial: contar */
 
   /* Paleta Cálida y Apagada: Papel Algodón, Piedra Caliza, Arcilla y Carbón */
   --bg-primary: #f6f3ec;
@@ -58,11 +59,11 @@ html {
 }
 
 body {
-  font-family: var(--font-sans);
+  font-family: var(--font-geo);
   background-color: var(--bg-primary);
   color: var(--ink-primary);
   line-height: 1.55;
-  letter-spacing: 0;
+  
   overflow-x: hidden;
 }
 
@@ -115,48 +116,48 @@ body {
 /* ==========================================================================
    TIPOGRAFÍA EDITORIAL
    ========================================================================== */
-.font-serif { font-family: var(--font-serif); }
-.font-sans { font-family: var(--font-sans); }
-.font-mono { font-family: var(--font-mono); }
+.font-serif { font-family: var(--font-geo); }
+.font-sans { font-family: var(--font-geo); }
+.font-mono { font-family: var(--font-geo); }
 
 .k-title-xl {
-  font-family: var(--font-serif);
+  font-family: var(--font-geo);
   font-weight: 300;
   font-size: clamp(2.85rem, 6vw, 5.6rem);
   line-height: 0.98;
-  letter-spacing: -0.025em;
+  
 }
 
 .k-title-lg {
-  font-family: var(--font-serif);
+  font-family: var(--font-geo);
   font-weight: 300;
   font-size: clamp(2.1rem, 3.8vw, 3.5rem);
   line-height: 1.06;
-  letter-spacing: -0.02em;
+  
 }
 
 .k-title-md {
-  font-family: var(--font-serif);
+  font-family: var(--font-geo);
   font-weight: 300;
   font-size: clamp(1.5rem, 2.5vw, 2.25rem);
   line-height: 1.15;
-  letter-spacing: -0.015em;
+  
 }
 
 .k-title-sm {
-  font-family: var(--font-serif);
+  font-family: var(--font-geo);
   font-weight: 400;
   font-size: 1.3rem;
   line-height: 1.25;
-  letter-spacing: -0.01em;
+  
 }
 
 .k-eyebrow {
-  font-family: var(--font-mono);
+  font-family: var(--font-geo);
   font-size: 0.69rem;
   font-weight: 400;
-  text-transform: uppercase;
-  letter-spacing: 0.15em;
+  
+  
   color: var(--ink-muted);
 }
 
@@ -180,8 +181,8 @@ body {
   color: var(--bg-primary);
   font-size: 0.78rem;
   font-weight: 500;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
+  
+  
   border-radius: var(--radius-xs);
   border: 1px solid var(--ink-primary);
   transition: all 0.35s var(--ease-calm);
@@ -209,8 +210,8 @@ body {
   color: var(--ink-primary);
   font-size: 0.78rem;
   font-weight: 500;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
+  
+  
   border-radius: var(--radius-xs);
   border: 1px solid var(--line-strong);
   transition: all 0.35s var(--ease-calm);
@@ -231,8 +232,8 @@ body {
   color: var(--ink-primary);
   font-size: 0.78rem;
   font-weight: 500;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
+  
+  
   border-radius: var(--radius-xs);
   border: 1px solid var(--bg-primary);
   transition: all 0.35s var(--ease-calm);
@@ -254,8 +255,8 @@ body {
   color: var(--ink-light);
   font-size: 0.78rem;
   font-weight: 500;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
+  
+  
   border-radius: var(--radius-xs);
   border: 1px solid rgba(246, 243, 236, 0.35);
   transition: all 0.35s var(--ease-calm);
@@ -272,8 +273,8 @@ body {
   gap: 0.45rem;
   font-size: 0.82rem;
   font-weight: 500;
-  letter-spacing: 0.05em;
-  text-transform: uppercase;
+  
+  
   position: relative;
   padding-bottom: 3px;
 }
@@ -324,10 +325,10 @@ body {
 .k-roast-bar {
   background: var(--bg-dark);
   color: var(--ink-light-sub);
-  font-family: var(--font-mono);
+  font-family: var(--font-geo);
   font-size: 0.68rem;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
+  
+  
   padding: 0.52rem 2.5rem;
   display: flex;
   align-items: center;
@@ -389,10 +390,10 @@ body {
 }
 
 .k-brand-word {
-  font-family: var(--font-serif);
+  font-family: var(--font-geo);
   font-size: 2.45rem;
   font-weight: 400;
-  letter-spacing: -0.055em;
+  
   color: var(--ink-primary);
   line-height: 0.8;
   font-style: italic;
@@ -404,11 +405,11 @@ body {
 }
 
 .k-brand-tag {
-  font-family: var(--font-mono);
+  font-family: var(--font-geo);
   font-size: 0.57rem;
   line-height: 1.45;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
+  
+  
   color: var(--ink-muted);
   border-left: 1px solid var(--line-medium);
   padding-left: 0.9rem;
@@ -422,10 +423,10 @@ body {
 }
 
 .k-nav-item {
-  font-family: var(--font-serif);
+  font-family: var(--font-geo);
   font-size: 1.13rem;
   font-weight: 400;
-  letter-spacing: -0.01em;
+  
   color: var(--ink-secondary);
   padding: 0.4rem 0;
   position: relative;
