@@ -2,7 +2,7 @@
 
 import React, { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react"
 import { flushSync } from "react-dom"
-import { KilnPattern, KilnWordmark } from "./Brand"
+import { KilnWordmark } from "./Brand"
 import { Bag } from "./Bag"
 import {
   BAG_SIZES,
@@ -15,7 +15,6 @@ import {
   type GrindOption,
 } from "./data"
 import {
-  InteractiveBrewStudio,
   SensoryRadar,
   formatEur,
   type ActiveSubscription,
@@ -26,10 +25,23 @@ import {
 import { HomeView, NewArrivalsView, ProductDetailView, ShopView } from "./Views"
 import { OriginView } from "./Origin"
 import { ObjectDetailView, ObjectsView } from "./Objects"
-import { StudioView, SubscriptionsView, VisitView, WholesaleView } from "./ExtraViews"
+import { StudioView, VisitView, WholesaleView } from "./ExtraViews"
+import { SubscriptionsView } from "./Subscriptions"
+import { PrepareView } from "./Brew"
+import {
+  AccountView,
+  demoSubscription,
+  loadOrders,
+  loadRatings,
+  persistOrders,
+  persistRatings,
+  type Order,
+  type Rating,
+} from "./Account"
 import {
   CartDrawer,
   CheckoutView,
+  DEMO_ACCOUNT,
   SESSION_KEY,
   loadAccounts,
   persistAccounts,
@@ -56,6 +68,10 @@ export default function KilnApp() {
   // Café filtrado por los lotes de un productor (desde Origen)
   const [shopProducer, setShopProducer] = useState<Producer | null>(null)
   const [subTab, setSubTab] = useState<SubTab>("personal")
+  // «Cafés para ti» desde el perfil de sabor
+  const [shopPicks, setShopPicks] = useState<string[] | null>(null)
+  // Último café visto: receta por defecto en Preparar
+  const [lastLotId, setLastLotId] = useState<string | null>(null)
 
   // Carrito con un lote inicial realista para poder probar el checkout de inmediato
   const [cart, setCart] = useState<CartItem[]>([
@@ -90,8 +106,21 @@ export default function KilnApp() {
     }
   }, [sessionEmail])
 
+  // Pedidos y valoraciones por cuenta (simulados en el navegador)
+  const [orders, setOrders] = useState<Record<string, Order[]>>(() => loadOrders())
+  const [ratings, setRatings] = useState<Record<string, Record<string, Rating>>>(() => loadRatings())
+  useEffect(() => persistOrders(orders), [orders])
+  useEffect(() => persistRatings(ratings), [ratings])
+
   // Suscripción activa para el panel de usuario
   const [activeSub, setActiveSub] = useState<ActiveSubscription | null>(null)
+  // La cuenta de prueba llega con una suscripción de ejemplo (una vez por visita)
+  const demoSubSeeded = useRef(false)
+  useEffect(() => {
+    if (view !== "account" || sessionEmail !== DEMO_ACCOUNT.email || demoSubSeeded.current) return
+    demoSubSeeded.current = true
+    setActiveSub((current) => current ?? demoSubscription())
+  }, [view, sessionEmail])
   // Solo una suscripción activa da derecho al 12% en compras puntuales
   const isMember = activeSub?.status === "Activa"
 
@@ -240,11 +269,16 @@ export default function KilnApp() {
     })
   }
 
-  const navigateTo = (target: ViewName, category = "Todos", options: { producer?: Producer | null; anchor?: string } = {}) => {
+  const navigateTo = (
+    target: ViewName,
+    category = "Todos",
+    options: { producer?: Producer | null; picks?: string[] | null; anchor?: string } = {}
+  ) => {
     runViewChange(
       () => {
         setShopCategory(category)
         setShopProducer(options.producer ?? null)
+        setShopPicks(options.picks ?? null)
         setView(target)
         setMobileMenuOpen(false)
         setSearchModalOpen(false)
@@ -257,7 +291,7 @@ export default function KilnApp() {
   }
 
   const navigateWithTransition = (target: ViewName, category = "Todos") => {
-    if (target === view && category === shopCategory && !shopProducer) {
+    if (target === view && category === shopCategory && !shopProducer && !shopPicks) {
       setMobileMenuOpen(false)
       return
     }
@@ -276,9 +310,11 @@ export default function KilnApp() {
       () => {
         if (view === "news" || view === "shop") setLotOrigin(view)
         setSelectedLot(lot)
+        setLastLotId(lot.id)
         setView("product")
         setMobileMenuOpen(false)
         setSearchModalOpen(false)
+        setCartOpen(false)
       },
       visibleStage(`[data-lot-id="${lot.id}"] .k-lot-stage`),
       document.querySelector<HTMLElement>(".k-pdp2-frame")
@@ -292,6 +328,7 @@ export default function KilnApp() {
         setView("object")
         setMobileMenuOpen(false)
         setSearchModalOpen(false)
+        setCartOpen(false)
       },
       visibleStage(`[data-object-id="${obj.id}"] .k-lot-stage`),
       document.querySelector<HTMLElement>(".k-pdp2-frame")
@@ -478,7 +515,8 @@ export default function KilnApp() {
     studio: "Estudio & Tostador",
     visit: "Visítanos · nuestro estudio",
     wholesale: "Profesionales B2B",
-    brew: "Laboratorio de Extracción",
+    brew: "Preparar",
+    account: "Cuenta",
     checkout: "Pedido",
     news: "Novedades",
     origin: "Origen",
@@ -489,7 +527,7 @@ export default function KilnApp() {
   return (
     <div
       ref={shellRef}
-      className={`kiln-shell ${mobileMenuOpen ? "is-menu-open" : ""} ${["shop", "news", "product", "checkout", "origin", "objects", "object"].includes(view) ? "is-dark" : ""} ${supportsViewTransitions() ? "" : "no-vt"}`}
+      className={`kiln-shell ${mobileMenuOpen ? "is-menu-open" : ""} ${["shop", "news", "product", "checkout", "origin", "objects", "object", "subscriptions", "brew", "account"].includes(view) ? "is-dark" : ""} ${supportsViewTransitions() ? "" : "no-vt"}`}
     >
       {/* 1. BARRA SUPERIOR DE ESTADO DE TUESTE EN VIVO (Heurística #1) */}
       <div className="k-roast-bar">
