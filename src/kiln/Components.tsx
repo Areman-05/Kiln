@@ -28,6 +28,7 @@ export type ViewName =
   | "origin"
   | "objects"
   | "object"
+  | "account"
 
 export type SubTab = "personal" | "gift" | "office"
 
@@ -44,8 +45,8 @@ export type CartItem = {
   cadenceWeeks?: number
   unitPrice: number
   qty: number
-  // Objetos (cerámica y equipo): sin tamaño ni molienda; `origin` guarda el material
-  kind?: "object"
+  // Objetos y regalos: sin tamaño ni molienda; `origin` guarda el material o el detalle
+  kind?: "object" | "gift"
   image?: string
 }
 
