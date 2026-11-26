@@ -3269,3 +3269,309 @@ html,body{margin:0;padding:0;background:#050505}
 .k-thumb.is-photo img{display:block;width:100%;height:100%;object-fit:cover}
 @media(prefers-reduced-motion:reduce){.k-object-photo{animation:none}}
 .kiln-shell .k-prose.k-object-text{margin-top:clamp(2.5rem,6vh,3.5rem)}
+
+/* ==========================================================================
+   Ajustes de marca: menú y footer sin patrón, footer fino
+   ========================================================================== */
+.k-side-menu{background:#000}
+.k-side-pattern,.k-footer-pattern{display:none}
+.k-footer.k-footer-v2{padding:clamp(2.5rem,4vw,3.5rem) clamp(1.25rem,3vw,2.75rem) 1.25rem}
+.k-footer-v2-top{grid-template-columns:minmax(6rem,1fr) repeat(3,minmax(0,1fr)) minmax(16rem,1.4fr);gap:2.5rem;align-items:start}
+.k-footer-v2-word{position:static;display:block;margin:0;color:#fff;font:400 44px/.8 var(--font-geo);letter-spacing:0;text-align:left;white-space:nowrap;user-select:none}
+.k-footer-v2-word .k-wordmark{font-size:44px;line-height:.8;letter-spacing:.01em;transform:translateY(-.12em)}
+.k-footer-v2-bottom{margin-top:clamp(2.5rem,4vw,3.5rem);padding-top:1rem}
+@media(max-width:900px){
+  .k-footer-v2-top{grid-template-columns:repeat(3,minmax(0,1fr))}
+  .k-footer-v2-word,.k-newsletter{grid-column:1/-1}
+}
+@media(max-width:560px){.k-footer-v2-top{grid-template-columns:1fr 1fr}}
+
+/* ==========================================================================
+   Cesta: producto clicable y desplegable propio
+   ========================================================================== */
+.kiln-shell .k-cart-thumb-link{display:block;padding:0;border:0;background:none;cursor:pointer}
+.kiln-shell .k-cart-name{min-width:0;padding:0;border:0;background:none;color:#fff;font:400 15px/1.3 var(--font-geo);text-align:left;cursor:pointer;transition:color .2s}
+.kiln-shell .k-cart-name:hover,.kiln-shell .k-cart-name:focus-visible{color:#b8b8b8;outline:none}
+.kiln-shell .k-cart-name:focus-visible{text-decoration:underline;text-underline-offset:.25em;text-decoration-thickness:1px}
+.kiln-shell .k-cart-thumb-link:hover+.k-cart-info .k-cart-name{color:#b8b8b8}
+
+.k-dd{position:relative;display:inline-block}
+.kiln-shell .k-dd-trigger{display:inline-flex;align-items:center;gap:.5rem;height:2rem;padding:0;border:0;background:none;color:var(--soft);font:400 13px/1 var(--font-geo);cursor:pointer;transition:color .2s}
+.kiln-shell .k-dd-trigger:hover,.kiln-shell .k-dd-trigger[aria-expanded="true"]{color:#fff}
+.kiln-shell .k-dd-trigger:focus-visible{color:#fff;outline:none;text-decoration:underline;text-underline-offset:.3em;text-decoration-thickness:1px}
+.k-dd-trigger i{width:5px;height:5px;margin-top:-3px;border-right:1px solid currentColor;border-bottom:1px solid currentColor;transform:rotate(45deg);transition:transform .2s}
+.k-dd-trigger[aria-expanded="true"] i{margin-top:2px;transform:rotate(225deg)}
+.k-dd-list{position:absolute;top:calc(100% + .25rem);left:-.85rem;z-index:20;min-width:calc(100% + 1.7rem);margin:0;padding:.4rem 0;border:1px solid var(--hair);background:#0b0b0b;list-style:none;outline:none;box-shadow:none;animation:kDdIn .16s ease-out both}
+.k-dd-list li{padding:.55rem .85rem;color:var(--soft);font:400 13px/1.2 var(--font-geo);white-space:nowrap;cursor:pointer;transition:color .15s}
+.k-dd-list li[aria-selected="true"],.k-dd-list li.is-active,.k-dd-list li:hover{color:#fff}
+.k-dd-list li[aria-selected="true"]::after{content:"";display:inline-block;width:4px;height:4px;margin:0 0 .15em .6rem;background:currentColor;vertical-align:middle}
+@keyframes kDdIn{from{opacity:0;transform:translateY(-3px)}to{opacity:1;transform:none}}
+.k-cart-row{position:relative}
+.k-cart-row:has(.k-dd-trigger[aria-expanded="true"]){z-index:5}
+
+/* Regalo en cesta/checkout: tarjeta negra con wordmark */
+.k-thumb.is-card{aspect-ratio:4/5;border:1px solid var(--hair);background:#050505;color:#fff}
+.k-thumb.is-card .k-wordmark{font-size:11px}
+
+/* ==========================================================================
+   Suscripciones: configurador en tres pasos, resumen fijo
+   ========================================================================== */
+.k-subs,.k-gifts{padding:clamp(3rem,8vw,7rem) clamp(1.25rem,4vw,3.5rem) clamp(5rem,10vw,9rem);color:#fff}
+.k-subs-intro{display:grid;gap:clamp(1.5rem,4vw,2.75rem);max-width:60rem}
+.k-gifts .k-view-title{font-family:var(--font-serif);font-weight:300;letter-spacing:-.01em}
+.k-subs-layout{display:grid;grid-template-columns:minmax(0,1fr) minmax(20rem,26rem);gap:clamp(3rem,8vw,8rem);align-items:start;margin-top:clamp(4rem,10vw,8rem)}
+.k-subs-steps{display:grid;gap:clamp(3.5rem,8vw,6rem)}
+.k-subs-step{display:grid;gap:1.25rem}
+.k-subs-step h2{display:flex;align-items:baseline;gap:1rem;margin:0 0 .5rem;color:#fff;font:300 clamp(1.75rem,3vw,2.5rem)/1.1 var(--font-geo);letter-spacing:-.01em}
+.k-subs-step h2 span{color:var(--soft);font:400 13px/1 var(--font-geo);letter-spacing:0;font-variant-numeric:tabular-nums}
+.k-subs-step>.k-text-link{justify-self:start}
+
+.k-rows{display:grid;border-bottom:1px solid var(--hair)}
+.kiln-shell .k-rows>button{display:grid;grid-template-columns:1.5rem minmax(0,1fr) auto;align-items:baseline;gap:1rem;width:100%;padding:1.05rem 0;border:0;border-top:1px solid var(--hair);background:none;color:#b8b8b8;text-align:left;cursor:pointer;transition:color .2s}
+.k-rows>button i{color:#fff;font:normal 9px/1 var(--font-geo)}
+.k-rows>button span{font:400 16px/1.3 var(--font-geo)}
+.k-rows>button small{color:var(--soft);font:400 13px/1.3 var(--font-geo);text-align:right}
+.kiln-shell .k-rows>button:hover,.kiln-shell .k-rows>button[aria-checked="true"]{color:#fff}
+.kiln-shell .k-rows>button:focus-visible{color:#fff;outline:none}
+.kiln-shell .k-rows>button:focus-visible span{text-decoration:underline;text-underline-offset:.25em;text-decoration-thickness:1px}
+
+.k-inline{display:grid;grid-template-columns:8.5rem minmax(0,1fr);align-items:baseline;gap:1rem;padding:1rem 0;border-top:1px solid var(--hair)}
+.k-inline:last-child{border-bottom:1px solid var(--hair)}
+.k-inline-label{color:var(--soft);font:400 12px/1.4 var(--font-geo)}
+.k-inline>div{display:flex;flex-wrap:wrap;gap:.5rem 1.75rem}
+.kiln-shell .k-inline button{padding:.2rem 0;border:0;border-bottom:1px solid transparent;background:none;color:var(--soft);font:400 15px/1.3 var(--font-geo);cursor:pointer;transition:color .2s,border-color .2s}
+.kiln-shell .k-inline button:hover{color:#fff}
+.kiln-shell .k-inline button[aria-checked="true"]{color:#fff;border-bottom-color:#fff}
+.kiln-shell .k-inline button:focus-visible{color:#fff;outline:none;border-bottom-color:var(--soft)}
+.kiln-shell .k-inline button[aria-checked="true"]:focus-visible{border-bottom-color:#fff}
+
+.k-subs-summary{position:sticky;top:7rem;display:grid;gap:1.75rem}
+.k-subs-summary dd.is-struck{color:var(--soft);text-decoration:line-through;text-decoration-thickness:1px}
+.k-subs-price{display:grid;gap:.6rem;margin:.5rem 0 0;padding-top:1.5rem;border-top:1px solid var(--hair);color:#fff;font:300 clamp(2.5rem,4vw,3.25rem)/1 var(--font-geo);letter-spacing:-.02em;font-variant-numeric:tabular-nums}
+.k-subs-price small{color:var(--soft);font:400 13px/1.3 var(--font-geo);letter-spacing:0}
+.k-subs-guarantees{display:grid;gap:.6rem;margin:0;padding:0;list-style:none}
+.k-subs-guarantees li{color:#b8b8b8;font:300 17px/1.4 var(--font-serif)}
+.k-subs-guarantees li::before{content:"— ";color:var(--soft)}
+
+.k-subs-active{display:grid;gap:1.5rem;max-width:44rem;margin-top:clamp(4rem,8vw,6rem);padding-top:2rem;border-top:1px solid var(--hair)}
+.k-subs-active h2{margin:-.5rem 0 0;color:#fff;font:300 clamp(1.75rem,3vw,2.5rem)/1.1 var(--font-serif)}
+.k-subs-active>.k-text-link{justify-self:start}
+.k-subs-dates{display:grid;margin:0;padding:0;border-bottom:1px solid var(--hair);list-style:none}
+.k-subs-dates li{display:flex;align-items:baseline;justify-content:space-between;gap:1rem;padding:.85rem 0;border-top:1px solid var(--hair);color:#fff;font:400 15px/1.3 var(--font-geo)}
+.k-subs-dates li>span::first-letter{text-transform:uppercase}
+.k-subs-dates li.is-skipped>span{color:var(--soft);text-decoration:line-through;text-decoration-thickness:1px}
+
+/* ==========================================================================
+   Regalos: tres opciones con foto, formulario subrayado y vista previa
+   ========================================================================== */
+.k-gift-options{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:clamp(3rem,6vw,5rem) clamp(1.5rem,3vw,2.5rem);margin-top:clamp(4rem,10vw,8rem)}
+.kiln-shell .k-gift-option{display:grid;gap:.75rem;padding:0;border:0;background:none;color:#fff;text-align:left;cursor:pointer}
+.k-gift-visual{position:relative;display:grid;place-items:center;aspect-ratio:5/4;margin-bottom:.75rem;overflow:hidden;background-color:#1b1b1b;background-image:radial-gradient(60% 50% at 18% 10%,rgba(255,255,255,.07),rgba(255,255,255,0) 70%),radial-gradient(120% 95% at 50% 45%,rgba(0,0,0,0) 55%,rgba(0,0,0,.55) 100%)}
+.k-gift-visual::after{content:"";position:absolute;inset:auto 0 0;height:1px;background:#fff;transform:scaleX(0);transform-origin:left;transition:transform .45s cubic-bezier(.16,1,.3,1)}
+.k-gift-option.is-selected .k-gift-visual::after{transform:none}
+.k-gift-visual>img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;transition:transform .8s cubic-bezier(.16,1,.3,1)}
+.k-gift-option:hover .k-gift-visual>img{transform:scale(1.02)}
+.k-gift-visual .k-giftcard{width:min(62%,22rem)}
+.k-gift-stage{display:grid;place-items:center;width:100%;height:100%}
+.k-gift-stage .kiln-bag-wrap,.k-gift-stage .kiln-bag-wrap:hover{width:auto!important;height:72%!important;aspect-ratio:240/350;transform:none!important;filter:drop-shadow(0 24px 30px rgba(0,0,0,.5))!important}
+.k-gift-stage .kiln-bag-svg{width:100%;height:100%}
+.k-gift-stage .kiln-bag-svg>ellipse{display:none}
+.k-gift-title{color:#b8b8b8;font:400 18px/1.2 var(--font-geo);transition:color .2s}
+.k-gift-option:hover .k-gift-title,.k-gift-option.is-selected .k-gift-title{color:#fff}
+.k-gift-line{max-width:28rem;color:var(--soft);font:300 17px/1.4 var(--font-serif)}
+.kiln-shell .k-gift-option:focus-visible{outline:none}
+.kiln-shell .k-gift-option:focus-visible .k-gift-title{color:#fff;text-decoration:underline;text-underline-offset:.25em;text-decoration-thickness:1px}
+
+.k-gift-config{display:grid;grid-template-columns:minmax(0,1fr) minmax(18rem,26rem);gap:clamp(3rem,8vw,8rem);align-items:start;margin-top:clamp(5rem,10vw,8rem);padding-top:clamp(2.5rem,5vw,3.5rem);border-top:1px solid var(--hair)}
+.k-gift-form{display:grid;gap:2rem;max-width:40rem}
+.k-gift-config-title{margin:0;color:#fff;font:300 clamp(1.75rem,3vw,2.5rem)/1.1 var(--font-serif)}
+.k-gift-form .k-inline:last-of-type{border-bottom:1px solid var(--hair)}
+.k-gift-hint{margin:0}
+.k-gift-form .k-btn-solid{justify-self:start;width:auto;min-width:16rem;padding:0 2rem}
+.kiln-shell .k-field textarea{display:block;width:100%;min-height:4.5rem;margin:0;padding:.6rem 0;border:0;border-bottom:1px solid rgba(255,255,255,.25);outline:0;background:transparent;color:#fff;font:400 16px/1.45 var(--font-geo);resize:vertical;transition:border-color .2s}
+.kiln-shell .k-field textarea:focus{border-bottom-color:#fff}
+.kiln-shell .k-field input[type="date"]{color-scheme:dark}
+.kiln-shell .k-field input[type="date"]::-webkit-calendar-picker-indicator{opacity:.55;cursor:pointer}
+.k-gift-preview{position:sticky;top:7rem;display:grid;gap:1.25rem}
+
+.k-giftcard{position:relative;isolation:isolate;display:flex;flex-direction:column;justify-content:space-between;aspect-ratio:1.6/1;margin:0;padding:clamp(1rem,2vw,1.4rem);overflow:hidden;border:1px solid var(--hair);background:#050505;color:#fff}
+.k-giftcard-pattern{position:absolute;inset:0;z-index:-1;width:100%;height:100%;pointer-events:none}
+.k-giftcard-top{display:flex;align-items:flex-start;justify-content:space-between;gap:1rem}
+.k-giftcard-top .k-wordmark{font-size:clamp(22px,3vw,30px);line-height:.8}
+.k-giftcard-top span{font:400 15px/1 var(--font-geo);font-variant-numeric:tabular-nums}
+.k-giftcard-bottom{display:grid;gap:.3rem}
+.k-giftcard-bottom span{color:#fff;font:400 13px/1.3 var(--font-geo)}
+.k-giftcard-bottom span+span{color:#b8b8b8}
+.k-giftcard-bottom .k-giftcard-msg{display:-webkit-box;margin-top:.35rem;overflow:hidden;color:#fff;font:300 15px/1.35 var(--font-serif);-webkit-line-clamp:2;-webkit-box-orient:vertical}
+.k-gift-visual .k-giftcard-bottom span{font-size:11px}
+.k-gift-visual .k-giftcard-top span{font-size:12px}
+
+@media(max-width:900px){
+  .k-subs-layout,.k-gift-config{grid-template-columns:1fr}
+  .k-subs-summary,.k-gift-preview{position:static}
+  .k-gift-preview{max-width:26rem}
+}
+@media(max-width:640px){
+  .k-gift-options{grid-template-columns:1fr}
+  .kiln-shell .k-rows>button{grid-template-columns:1.25rem minmax(0,1fr)}
+  .k-rows>button small{grid-column:2;text-align:left}
+  .k-inline{grid-template-columns:1fr;gap:.6rem}
+  .k-gift-form .k-btn-solid{width:100%}
+}
+@media(prefers-reduced-motion:reduce){
+  .k-dd-list{animation:none}
+  .k-gift-visual::after,.k-gift-visual>img,.k-dd-trigger i{transition:none}
+}
+
+/* ==========================================================================
+   Preparar: índice de métodos, ficha y modo receta
+   ========================================================================== */
+.k-brew,.k-account{padding:clamp(3rem,8vw,7rem) clamp(1.25rem,4vw,3.5rem) clamp(5rem,10vw,9rem);color:#fff}
+.k-brew-methods{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:clamp(3rem,6vw,5rem) clamp(1.5rem,3vw,2.5rem);margin:clamp(4rem,10vw,8rem) 0 0;padding:0;list-style:none}
+.kiln-shell .k-brew-method{display:grid;gap:.6rem;width:100%;padding:0;border:0;background:none;color:#fff;text-align:left;cursor:pointer}
+.k-brew-photo{display:block;aspect-ratio:5/4;margin-bottom:.75rem;overflow:hidden;background:#111}
+.k-brew-photo img{display:block;width:100%;height:100%;object-fit:cover;filter:grayscale(1);transition:transform .8s cubic-bezier(.16,1,.3,1)}
+.k-brew-method:hover .k-brew-photo img{transform:scale(1.02)}
+.k-brew-method-name{color:#fff;font:400 22px/1.2 var(--font-geo);transition:color .2s}
+.k-brew-method-meta{color:var(--soft);font:400 13px/1.3 var(--font-geo)}
+.kiln-shell .k-brew-method:focus-visible{outline:none}
+.kiln-shell .k-brew-method:focus-visible .k-brew-method-name{text-decoration:underline;text-underline-offset:.25em;text-decoration-thickness:1px}
+
+.kiln-shell .k-brew-back{margin-bottom:clamp(2rem,5vw,3.5rem)}
+.k-brew-layout{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:clamp(3rem,7vw,7rem);align-items:start}
+.k-brew-figure{position:sticky;top:7rem;aspect-ratio:4/5;overflow:hidden;background:#111}
+.k-brew-figure img{display:block;width:100%;height:100%;object-fit:cover;filter:grayscale(1)}
+.k-brew-body{display:grid;gap:clamp(2rem,4vw,3rem);min-width:0}
+.k-brew-coffee{display:grid;justify-items:start;gap:.6rem;padding-top:1.5rem;border-top:1px solid var(--hair)}
+.k-brew-coffee small{color:var(--soft);font:400 13px/1.4 var(--font-geo)}
+.kiln-shell .k-brew-coffee .k-dd-trigger{height:auto;padding:.2rem 0;color:#fff;font:300 clamp(1.6rem,2.6vw,2.1rem)/1.15 var(--font-geo);letter-spacing:-.01em}
+.k-brew-coffee .k-dd-trigger i{width:8px;height:8px;margin-left:.35rem}
+.k-brew-coffee .k-dd-list{left:0;min-width:18rem;max-height:min(50vh,26rem);overflow-y:auto;scrollbar-width:thin;scrollbar-color:#333 transparent}
+.k-brew-coffee .k-dd-list li{font-size:14px}
+.k-brew-steps{display:grid;margin:0;padding:0;border-bottom:1px solid var(--hair);list-style:none}
+.k-brew-steps li{display:grid;grid-template-columns:2.25rem 6.5rem 5rem minmax(0,1fr);align-items:baseline;gap:1rem;padding:1.1rem 0;border-top:1px solid var(--hair)}
+.k-brew-step-no{color:var(--soft);font:400 13px/1 var(--font-geo);font-variant-numeric:tabular-nums}
+.k-brew-step-time{color:var(--soft);font:400 13px/1.3 var(--font-geo);font-variant-numeric:tabular-nums}
+.k-brew-step-amount{color:#fff;font:400 15px/1.3 var(--font-geo);font-variant-numeric:tabular-nums}
+.k-brew-steps p{margin:0;color:#fff;font:300 17px/1.45 var(--font-serif)}
+.kiln-shell .k-brew-start{justify-self:start;width:auto;min-width:14rem;padding:0 2.5rem}
+
+/* Modo receta: pantalla completa, un paso a la vez */
+.k-recipe{position:fixed;inset:0;z-index:300;display:grid;grid-template-rows:auto 1fr auto;padding:clamp(1.25rem,3vw,2.25rem) clamp(1.25rem,4vw,3.5rem);background:#050505;color:#fff;outline:none;animation:kRecipeIn .35s ease-out both}
+@keyframes kRecipeIn{from{opacity:0}to{opacity:1}}
+.k-recipe-top{display:grid;grid-template-columns:1fr auto 1fr;align-items:baseline;gap:1rem;color:var(--soft);font:400 13px/1 var(--font-geo);font-variant-numeric:tabular-nums}
+.k-recipe-title{text-align:center}
+.kiln-shell .k-recipe-close{justify-self:end;padding:.3rem 0;border:0;background:none;color:#fff;font:400 14px/1 var(--font-geo);cursor:pointer;transition:opacity .2s}
+.kiln-shell .k-recipe-close:hover,.kiln-shell .k-recipe-close:focus-visible{opacity:.6;outline:none}
+.k-recipe-main{display:grid;align-content:center;gap:clamp(1.5rem,4vh,3rem);width:100%;max-width:64rem;margin:0 auto;animation:kRecipeStep .5s cubic-bezier(.16,1,.3,1) both}
+@keyframes kRecipeStep{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+.k-recipe-text{max-width:44rem;margin:0;color:#fff;font:300 clamp(1.75rem,3.4vw,3rem)/1.2 var(--font-serif);letter-spacing:-.005em}
+.k-recipe-target{margin:0;color:#fff;font:300 clamp(5rem,15vw,13rem)/.9 var(--font-geo);letter-spacing:-.04em;font-variant-numeric:tabular-nums;white-space:nowrap}
+.k-recipe-main.is-done{justify-items:start}
+.k-recipe-main.is-done .k-recipe-text{font-size:clamp(2.75rem,7vw,6rem);line-height:1.05}
+.k-recipe-summary{margin:0;color:var(--soft);font:400 15px/1.3 var(--font-geo);font-variant-numeric:tabular-nums}
+.k-recipe-foot{display:grid;gap:1.25rem;width:100%;max-width:64rem;margin:0 auto}
+.k-recipe-clock{display:flex;align-items:baseline;justify-content:space-between;gap:1.5rem}
+.k-recipe-time{color:#fff;font:300 clamp(2.75rem,6vw,4.75rem)/1 var(--font-geo);letter-spacing:-.02em;font-variant-numeric:tabular-nums}
+.k-recipe-clock small{color:var(--soft);font:400 13px/1.3 var(--font-geo);font-variant-numeric:tabular-nums}
+.k-recipe-progress{height:1px;overflow:hidden;background:var(--hair)}
+.k-recipe-progress i{display:block;height:100%;background:#fff;transform-origin:left;transition:transform .12s linear}
+.k-recipe-controls{display:flex;flex-wrap:wrap;gap:.75rem 2.25rem;padding-top:.5rem}
+.kiln-shell .k-recipe .k-text-link{font-size:15px}
+.kiln-shell .k-recipe .k-text-link:disabled{opacity:.3;cursor:default}
+
+/* Ficha de café: acceso directo junto a «Cómo prepararlo» */
+.k-pdp2-acc-extra{display:inline-block;margin-left:1.5rem}
+
+/* ==========================================================================
+   Cuenta
+   ========================================================================== */
+.k-account-head{display:grid;gap:.9rem}
+.k-account-head p{margin:0;color:var(--soft);font:400 15px/1.3 var(--font-geo)}
+.k-account-tabs{display:flex;flex-wrap:wrap;align-items:baseline;gap:.5rem 1rem;margin-top:clamp(2.5rem,6vw,4rem);padding-bottom:1.25rem;border-bottom:1px solid var(--hair)}
+.k-account-tabs>span{color:#3a3a3a;font:400 15px/1 var(--font-geo)}
+.kiln-shell .k-account-tabs button{padding:.2rem 0;border:0;background:none;color:var(--soft);font:400 16px/1.2 var(--font-geo);cursor:pointer;transition:color .2s}
+.kiln-shell .k-account-tabs button:hover,.kiln-shell .k-account-tabs button[aria-current="page"]{color:#fff}
+.kiln-shell .k-account-tabs button:focus-visible{color:#fff;outline:none;text-decoration:underline;text-underline-offset:.3em;text-decoration-thickness:1px}
+.k-account-panel{margin-top:clamp(2.5rem,6vw,4rem);animation:kRiseIn .35s cubic-bezier(.16,1,.3,1) both}
+.k-account-empty{display:grid;justify-items:start;gap:1.25rem;max-width:36rem}
+
+.k-account-signin{display:grid}
+.k-account-form{display:grid;gap:2rem;max-width:30rem}
+.k-account-signin .k-account-form{max-width:34rem}
+.k-account-signin .k-lede{margin:-.5rem 0 1rem}
+.k-account-links{display:grid;justify-items:start;gap:.85rem}
+.k-co-row{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.4fr);gap:1.5rem}
+.k-field-label{color:var(--soft);font:400 12px/1 var(--font-geo);letter-spacing:.01em}
+.k-field-select .k-dd{display:block}
+.kiln-shell .k-field-select .k-dd-trigger{justify-content:space-between;width:100%;height:2.6rem;border-bottom:1px solid rgba(255,255,255,.25);color:#fff;font:400 16px/1 var(--font-geo)}
+.kiln-shell .k-field-select .k-dd-trigger[aria-expanded="true"]{border-bottom-color:#fff}
+.k-field-select .k-dd-list{left:0;width:100%;min-width:0}
+.k-field-select .k-dd-list li{font-size:14px}
+.kiln-shell .k-account-details .k-btn-solid{justify-self:start;width:auto;min-width:14rem;padding:0 2.5rem}
+.kiln-shell .k-account-details>.k-text-link{justify-self:start}
+
+.k-orders{margin:0;padding:0;border-bottom:1px solid var(--hair);list-style:none}
+.k-order{border-top:1px solid var(--hair)}
+.k-order-row{display:grid;grid-template-columns:minmax(11rem,1.2fr) minmax(8rem,1fr) 6rem 6.5rem auto;align-items:center;gap:1.5rem 2rem;padding:1.5rem 0}
+.k-order-id{display:grid;gap:.4rem}
+.k-order-id strong{color:#fff;font:400 15px/1.2 var(--font-geo);font-variant-numeric:tabular-nums}
+.k-order-id span{color:var(--soft);font:400 13px/1.2 var(--font-geo)}
+.k-order-thumbs{display:flex;gap:.5rem}
+.k-order-thumbs .k-thumb{width:40px}
+.k-order-total{color:#fff;font:400 15px/1 var(--font-geo);font-variant-numeric:tabular-nums}
+.k-order-status{color:var(--soft);font:400 13px/1 var(--font-geo)}
+.k-order-status.is-live{color:#fff}
+.k-order-status.is-live::before{content:"";display:inline-block;width:5px;height:5px;margin:0 .5rem .15em 0;background:#fff;vertical-align:middle}
+.k-order-actions{display:flex;flex-wrap:wrap;justify-content:flex-end;gap:.5rem 1.5rem}
+.k-order-lines{display:grid;gap:.75rem;margin:-.25rem 0 0;padding:0 0 1.5rem;list-style:none;animation:kRiseIn .3s ease-out both}
+.k-order-lines li{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr) auto;gap:1.5rem;align-items:baseline;color:#fff;font:400 14px/1.3 var(--font-geo)}
+.k-order-lines small{color:var(--soft);font:400 13px/1.3 var(--font-geo)}
+.k-order-lines li>span:last-child{font-variant-numeric:tabular-nums}
+
+.k-account-sub{display:grid;gap:2rem;max-width:40rem}
+.k-account-actions{display:flex;flex-wrap:wrap;gap:.75rem 2rem}
+.k-account-confirm{display:grid;gap:1rem}
+
+.k-taste{display:grid;gap:clamp(2.5rem,6vw,4rem)}
+.k-taste-summary{display:grid;justify-items:start;gap:1.25rem;max-width:44rem}
+.k-taste-summary p{margin:0;color:#fff;font:300 clamp(1.75rem,3.2vw,2.75rem)/1.2 var(--font-serif)}
+.k-taste-list{margin:0;padding:0;border-bottom:1px solid var(--hair);list-style:none}
+.k-taste-list li{display:grid;grid-template-columns:44px minmax(0,1fr) auto;align-items:center;gap:1.5rem;padding:1.1rem 0;border-top:1px solid var(--hair)}
+.k-taste-list .k-thumb{width:44px}
+.k-taste-info{display:grid;justify-items:start;gap:.35rem;min-width:0}
+.k-taste-info small{color:var(--soft);font:400 13px/1.35 var(--font-geo)}
+.k-taste-rate{display:flex;gap:1.5rem}
+.kiln-shell .k-taste-rate button{padding:.2rem 0;border:0;border-bottom:1px solid transparent;background:none;color:var(--soft);font:400 14px/1.2 var(--font-geo);cursor:pointer;transition:color .2s,border-color .2s}
+.kiln-shell .k-taste-rate button:hover{color:#fff}
+.kiln-shell .k-taste-rate button[aria-pressed="true"]{color:#fff;border-bottom-color:#fff}
+.kiln-shell .k-taste-rate button:focus-visible{color:#fff;outline:none;border-bottom-color:var(--soft)}
+
+@media(max-width:900px){
+  .k-brew-layout{grid-template-columns:1fr}
+  .k-brew-figure{position:static;aspect-ratio:5/4}
+  .k-order-row{grid-template-columns:minmax(0,1fr) auto;gap:1rem 1.5rem}
+  .k-order-thumbs{grid-column:1/-1;order:3}
+  .k-order-actions{grid-column:1/-1;order:5;justify-content:flex-start}
+  .k-order-status{order:4;grid-column:1/-1}
+}
+@media(max-width:640px){
+  .k-brew-methods{grid-template-columns:1fr}
+  .k-brew-steps li{grid-template-columns:2rem minmax(0,1fr) auto}
+  .k-brew-steps p{grid-column:2/-1}
+  .k-recipe-top{grid-template-columns:1fr auto}
+  .k-recipe-title{display:none}
+  .k-co-row{grid-template-columns:1fr}
+  .k-taste-list li{grid-template-columns:44px minmax(0,1fr)}
+  .k-taste-rate{grid-column:2}
+  .k-order-lines li{grid-template-columns:minmax(0,1fr) auto}
+  .k-order-lines small{grid-column:1;grid-row:2}
+}
+@media(prefers-reduced-motion:reduce){
+  .k-recipe,.k-recipe-main,.k-account-panel,.k-order-lines{animation:none}
+  .k-recipe-progress i,.k-brew-photo img{transition:none}
+}
+.k-brew-table dd{min-width:0;white-space:normal;overflow-wrap:anywhere}
+.k-account-tabs{padding-bottom:0;border-bottom:0}
+.k-order-row{grid-template-columns:minmax(11rem,1.3fr) minmax(7rem,1fr) 6rem 7rem 15.5rem}
+@media(max-width:900px){.k-order-row{grid-template-columns:minmax(0,1fr) auto}}
