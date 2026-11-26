@@ -4,7 +4,7 @@ import React, { useEffect, useId, useRef, useState } from "react"
 import { Bag } from "./Bag"
 import { BAG_SIZES, COFFEE_LOTS, GRIND_OPTIONS, type BagSizeOption, type GrindOption } from "./data"
 import { formatEur, type CartItem } from "./Components"
-import { KilnPattern } from "./Brand"
+import { KilnPattern, KilnWordmark } from "./Brand"
 
 /* ==========================================================================
    Cuentas y pago: simulación local en el navegador.
@@ -12,7 +12,7 @@ import { KilnPattern } from "./Brand"
    ========================================================================== */
 export type SavedAddress = { name: string; address: string; postal: string; city: string; phone: string }
 export type SavedPayment = { method: "card"; brand: string; last4: string; exp: string } | { method: "paypal" | "bizum" }
-export type Account = { email: string; name: string; address?: SavedAddress; payment?: SavedPayment }
+export type Account = { email: string; name: string; address?: SavedAddress; payment?: SavedPayment; grind?: GrindOption }
 export type DeliveryMethod = "shipping" | "pickup"
 
 export const DEMO_ACCOUNT: Account = {
@@ -52,11 +52,20 @@ export function persistAccounts(accounts: Account[]) {
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
 const sizeLabel = (size: BagSizeOption) => BAG_SIZES.find((s) => s.id === size)?.label ?? size
 const isCoffee = (item: CartItem) => COFFEE_LOTS.some((l) => l.id === item.lotId)
+// Cafés y objetos tienen ficha; los regalos no
+const canOpen = (item: CartItem) => item.kind === "object" || (!item.kind && isCoffee(item))
 // Línea secundaria: «250 g · En grano» para cafés, el material para objetos
-const itemDetail = (item: CartItem) => (item.kind === "object" ? item.origin : `${sizeLabel(item.size)} · ${item.grind}`)
+const itemDetail = (item: CartItem) => (item.kind ? item.origin : `${sizeLabel(item.size)} · ${item.grind}`)
 
 /* Miniatura: bolsa sobre el mismo recuadro de yeso que la ficha */
-export function CoffeeThumb({ item }: { item: Pick<CartItem, "name" | "no" | "origin" | "tone" | "size" | "image"> }) {
+export function CoffeeThumb({ item }: { item: Pick<CartItem, "name" | "no" | "origin" | "tone" | "size" | "image" | "kind"> }) {
+  if (item.kind === "gift" && !item.image) {
+    return (
+      <span className="k-thumb is-card" aria-hidden="true">
+        <KilnWordmark />
+      </span>
+    )
+  }
   if (item.image) {
     return (
       <span className="k-thumb is-photo" aria-hidden="true">
@@ -92,8 +101,9 @@ function Totals({ subtotal, shipping, total }: { subtotal: number; shipping: num
   )
 }
 
-/* Desplegable de texto: select nativo (accesible y cómodo en móvil) sin caja */
-function TextSelect({
+/* Desplegable de texto propio: listbox accesible, sin el resaltado azul del sistema.
+   Cierra con clic fuera, Escape o Tab; se navega con flechas, Inicio/Fin y Enter. */
+export function TextSelect({
   label,
   value,
   options,
@@ -104,17 +114,105 @@ function TextSelect({
   options: { value: string; label: string }[]
   onChange: (value: string) => void
 }) {
+  const [open, setOpen] = useState(false)
+  const selectedIndex = Math.max(0, options.findIndex((o) => o.value === value))
+  const [active, setActive] = useState(selectedIndex)
+  const rootRef = useRef<HTMLDivElement>(null)
+  const triggerRef = useRef<HTMLButtonElement>(null)
+  const listRef = useRef<HTMLUListElement>(null)
+  const id = useId()
+
+  useEffect(() => {
+    if (!open) return
+    listRef.current?.focus({ preventScroll: true })
+    const onDown = (e: PointerEvent) => {
+      if (rootRef.current && !rootRef.current.contains(e.target as Node)) setOpen(false)
+    }
+    document.addEventListener("pointerdown", onDown)
+    return () => document.removeEventListener("pointerdown", onDown)
+  }, [open])
+
+  // Listas largas: la opción activa siempre a la vista
+  useEffect(() => {
+    if (open) document.getElementById(`${id}-${active}`)?.scrollIntoView({ block: "nearest" })
+  }, [open, active, id])
+
+  const openList = () => {
+    setActive(selectedIndex)
+    setOpen(true)
+  }
+  const close = () => {
+    setOpen(false)
+    triggerRef.current?.focus({ preventScroll: true })
+  }
+  const choose = (index: number) => {
+    onChange(options[index].value)
+    close()
+  }
+
+  const onListKey = (e: React.KeyboardEvent<HTMLUListElement>) => {
+    if (e.key === "ArrowDown") setActive((a) => Math.min(options.length - 1, a + 1))
+    else if (e.key === "ArrowUp") setActive((a) => Math.max(0, a - 1))
+    else if (e.key === "Home") setActive(0)
+    else if (e.key === "End") setActive(options.length - 1)
+    else if (e.key === "Enter" || e.key === " ") choose(active)
+    else if (e.key === "Escape") {
+      // Que Escape cierre solo el desplegable, no la cesta
+      e.stopPropagation()
+      close()
+    } else if (e.key === "Tab") setOpen(false)
+    else return
+    if (e.key !== "Tab") e.preventDefault()
+  }
+
   return (
-    <label className="k-tselect">
-      <span className="k-sr">{label}</span>
-      <select value={value} onChange={(e) => onChange(e.target.value)}>
-        {options.map((o) => (
-          <option key={o.value} value={o.value}>
-            {o.label}
-          </option>
-        ))}
-      </select>
-    </label>
+    <div className="k-dd" ref={rootRef}>
+      <button
+        ref={triggerRef}
+        type="button"
+        className="k-dd-trigger"
+        aria-haspopup="listbox"
+        aria-expanded={open}
+        aria-controls={`${id}-list`}
+        aria-label={`${label}: ${options[selectedIndex]?.label}`}
+        onClick={() => (open ? setOpen(false) : openList())}
+        onKeyDown={(e) => {
+          if (e.key === "ArrowDown" || e.key === "ArrowUp") {
+            e.preventDefault()
+            openList()
+          }
+        }}
+      >
+        {options[selectedIndex]?.label}
+        <i aria-hidden="true" />
+      </button>
+      {open && (
+        <ul
+          ref={listRef}
+          id={`${id}-list`}
+          className="k-dd-list"
+          role="listbox"
+          tabIndex={-1}
+          aria-label={label}
+          aria-activedescendant={`${id}-${active}`}
+          onKeyDown={onListKey}
+        >
+          {options.map((o, i) => (
+            <li
+              key={o.value}
+              id={`${id}-${i}`}
+              role="option"
+              aria-selected={o.value === value}
+              className={i === active ? "is-active" : ""}
+              onPointerEnter={() => setActive(i)}
+              onClick={() => choose(i)}
+            >
+              {o.label}
+            </li>
+          ))}
+        </ul>
+      )}
+    </div>
   )
 }
 
@@ -137,7 +235,9 @@ export function CartDrawer({
   onCheckout,
   onShop,
   onSubscribe,
+  onOpenItem,
 }: {
+  onOpenItem: (item: CartItem) => void
   open: boolean
   items: CartItem[]
   count: number
