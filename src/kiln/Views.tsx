@@ -3,6 +3,7 @@
 import React, { useEffect, useRef, useState } from "react"
 import { createPortal } from "react-dom"
 import { Bag } from "./Bag"
+import { RecipeMode, buildRecipe, methodForLot } from "./Brew"
 import {
   BAG_SIZES,
   COFFEE_LOTS,
@@ -148,9 +149,13 @@ export function ShopView({
   onToggleCompare,
   producer = null,
   onClearProducer,
+  picks = null,
+  onClearPicks,
 }: {
   producer?: Producer | null
   onClearProducer?: () => void
+  picks?: string[] | null
+  onClearPicks?: () => void
   initialCategory?: string
   onSelectLot: (lot: CoffeeLot) => void
   onQuickAdd: (lot: CoffeeLot, size: BagSizeOption, grind: GrindOption) => void
@@ -187,6 +192,7 @@ export function ShopView({
       if (option && !option.test(lot)) return false
     }
     if (producer && !producer.lotIds.includes(lot.id)) return false
+    if (picks && !picks.includes(lot.id)) return false
     const q = searchQuery.trim().toLowerCase()
     if (q) {
       const hay = `${lot.name} ${lot.origin} ${lot.country} ${lot.variety} ${lot.notes.join(" ")} ${lot.producer} ${lot.process} ${lot.roast}`.toLowerCase()
@@ -223,6 +229,14 @@ export function ShopView({
             <p className="k-shop-note">
               Cafés de {producer.name}
               <button type="button" className="k-text-link" onClick={onClearProducer}>
+                — Ver todos
+              </button>
+            </p>
+          )}
+          {picks && (
+            <p className="k-shop-note">
+              Cafés para ti, según tu perfil de sabor
+              <button type="button" className="k-text-link" onClick={onClearPicks}>
                 — Ver todos
               </button>
             </p>
@@ -380,6 +394,19 @@ const BAG_VIEWS = [
 
 type BagView = (typeof BAG_VIEWS)[number][0]
 
+// «Hario V60 02 (Papel blanqueado japonés)» → «V60»: el método en una palabra para la etiqueta
+const shortMethod = (method: string) => {
+  const known = ["V60", "Kalita", "Aeropress", "Chemex", "Origami", "Switch", "Espresso"]
+  return known.find((m) => method.includes(m)) ?? method.replace(/\s*\(.*\)/, "").split(" / ")[0]
+}
+
+// Tueste semanal de los lunes: fecha del último lunes, para la etiqueta trasera
+const lastRoastDay = () => {
+  const d = new Date()
+  d.setDate(d.getDate() - ((d.getDay() + 6) % 7))
+  return d.toLocaleDateString("es-ES", { day: "numeric", month: "short", year: "numeric" })
+}
+
 // "2.150 – 2.280 m" → "2.150 m"
 const minAltitude = (altitude: string) => `${altitude.split("–")[0].replace(/m\s*$/i, "").trim()} m`
 
@@ -413,6 +440,7 @@ export function ProductDetailView({
   const [viewDir, setViewDir] = useState<"next" | "prev">("next")
   const [added, setAdded] = useState<boolean>(false)
   const [openInfo, setOpenInfo] = useState<Record<"story" | "brew", boolean>>({ story: false, brew: false })
+  const [cooking, setCooking] = useState<boolean>(false)
   const addedTimer = useRef<number | undefined>(undefined)
 
   useEffect(() => () => window.clearTimeout(addedTimer.current), [])
@@ -428,7 +456,22 @@ export function ProductDetailView({
   // Los suscriptores ven y pagan directamente el precio con su 12% de descuento
   const unitPrice = isMember ? Math.round(rawPrice * 0.88 * 100) / 100 : rawPrice
   const ground = grind !== "En grano"
-  const bagLot = { name: lot.name, no: lot.no, origin: lot.origin, process: lot.process, roast: lot.roast, variety: lot.variety, notes: lot.notes, tone: lot.tone, weight: sizeObj.label }
+  const bagLot = {
+    name: lot.name,
+    no: lot.no,
+    origin: lot.origin,
+    producer: lot.producer,
+    region: lot.region,
+    altitude: lot.altitude,
+    process: lot.process,
+    roast: lot.roast,
+    variety: lot.variety,
+    notes: lot.notes,
+    tone: lot.tone,
+    weight: sizeObj.label,
+    recipe: `${shortMethod(lot.recipe.method)} · ${lot.recipe.doseG} g · ${lot.recipe.waterMl} ml · ${lot.recipe.tempC} °C`,
+    roastedOn: lastRoastDay(),
+  }
 
   // El botón confirma por sí mismo durante 1,5 s: sin avisos ni saltos de maquetación
   const handleAdd = () => {
@@ -567,6 +610,13 @@ export function ProductDetailView({
                     {block.label}
                     <i aria-hidden="true">{open ? "−" : "+"}</i>
                   </button>
+                  {block.id === "brew" && (
+                    <span className="k-pdp2-acc-extra">
+                      <button type="button" className="k-text-link" onClick={() => setCooking(true)}>
+                        — Prepararlo ahora
+                      </button>
+                    </span>
+                  )}
                   <div id={`k-pdp2-${block.id}`} className="k-pdp2-acc-body" aria-hidden={!open}>
                     <div>{block.body}</div>
                   </div>
@@ -576,6 +626,10 @@ export function ProductDetailView({
           </div>
         </div>
       </div>
+
+      {cooking && (
+        <RecipeMode recipe={buildRecipe(methodForLot(lot), lot)} onClose={() => setCooking(false)} onBackToCoffee={() => setCooking(false)} />
+      )}
 
       <div className="k-shop-view k-pdp2-related">
         <h2>Otros cafés</h2>
