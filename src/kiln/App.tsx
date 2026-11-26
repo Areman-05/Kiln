@@ -583,7 +583,6 @@ export default function KilnApp() {
         }}
       />
       <aside id="k-side-menu" className={`k-side-menu ${mobileMenuOpen ? "open" : ""}`} aria-label="Menú principal" aria-hidden={!mobileMenuOpen}>
-        <KilnPattern className="k-side-pattern" color="#ffffff" opacity={0.06} />
         <div className="k-side-menu-head">
           <button
             type="button"
@@ -646,6 +645,18 @@ export default function KilnApp() {
           >
             Regalos
           </button>
+          <button
+            type="button"
+            className={view === "brew" ? "active" : ""}
+            aria-current={view === "brew" ? "page" : undefined}
+            tabIndex={mobileMenuOpen ? 0 : -1}
+            onClick={() => {
+              setSearchModalOpen(false)
+              navigateWithTransition("brew")
+            }}
+          >
+            Preparar
+          </button>
         </div>
         <div className="k-side-secondary">
           <button
@@ -659,10 +670,10 @@ export default function KilnApp() {
           <button
             type="button"
             tabIndex={mobileMenuOpen ? 0 : -1}
+            aria-current={view === "account" ? "page" : undefined}
             onClick={() => {
               setSearchModalOpen(false)
-              setSubTab("personal")
-              navigateTo("subscriptions")
+              navigateWithTransition("account")
             }}
           >
             Cuenta
@@ -725,7 +736,7 @@ export default function KilnApp() {
       </aside>
 
       {/* 3. BARRA DE RASTRO (BREADCRUMBS) EN VISTAS INTERNAS */}
-      {!["home", "shop", "news", "product", "checkout", "origin", "objects", "object"].includes(view) && (
+      {!["home", "shop", "news", "product", "checkout", "origin", "objects", "object", "subscriptions", "brew", "account"].includes(view) && (
         <div className="k-breadcrumb-bar">
           <div className="k-container">
             <div className="k-breadcrumbs">
@@ -751,10 +762,12 @@ export default function KilnApp() {
 
         {view === "shop" && (
           <ShopView
-            key={`${shopCategory}-${shopProducer?.id ?? "todos"}`}
+            key={`${shopCategory}-${shopProducer?.id ?? "todos"}-${shopPicks ? "picks" : ""}`}
             initialCategory={shopCategory}
             producer={shopProducer}
             onClearProducer={() => setShopProducer(null)}
+            picks={shopPicks}
+            onClearPicks={() => setShopPicks(null)}
             onSelectLot={openLotDetail}
             onQuickAdd={(l, s, g) => handleAddToCart(l, s, g, 1, " puntual")}
             comparedIds={comparedIds}
@@ -796,7 +809,6 @@ export default function KilnApp() {
         {view === "subscriptions" && (
           <SubscriptionsView
             activeTab={subTab}
-            onChangeTab={setSubTab}
             activeSub={activeSub}
             onSaveSub={(sub) => {
               setActiveSub(sub)
@@ -816,45 +828,114 @@ export default function KilnApp() {
               setActiveSub({ ...activeSub, skippedDates: nextSkipped })
               showToast(exists ? `Entrega del ${dateStr} restaurada.` : `Entrega del ${dateStr} saltada sin cargo.`)
             }}
-            onAddGiftToCart={(months, bagsPerMonth, grind, recipient, _note, price) => {
-              const giftKey = `gift-${months}m-${bagsPerMonth}b-${grind}`
+            onAddGift={(gift) => {
+              const giftKey = `gift-${Date.now()}`
               setCart((prev) => [
                 ...prev,
                 {
                   key: giftKey,
-                  lotId: "gift-card",
-                  name: `Bono Regalo ${months} Meses (Para ${recipient || "Destinatario"})`,
-                  origin: `${bagsPerMonth} × 250g al mes · Envío urgente incluido`,
+                  lotId: giftKey,
+                  kind: "gift",
+                  name: gift.name,
+                  origin: gift.detail,
+                  image: gift.image,
                   tone: "noir",
                   no: "GIFT",
                   size: "250g",
-                  grind,
+                  grind: "En grano",
                   purchaseMode: " puntual",
-                  unitPrice: price,
+                  unitPrice: gift.price,
                   qty: 1,
                 },
               ])
               setCartOpen(true)
-              showToast(`Tarjeta Regalo de ${months} meses añadida a la cesta.`)
             }}
-            onNotify={(msg) => showToast(msg)}
           />
         )}
 
         {view === "brew" && (
-          <section className="k-section-sm">
-            <div className="k-container">
-              <div className="k-section-head">
-                <div>
-                  <span className="k-eyebrow">Protocolos de extracción y agua</span>
-                  <h1 className="k-title-lg" style={{ marginTop: "0.35rem" }}>
-                    Calculadora Barista y Cronómetro de Vertido
-                  </h1>
-                </div>
-              </div>
-              <InteractiveBrewStudio initialLot={selectedLot} onSelectLot={openLotDetail} />
-            </div>
-          </section>
+          <PrepareView
+            defaultLotId={lastLotId ?? cart.find((i) => !i.kind && COFFEE_LOTS.some((l) => l.id === i.lotId))?.lotId ?? COFFEE_LOTS[0].id}
+            onOpenLot={openLotDetail}
+          />
+        )}
+
+        {view === "account" && (
+          <AccountView
+            session={session}
+            findAccount={(email) => accounts.find((a) => a.email === email)}
+            onSignIn={(account) => setSessionEmail(account.email)}
+            onSignOut={() => {
+              setSessionEmail(null)
+              window.scrollTo({ top: 0 })
+            }}
+            onCreateAccount={(account) => {
+              setAccounts((prev) => [...prev.filter((a) => a.email !== account.email), account])
+              setSessionEmail(account.email)
+              showToast("Cuenta creada.")
+            }}
+            onUpdateAccount={(previousEmail, account) => {
+              setAccounts((prev) => prev.map((a) => (a.email === previousEmail ? account : a)))
+              if (account.email !== previousEmail) {
+                // Pedidos y valoraciones siguen a la cuenta si cambia el email
+                const move = <T,>(map: Record<string, T>) => {
+                  if (!(previousEmail in map)) return map
+                  const { [previousEmail]: value, ...rest } = map
+                  return { ...rest, [account.email]: value }
+                }
+                setOrders(move)
+                setRatings(move)
+                setSessionEmail(account.email)
+              }
+            }}
+            orders={(sessionEmail && orders[sessionEmail]) || []}
+            onRepeatOrder={(order) => {
+              setCart((prev) => {
+                const next = [...prev]
+                order.items.forEach((item) => {
+                  const found = next.findIndex((i) => i.key === item.key)
+                  if (found >= 0) next[found] = { ...next[found], qty: next[found].qty + item.qty }
+                  else next.push({ ...item })
+                })
+                return next
+              })
+              setCartOpen(true)
+            }}
+            onOpenLot={openLotDetail}
+            onShop={() => navigateWithTransition("shop")}
+            activeSub={activeSub}
+            onSkipDate={(dateStr) => {
+              if (!activeSub) return
+              const exists = activeSub.skippedDates.includes(dateStr)
+              setActiveSub({
+                ...activeSub,
+                skippedDates: exists ? activeSub.skippedDates.filter((d) => d !== dateStr) : [...activeSub.skippedDates, dateStr],
+              })
+              showToast(exists ? `Envío del ${dateStr} restaurado.` : `Envío del ${dateStr} saltado, sin cargo.`)
+            }}
+            onUpdateSubStatus={(status) => {
+              if (!activeSub) return
+              setActiveSub({ ...activeSub, status })
+              showToast(status === "Pausada" ? "Suscripción en pausa." : "Suscripción reactivada.")
+            }}
+            onCancelSub={() => {
+              setActiveSub(null)
+              showToast("Suscripción cancelada.")
+            }}
+            onChangeCoffee={openSubscriptions}
+            ratings={(sessionEmail && ratings[sessionEmail]) || {}}
+            onRate={(lotId, rating) => {
+              if (!sessionEmail) return
+              setRatings((prev) => {
+                const mine = { ...(prev[sessionEmail] ?? {}) }
+                if (rating) mine[lotId] = rating
+                else delete mine[lotId]
+                return { ...prev, [sessionEmail]: mine }
+              })
+            }}
+            onShowPicks={(lotIds) => navigateTo("shop", "Todos", { picks: lotIds })}
+            onNotify={showToast}
+          />
         )}
 
         {view === "studio" && <StudioView onNavigate={navigateTo} />}
@@ -875,7 +956,14 @@ export default function KilnApp() {
             onSignIn={(account) => setSessionEmail(account.email)}
             onSignOut={() => setSessionEmail(null)}
             onSaveAccount={(account) => setAccounts((prev) => [...prev.filter((a) => a.email !== account.email), account])}
-            onPlaceOrder={() => setCart([])}
+            onPlaceOrder={(order) => {
+              setCart([])
+              const email = order.email.trim().toLowerCase()
+              setOrders((prev) => ({
+                ...prev,
+                [email]: [{ number: order.number, date: order.placedAt.toISOString(), items: order.items, total: order.total }, ...(prev[email] ?? [])],
+              }))
+            }}
             onEditCart={() => setCartOpen(true)}
             onShop={() => navigateWithTransition("shop")}
             onBrew={() => navigateWithTransition("brew")}
@@ -1111,11 +1199,23 @@ export default function KilnApp() {
         onCheckout={() => navigateTo("checkout")}
         onShop={() => navigateWithTransition("news")}
         onSubscribe={openSubscriptions}
+        onOpenItem={(item) => {
+          if (item.kind === "object") {
+            const obj = OBJECTS.find((o) => o.id === item.lotId)
+            if (obj) openObject(obj)
+            return
+          }
+          const lot = COFFEE_LOTS.find((l) => l.id === item.lotId)
+          if (lot) openLotDetail(lot)
+        }}
       />
 
       {/* 10. FOOTER */}
       <footer className="k-footer k-footer-v2">
         <div className="k-footer-v2-top">
+          <div className="k-footer-v2-word">
+            <KilnWordmark />
+          </div>
           {(
             [
               [
@@ -1132,6 +1232,7 @@ export default function KilnApp() {
                 "Kiln",
                 [
                   ["Origen", () => navigateWithTransition("origin")],
+                  ["Preparar", () => navigateWithTransition("brew")],
                   ["Visítanos", () => navigateWithTransition("visit")],
                   ["Profesionales", () => navigateWithTransition("wholesale")],
                 ],
@@ -1199,14 +1300,8 @@ export default function KilnApp() {
           </form>
         </div>
 
-        <div className="k-footer-v2-word" aria-hidden="true">
-          <KilnPattern className="k-footer-pattern" color="#ffffff" opacity={0.08} />
-          <span>kiln</span>
-        </div>
-
         <div className="k-footer-v2-bottom">
           <span>© 2026 Kiln</span>
-          <span>ES</span>
           <a href="https://www.instagram.com/" target="_blank" rel="noreferrer">
             Instagram
           </a>
