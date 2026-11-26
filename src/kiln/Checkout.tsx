@@ -293,10 +293,22 @@ export function CartDrawer({
                   const editable = isCoffee(item)
                   return (
                     <li key={item.key} className="k-cart-row">
-                      <CoffeeThumb item={item} />
+                      {canOpen(item) ? (
+                        <button type="button" className="k-cart-thumb-link" onClick={() => onOpenItem(item)} tabIndex={-1} aria-hidden="true">
+                          <CoffeeThumb item={item} />
+                        </button>
+                      ) : (
+                        <CoffeeThumb item={item} />
+                      )}
                       <div className="k-cart-info">
                         <div className="k-cart-line">
-                          <strong>{item.name}</strong>
+                          {canOpen(item) ? (
+                            <button type="button" className="k-cart-name" onClick={() => onOpenItem(item)}>
+                              {item.name}
+                            </button>
+                          ) : (
+                            <strong>{item.name}</strong>
+                          )}
                           <span>{formatEur(item.unitPrice * item.qty)}</span>
                         </div>
                         {(!editable || item.purchaseMode === "suscripcion") && (
@@ -442,7 +454,7 @@ const formatExp = (v: string) => {
   return d.length > 2 ? `${d.slice(0, 2)}/${d.slice(2)}` : d
 }
 
-function Field({
+export function Field({
   label,
   error,
   className = "",
@@ -515,7 +527,7 @@ export function CheckoutView({
   onSignIn: (account: Account) => void
   onSignOut: () => void
   onSaveAccount: (account: Account) => void
-  onPlaceOrder: () => void
+  onPlaceOrder: (order: { number: string; items: CartItem[]; total: number; email: string; placedAt: Date }) => void
   onEditCart: () => void
   onShop: () => void
   onBrew: () => void
@@ -640,7 +652,7 @@ export function CheckoutView({
   const finalize = (opts: { email: string; address: SavedAddress; paymentLabel: string; payment?: SavedPayment }) => {
     const placedAt = new Date()
     const roastDate = nextBusinessDay(placedAt)
-    setPlaced({
+    const order: PlacedOrder = {
       number: `KLN-${Math.floor(1000 + Math.random() * 9000)}`,
       items,
       subtotal,
@@ -655,8 +667,9 @@ export function CheckoutView({
       placedAt,
       roastDate,
       shipDate: delivery === "pickup" ? roastDate : nextBusinessDay(roastDate),
-    })
-    onPlaceOrder()
+    }
+    setPlaced(order)
+    onPlaceOrder(order)
     setBusy(null)
     goTo("done")
   }
