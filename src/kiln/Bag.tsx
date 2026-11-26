@@ -19,6 +19,10 @@ export type BagLot = {
   format?: "bag" | "box" | "capsules" | "bottle"
   weight?: string
   view?: "front" | "side" | "back"
+  /** Receta en una línea, p. ej. «V60 · 15 g · 250 ml · 94 °C» (dorso) */
+  recipe?: string
+  /** Fecha de tueste ya formateada (dorso) */
+  roastedOn?: string
 }
 
 const widths = {
@@ -50,7 +54,6 @@ function splitName(name: string) {
   return [words.slice(0, best).join(" "), words.slice(best).join(" ")]
 }
 
-const minAltitude = (altitude?: string) => (altitude ? `${altitude.split("–")[0].replace(/m\s*$/i, "").trim()} m` : "—")
 const shortOrigin = (origin: string) => origin.split("·").pop()?.trim() ?? origin
 
 /* Cuerpo de la bolsa: blanco con un sombreado lateral muy leve */
@@ -113,56 +116,80 @@ export function Bag({
 
   const side = (
     <>
-      <defs>
-        <clipPath id={`${uid}-side`}>
-          <rect x="84" y="62" width="58" height="188" />
-        </clipPath>
-      </defs>
       <BagBody gradient={gradient} x0={78} x1={162} />
       <path d="M120 40V336" stroke="rgba(0,0,0,.05)" strokeWidth="0.6" />
-      <g clipPath={`url(#${uid}-side)`}>
-        <KilnPattern x={40} y={62} width={172} height={188} color={INK} opacity={1} />
-      </g>
       <text transform="translate(150 316) rotate(-90)" fill={INK} fontFamily={GEO} fontSize="12">
         kiln
       </text>
     </>
   )
 
+  /* Dorso: etiqueta trasera de café de especialidad, tinta negra sobre blanco */
+  const fit = (text: string | undefined, max: number) => {
+    if (!text) return "—"
+    return text.length > max ? `${text.slice(0, max - 1).trimEnd()}…` : text
+  }
   const rows: [string, string][] = [
-    ["Origen", shortOrigin(lot.origin)],
-    ["Proceso", lot.process ?? "—"],
-    ["Altitud", minAltitude(lot.altitude)],
-    ["Tueste", lot.roast ?? "—"],
+    ["Productor", fit(lot.producer, 34)],
+    ["Región", fit(lot.region ?? shortOrigin(lot.origin), 34)],
+    ["Variedad", fit(lot.variety, 34)],
+    ["Proceso", fit(lot.process, 34)],
+    ["Altitud", lot.altitude ?? "—"],
+    ["Tueste", fit(lot.roast, 34)],
+    ["Tostado el", lot.roastedOn ?? "—"],
   ]
+  const notes = (lot.notes ?? []).join(" · ")
+  const backNameSize = Math.max(10, Math.min(15, 180 / (lot.name.length * 0.46)))
   const back = (
     <>
       <BagBody gradient={gradient} x0={14} x1={226} />
-      <text x="34" y="72" fill={INK} fontFamily={GEO} fontSize="12">
-        kiln
+      <g fontFamily={GEO}>
+        <text x="30" y="60" fill={INK} fontSize="12">
+          kiln
+        </text>
+        <text x="210" y="60" textAnchor="end" fill={INK} fontSize="7.5">
+          {`Lote ${lot.no ?? "—"}`}
+        </text>
+        <path d="M30 67H210" stroke={INK} strokeOpacity=".35" strokeWidth="0.5" />
+      </g>
+      <text x="30" y="92" fill={INK} fontFamily={SERIF} fontSize={backNameSize.toFixed(2)}>
+        {lot.name}
+      </text>
+      <text x="30" y="105" fill={SOFT} fontFamily={GEO} fontSize="7">
+        {fit(lot.producer, 46)}
       </text>
       <g fontFamily={GEO}>
         {rows.map(([label, value], i) => {
-          const y = 112 + i * 24
+          const y = 128 + i * 16
           return (
             <g key={label}>
-              <path d={`M34 ${y + 8}H206`} stroke="rgba(0,0,0,.1)" strokeWidth="0.6" />
-              <text x="34" y={y} fill={SOFT} fontSize="7.5">
+              <text x="30" y={y} fill={SOFT} fontSize="6.6">
                 {label}
               </text>
-              <text x="92" y={y} fill={INK} fontSize="8.5">
+              <text x="82" y={y} fill={INK} fontSize="7">
                 {value}
               </text>
+              <path d={`M30 ${y + 5.5}H210`} stroke={INK} strokeOpacity=".12" strokeWidth="0.5" />
             </g>
           )
         })}
+        <text x="30" y="248" fill={INK} fontSize={notes.length > 44 ? "6.4" : "7.2"}>
+          {notes || "—"}
+        </text>
+        <text x="30" y="261" fill={SOFT} fontSize="6.8">
+          {lot.recipe ?? "—"}
+        </text>
       </g>
-      <text x="34" y="298" fill={INK} fontFamily={SERIF} fontSize="12">
-        {lot.name}
-      </text>
-      <text x="34" y="316" fill={INK} fillOpacity=".6" fontFamily={GEO} fontSize="8.5">
-        {weight}
-      </text>
+      {/* Tira del patrón de marca a modo de código de barras */}
+      <KilnPattern x={30} y={276} width={180} height={24} color={INK} opacity={1} />
+      <g fontFamily={GEO}>
+        <text x="30" y="318" fill={INK} fontSize="8.5">
+          {weight}
+        </text>
+        <text x="210" y="318" textAnchor="end" fill={SOFT} fontSize="6.8">
+          Tostado en Barcelona
+        </text>
+      </g>
     </>
   )
 
